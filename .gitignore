@@ -1,0 +1,57 @@
+# =========================
+# LOGS
+# =========================
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# =========================
+# NODE MODULES
+# =========================
+node_modules/
+backend/node_modules/
+
+# =========================
+# BUILD
+# =========================
+dist/
+dist-ssr/
+build/
+
+# =========================
+# ENV / PASSWORD
+# =========================
+.env
+.env.*
+backend/.env
+
+# =========================
+# POWER BI
+# =========================
+*.pbix
+
+# =========================
+# LOCAL / CACHE
+# =========================
+*.local
+.cache/
+*.tmp
+*.temp
+
+# =========================
+# EDITOR
+# =========================
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
