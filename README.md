@@ -1,16 +1,69 @@
-# React + Vite
+# Đồ Án Chuyên Ngành - LMS Learning Analytics Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Hệ thống phân tích học tập (Learning Analytics) và quản lý LMS dành cho Giảng viên và Sinh viên.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 📁 Cấu trúc thư mục dự án
 
-## React Compiler
+```text
+DoAnChuyenNganh/
+├── Backend/                 # Máy chủ API Node.js / Express (Port 3000)
+│   ├── .env.example         # File cấu hình môi trường mẫu
+│   ├── scripts/seedAuth.js  # Script tạo tài khoản mẫu bcrypt
+│   └── src/                 # Mã nguồn backend (routes, controllers, models)
+├── Database/                # 16 file SQL DDL & Seed dữ liệu (Moodle source & Data Warehouse)
+├── ETL/                     # 9 file SQL ETL nạp dữ liệu vào Data Warehouse
+├── Documentation/           # Tài liệu thiết kế & báo cáo đồ án
+└── Frontend/
+    ├── GiangVien/           # Cổng Giảng viên (React + Vite, Port 5173)
+    └── SinhVien/            # Cổng Sinh viên (React + Tailwind v4 + AntD, Port 5174)
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🚀 Hướng dẫn cài đặt & Khởi chạy
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 1. Chuẩn bị Cơ sở dữ liệu (MySQL)
+1. Chạy các file SQL trong thư mục `Database/` theo thứ tự từ `01` đến `16`.
+2. Chạy các file ETL trong thư mục `ETL/` từ `01` đến `09` để đồng bộ dữ liệu vào `lms_datawarehouse`.
+
+### 2. Cài đặt Backend
+1. Vào thư mục `Backend`:
+   ```powershell
+   cd Backend
+   npm install
+   ```
+2. Tạo file `.env` từ `.env.example` và điền mật khẩu MySQL của bạn:
+   ```env
+   PORT=3000
+   DB_HOST=localhost
+   DB_PORT=3306
+   DB_USER=root
+   DB_PASSWORD=your_mysql_password
+   DB_NAME=lms_datawarehouse
+   ```
+3. Tạo tài khoản mẫu cho giảng viên:
+   ```powershell
+   node scripts/seedAuth.js
+   ```
+   *Tài khoản mặc định:* `gv_nguyenan` hoặc `gv_tranminhb` | *Mật khẩu:* `123456`
+
+### 3. Cài đặt các cổng Frontend
+Từ thư mục gốc hoặc vào từng thư mục để cài đặt:
+```powershell
+npm --prefix Frontend/GiangVien install
+npm --prefix Frontend/SinhVien install
+```
+
+---
+
+## 💻 Các lệnh khởi chạy hệ thống
+
+Từ thư mục gốc của dự án, sử dụng các lệnh tiện lợi sau:
+
+| Dịch vụ | Lệnh chạy từ root | Địa chỉ truy cập |
+| :--- | :--- | :--- |
+| **Backend API** | `npm run dev:backend` | `http://localhost:3000` |
+| **Cổng Giảng Viên** | `npm run dev:gv` *(hoặc `npm run dev`)* | `http://localhost:5173` |
+| **Cổng Sinh Viên** | `npm run dev:sv` | `http://localhost:5174` |

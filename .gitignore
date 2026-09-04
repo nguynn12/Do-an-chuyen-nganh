@@ -13,7 +13,8 @@ lerna-debug.log*
 # NODE MODULES
 # =========================
 node_modules/
-backend/node_modules/
+Backend/node_modules/
+Frontend/*/node_modules/
 
 # =========================
 # BUILD
@@ -27,7 +28,9 @@ build/
 # =========================
 .env
 .env.*
-backend/.env
+!.env.example
+!Backend/.env.example
+Backend/.env
 
 # =========================
 # POWER BI
