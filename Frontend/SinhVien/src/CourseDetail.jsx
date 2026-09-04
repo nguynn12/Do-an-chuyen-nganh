@@ -215,9 +215,39 @@ function ResourceModal({ resource, onClose }) {
 }
 
 export default function CourseDetail({ course = COURSE_DETAIL_DATA, courseId, onNavigateToDashboard = () => { window.location.hash = ''; } }) {
-  const [expandedTopicIds, setExpandedTopicIds] = useState(() => new Set(course.topics.filter((topic) => topic.isOpen).map((topic) => topic.id)));
+  const [courseData, setCourseData] = useState(course);
+  const [isLoading, setIsLoading] = useState(false);
+  const [expandedTopicIds, setExpandedTopicIds] = useState(() => new Set((course.topics || []).filter((topic) => topic.isOpen).map((topic) => topic.id)));
   const [selectedResource, setSelectedResource] = useState(null);
   const [settingsMessage, setSettingsMessage] = useState('');
+
+  // Nạp dữ liệu chi tiết môn học từ API khi có courseId
+  useEffect(() => {
+    if (!courseId) return undefined;
+    const controller = new AbortController();
+    setIsLoading(true);
+
+    fetch(`/api/v1/student/courses/${courseId}`, { signal: controller.signal })
+      .then((res) => {
+        if (!res.ok) throw new Error(`API error: ${res.status}`);
+        return res.json();
+      })
+      .then((payload) => {
+        if (payload?.course) {
+          setCourseData(payload.course);
+          setExpandedTopicIds(new Set((payload.course.topics || []).filter((t) => t.isOpen).map((t) => t.id)));
+        }
+      })
+      .catch((err) => {
+        if (err.name !== 'AbortError') {
+          console.warn('Sử dụng dữ liệu mẫu cho CourseDetail:', err.message);
+          setCourseData(course);
+        }
+      })
+      .finally(() => setIsLoading(false));
+
+    return () => controller.abort();
+  }, [courseId, course]);
 
   // Mỗi lần click sẽ tạo Set mới để React nhận biết thay đổi và cập nhật đúng accordion.
   const handleTopicToggle = (topicId) => setExpandedTopicIds((currentIds) => {
@@ -244,18 +274,21 @@ export default function CourseDetail({ course = COURSE_DETAIL_DATA, courseId, on
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [selectedResource, settingsMessage]);
 
+  const activeCourse = courseData || course;
+
   return (
     <MainLayout onNavigateHome={onNavigateToDashboard}>
-      <div className="course-detail" data-course-id={courseId || course.id}>
+      <div className="course-detail" data-course-id={courseId || activeCourse.id}>
       <main className="course-detail__container">
-        <Breadcrumbs items={course.breadcrumbs} onSettings={() => setSettingsMessage('Khu vực cài đặt khóa học đang sẵn sàng kết nối API.')} onNavigateToDashboard={onNavigateToDashboard} />
+        <Breadcrumbs items={activeCourse.breadcrumbs || []} onSettings={() => setSettingsMessage('Khu vực cài đặt khóa học đang sẵn sàng kết nối API.')} onNavigateToDashboard={onNavigateToDashboard} />
+        {isLoading && <div className="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-500 shadow-sm mb-4">Đang tải dữ liệu khóa học...</div>}
         {settingsMessage && <div className="course-detail__notice" role="status"><AlertCircle size={16} />{settingsMessage}<button type="button" onClick={() => setSettingsMessage('')} className="course-detail__notice-close">×</button></div>}
         <div className="course-detail__layout">
           <div className="course-detail__main">
-            <CourseBanner course={course} />
-            <div className="course-detail__topics">{course.topics.map((topic) => <TopicSection key={topic.id} topic={topic} isExpanded={expandedTopicIds.has(topic.id)} onToggle={() => handleTopicToggle(topic.id)} onResourceClick={handleResourceClick} />)}</div>
+            <CourseBanner course={activeCourse} />
+            <div className="course-detail__topics">{(activeCourse.topics || []).map((topic) => <TopicSection key={topic.id} topic={topic} isExpanded={expandedTopicIds.has(topic.id)} onToggle={() => handleTopicToggle(topic.id)} onResourceClick={handleResourceClick} />)}</div>
           </div>
-          <aside className="course-detail__sidebar"><div className="course-detail__sidebar-heading"><GraduationCap size={18} /><h2>Thông tin khóa học</h2></div><p>Mã học phần: <strong>{course.code}</strong></p><a href="#participants" className="course-detail__sidebar-link"><BookOpen size={15} />Danh sách học viên</a></aside>
+          <aside className="course-detail__sidebar"><div className="course-detail__sidebar-heading"><GraduationCap size={18} /><h2>Thông tin khóa học</h2></div><p>Mã học phần: <strong>{activeCourse.code}</strong></p><a href="#participants" className="course-detail__sidebar-link"><BookOpen size={15} />Danh sách học viên</a></aside>
         </div>
       </main>
       <ResourceModal resource={selectedResource} onClose={() => setSelectedResource(null)} />
@@ -263,3 +296,4 @@ export default function CourseDetail({ course = COURSE_DETAIL_DATA, courseId, on
     </MainLayout>
   );
 }
+

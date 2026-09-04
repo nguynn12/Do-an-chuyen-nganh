@@ -1,16 +1,35 @@
 import express from "express";
 import cors from "cors";
 
-import testRoutes from "./routes/testRoutes.js";
-import teacherRoutes from "./routes/teacherRoutes.js";
-import courseRoutes from "./routes/courseRoutes.js";
-import authRoutes from "./routes/authRoutes.js";
+// Shared routes
+import authRoutes from "./shared/routes/authRoutes.js";
+import testRoutes from "./shared/routes/testRoutes.js";
+
+// Phân hệ Giảng viên
+import teacherRoutes from "./GiangVien/routes/teacherRoutes.js";
+import courseRoutes from "./GiangVien/routes/courseRoutes.js";
+
+// Phân hệ Sinh viên
+import studentRoutes from "./SinhVien/routes/studentRoutes.js";
 
 const app = express();
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:5174",
+];
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: (origin, callback) => {
+      // Cho phép requests không có origin (curl/Postman) hoặc nằm trong danh sách
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     credentials: true,
   })
 );
@@ -25,13 +44,17 @@ app.get("/", (req, res) => {
   });
 });
 
+// 1. Shared APIs
 app.use("/api/auth", authRoutes);
-
 app.use("/api/test", testRoutes);
 
+// 2. Cổng Giảng viên APIs
 app.use("/api/teachers", teacherRoutes);
-
 app.use("/api/courses", courseRoutes);
+
+// 3. Cổng Sinh viên APIs
+app.use("/api/v1/student", studentRoutes);
+app.use("/api/student", studentRoutes);
 
 app.use((req, res) => {
   res.status(404).json({

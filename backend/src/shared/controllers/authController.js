@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import pool from "../config/database.js";
+import pool from "../../config/database.js";
 
 export async function login(req, res) {
   try {

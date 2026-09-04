@@ -11,7 +11,11 @@ DoAnChuyenNganh/
 ├── Backend/                 # Máy chủ API Node.js / Express (Port 3000)
 │   ├── .env.example         # File cấu hình môi trường mẫu
 │   ├── scripts/seedAuth.js  # Script tạo tài khoản mẫu bcrypt
-│   └── src/                 # Mã nguồn backend (routes, controllers, models)
+│   └── src/
+│       ├── config/          # Cấu hình kết nối MySQL pool
+│       ├── shared/          # API xác thực đăng nhập & test
+│       ├── GiangVien/       # Controllers & Routes phân hệ Giảng viên
+│       └── SinhVien/        # Controllers & Routes phân hệ Sinh viên
 ├── Database/                # 16 file SQL DDL & Seed dữ liệu (Moodle source & Data Warehouse)
 ├── ETL/                     # 9 file SQL ETL nạp dữ liệu vào Data Warehouse
 ├── Documentation/           # Tài liệu thiết kế & báo cáo đồ án
