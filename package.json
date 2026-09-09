@@ -1,0 +1,14 @@
+{
+  "name": "doanchuyennghanh",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "npm --prefix Frontend/GiangVien run dev",
+    "dev:gv": "npm --prefix Frontend/GiangVien run dev",
+    "dev:sv": "npm --prefix Frontend/SinhVien run dev",
+    "dev:backend": "npm --prefix Backend run dev",
+    "build:gv": "npm --prefix Frontend/GiangVien run build",
+    "build:sv": "npm --prefix Frontend/SinhVien run build"
+  }
+}
