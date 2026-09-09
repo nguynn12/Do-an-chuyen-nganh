@@ -1,0 +1,1067 @@
+/* ==========================================================================
+   DLU LMS - STUDENT LEARNING ANALYTICS DASHBOARD
+   Đồng bộ 100% Format, Bố cục Header 62px, Sidebar 45px và Bảng màu Xanh Lá DLU
+   ========================================================================== */
+
+/* ========================================
+   GLOBAL
+======================================== */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f3f5f4;
+  color: #101714;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+:root {
+  --dlu-green: #37883e;
+  --dlu-green-dark: #17221d;
+  --dlu-green-sidebar: #19201c;
+  --dlu-green-border: #41954c;
+  --dlu-green-accent: #65c777;
+  --dlu-green-active: #3e8f46;
+  --dlu-green-btn: #438249;
+  --dlu-green-btn-hover: #36753d;
+  --dlu-card-bg: #ffffff;
+  --dlu-border: #dfe4e1;
+  --dlu-text-main: #101714;
+  --dlu-text-muted: #66736b;
+}
+
+/* ========================================
+   HEADER (FIXED TOP 62px)
+======================================== */
+.header {
+  height: 62px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  border-bottom: 2px solid #41954c;
+  background: #17221d;
+  color: white;
+}
+
+.school {
+  width: 360px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.school-logo {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #37883e;
+  font-size: 11px;
+  font-weight: bold;
+  color: white;
+  flex-shrink: 0;
+}
+
+.school-name {
+  color: #65c777;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 0.2px;
+}
+
+.school-sub {
+  margin-top: 4px;
+  color: #bec8c1;
+  font-size: 9px;
+  letter-spacing: 0.3px;
+}
+
+.top-nav {
+  display: flex;
+  gap: 7px;
+}
+
+.top-nav button {
+  height: 34px;
+  padding: 0 14px;
+  border: 0;
+  background: transparent;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 4px;
+  transition: background 0.15s ease;
+}
+
+.top-nav button:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.top-nav .active-nav {
+  background: #39833d;
+}
+
+.header-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.search-box {
+  width: 260px;
+  height: 33px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border-radius: 6px;
+  background: #26322d;
+  color: #68766f;
+}
+
+.search-box input {
+  flex: 1;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: white;
+  font-size: 11px;
+}
+
+.search-box input::placeholder {
+  color: #87928b;
+}
+
+.avatar,
+.big-avatar {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #459b4e;
+  color: white;
+  font-weight: bold;
+}
+
+.avatar {
+  width: 34px;
+  height: 34px;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.teacher-mini strong,
+.teacher-mini span {
+  display: block;
+}
+
+.teacher-mini strong {
+  font-size: 11px;
+  color: white;
+}
+
+.teacher-mini span {
+  margin-top: 2px;
+  color: #aab7af;
+  font-size: 8px;
+}
+
+/* ========================================
+   SIDEBAR (FIXED LEFT 45px)
+======================================== */
+.sidebar {
+  width: 45px;
+  position: fixed;
+  top: 62px;
+  left: 0;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 14px;
+  background: #19201c;
+}
+
+.sidebar-menu {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 13px;
+}
+
+.sidebar-button {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: #87928b;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-button:hover {
+  background: #29352f;
+  color: white;
+}
+
+.sidebar-button.side-active {
+  background: #3e8f46;
+  color: white;
+}
+
+.side-bottom {
+  width: 100%;
+  margin-top: auto;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: center;
+}
+
+.logout-button:hover {
+  background: #49302e;
+  color: #ff7770;
+}
+
+/* ========================================
+   PAGE LAYOUT (2-COLUMN & FULL WIDTH)
+======================================== */
+.app {
+  min-height: 100vh;
+  background: #f3f5f4;
+}
+
+.page {
+  min-height: 100vh;
+  margin-left: 45px;
+  padding-top: 62px;
+  padding-left: 21px;
+  padding-right: 20px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 345px;
+  gap: 17px;
+}
+
+.page-full {
+  min-height: 100vh;
+  margin-left: 45px;
+  padding-top: 62px;
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-bottom: 40px;
+  display: block;
+}
+
+.main-content {
+  padding-top: 12px;
+  padding-bottom: 30px;
+}
+
+/* ========================================
+   WELCOME CARD
+======================================== */
+.welcome-card {
+  padding: 16px;
+  border: 1px solid #dfe4e1;
+  border-radius: 11px;
+  background: white;
+  box-shadow: 0 2px 7px rgba(20, 45, 28, 0.04);
+}
+
+.welcome-user {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.big-avatar {
+  width: 46px;
+  height: 46px;
+  background: #3c8342;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.welcome-user h2 {
+  margin: 0 0 4px;
+  font-size: 16px;
+  color: #17221d;
+  font-weight: 700;
+}
+
+.welcome-user p {
+  margin: 0;
+  color: #6b7770;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+/* ========================================
+   SUMMARY GRID (KPIs)
+======================================== */
+.summary-grid {
+  margin-top: 15px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.summary-item {
+  min-height: 60px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: none;
+  border-radius: 8px;
+  text-align: left;
+  transition: 0.2s ease;
+  cursor: pointer;
+}
+
+.summary-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.summary-icon {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+}
+
+.summary-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.summary-item span,
+.summary-item strong,
+.summary-item small {
+  display: block;
+}
+
+.summary-item span {
+  color: #66726b;
+  font-size: 10px;
+}
+
+.summary-item strong {
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.summary-item small {
+  margin-top: 2px;
+  color: #738078;
+  font-size: 9px;
+}
+
+.summary-arrow {
+  opacity: 0;
+  transition: 0.2s ease;
+}
+
+.summary-item:hover .summary-arrow {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+.summary-green {
+  background: #e8f2e7;
+  color: #3a823d;
+}
+
+.summary-orange {
+  background: #fff1dc;
+  color: #e66d1e;
+}
+
+.summary-blue {
+  background: #dff0f1;
+  color: #237b72;
+}
+
+.summary-light {
+  background: #eef5e3;
+  color: #4e8b32;
+}
+
+/* ========================================
+   SECTIONS
+======================================== */
+.section {
+  margin-top: 18px;
+}
+
+.section-title {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.section-title > div:first-child,
+.section-title.left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #17221d;
+}
+
+.section-title strong {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ========================================
+   COURSES GRID & CARDS (GREEN COVER)
+======================================== */
+.courses-grid {
+  margin-top: 6px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.course-card {
+  min-height: 220px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #dfe4e1;
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 2px 7px rgba(20, 45, 28, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.course-card:hover {
+  transform: translateY(-2px);
+  border-color: #cbd9ce;
+  box-shadow: 0 7px 18px rgba(20, 45, 28, 0.08);
+}
+
+.course-cover {
+  height: 54px;
+  min-height: 54px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: #4b8447;
+  color: white;
+}
+
+.course-cover > div span {
+  color: white;
+  font-size: 11px !important;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+}
+
+.course-cover-badge {
+  font-size: 9px;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.course-body {
+  flex: 1;
+  padding: 14px 15px 13px;
+  display: flex;
+  flex-direction: column;
+}
+
+.course-body h3 {
+  margin: 0 0 10px;
+  color: #17221d;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.course-body p {
+  min-height: 18px;
+  margin: 3px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #66736b;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.course-body p svg {
+  flex-shrink: 0;
+  color: #4c8750;
+}
+
+.course-body p strong {
+  color: #29362e;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.course-actions {
+  margin-top: auto;
+  padding-top: 13px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.course-actions button {
+  height: 32px;
+  border: 1px solid #d4ddd6;
+  border-radius: 6px;
+  background: white;
+  color: #344039;
+  font-size: 11px;
+  font-weight: 600;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.course-actions button:hover {
+  border-color: #4b8a50;
+  background: #eef6ee;
+  color: #34783d;
+}
+
+.course-actions button:last-child {
+  border-color: #438249;
+  background: #438249;
+  color: white;
+}
+
+.course-actions button:last-child:hover {
+  border-color: #36753d;
+  background: #36753d;
+  color: white;
+}
+
+/* ========================================
+   ANALYTICS CARD & CHARTS
+======================================== */
+.analytics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.analytics-card {
+  padding: 16px;
+  border: 1px solid #dfe4e1;
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 2px 7px rgba(20, 45, 28, 0.04);
+}
+
+.analytics-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.analytics-card__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #17221d;
+}
+
+.analytics-card__title svg {
+  color: #37883e;
+}
+
+.analytics-bar-item {
+  margin-bottom: 12px;
+}
+
+.analytics-bar-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  margin-bottom: 4px;
+  color: #415147;
+  font-weight: 600;
+}
+
+.analytics-track {
+  height: 8px;
+  background: #e8ede9;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.analytics-fill {
+  height: 100%;
+  background: #37883e;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.analytics-fill.orange {
+  background: #e66d1e;
+}
+
+.analytics-fill.teal {
+  background: #237b72;
+}
+
+/* ========================================
+   RIGHT PANEL
+======================================== */
+.right-panel {
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.right-card {
+  padding: 15px;
+  border: 1px solid #dfe4e1;
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 2px 7px rgba(20, 45, 28, 0.04);
+}
+
+.right-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.right-heading > div {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #17221d;
+}
+
+.right-heading strong {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.right-heading .badge {
+  background: #e8f2e7;
+  color: #37883e;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 9999px;
+}
+
+/* CALENDAR */
+.calendar-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.calendar-title strong {
+  font-size: 12px;
+  color: #17221d;
+}
+
+.calendar-nav {
+  display: flex;
+  gap: 5px;
+}
+
+.calendar-title button {
+  width: 27px;
+  height: 23px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #d5ddd6;
+  border-radius: 4px;
+  background: #f5f7f5;
+  color: #536057;
+  font-size: 14px;
+}
+
+.calendar-title button:hover {
+  border-color: #b9c9bc;
+  background: #edf3ee;
+  color: #34783d;
+}
+
+.calendar-week,
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+}
+
+.calendar-week {
+  margin-top: 12px;
+}
+
+.calendar-week span {
+  color: #69746d;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.calendar-days {
+  margin-top: 8px;
+  row-gap: 5px;
+}
+
+.calendar-day {
+  min-height: 27px;
+  position: relative;
+  display: grid;
+  place-items: center;
+  border-radius: 4px;
+  color: #1f2923;
+  font-size: 10px;
+}
+
+.calendar-day.marked {
+  background: #e8f2e5;
+  color: #2f7338;
+  font-weight: 700;
+}
+
+.calendar-day.today {
+  background: #37883e;
+  color: white;
+  font-weight: 700;
+}
+
+.calendar-dot {
+  width: 4px;
+  height: 4px;
+  position: absolute;
+  left: 50%;
+  bottom: 2px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: #418747;
+}
+
+/* NOTIFICATIONS */
+.notification-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #eef2ef;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+.notification-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #37883e;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+
+.notification-dot.urgent {
+  background: #e66d1e;
+}
+
+.notification-info strong {
+  display: block;
+  font-size: 11px;
+  color: #17221d;
+  font-weight: 600;
+}
+
+.notification-info span {
+  display: block;
+  font-size: 9px;
+  color: #7d8881;
+  margin-top: 2px;
+}
+
+/* QUICK LINKS */
+.quick-title {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #17221d;
+}
+
+.quick-link {
+  width: 100%;
+  height: 36px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #dfe5e1;
+  border-radius: 6px;
+  background: #f8faf8;
+  color: #2c3831;
+  margin-bottom: 7px;
+  font-size: 11px;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+.quick-link:hover {
+  background: #eef6ee;
+  border-color: #37883e;
+  color: #37883e;
+}
+
+.quick-link > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ========================================
+   SUB-PAGES: HERO BANNER & TABLES
+======================================== */
+.courses-hero {
+  margin-bottom: 20px;
+  padding: 20px 24px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #17221d 0%, #1e3327 100%);
+  border-left: 4px solid #41954c;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.courses-hero-main {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.courses-hero-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: #37883e;
+  display: grid;
+  place-items: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+.courses-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #9ab4a1;
+  margin-bottom: 4px;
+}
+
+.courses-hero-kicker {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #65c777;
+  text-transform: uppercase;
+}
+
+.courses-hero h1 {
+  margin: 2px 0 6px;
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+}
+
+.courses-hero p {
+  margin: 0;
+  font-size: 12px;
+  color: #c4d4c8;
+}
+
+.courses-semester {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.courses-semester span {
+  display: block;
+  font-size: 10px;
+  color: #a0b6a6;
+}
+
+.courses-semester strong {
+  display: block;
+  font-size: 12px;
+  color: #65c777;
+}
+
+/* DATA TABLE (GREEN ACCENT) */
+.student-table-card {
+  padding: 18px;
+  border: 1px solid #dfe4e1;
+  border-radius: 11px;
+  background: white;
+  box-shadow: 0 2px 7px rgba(20, 45, 28, 0.04);
+  margin-top: 16px;
+}
+
+.student-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 12px;
+}
+
+.student-table th {
+  padding: 10px 12px;
+  background: #f5f8f5;
+  color: #37463c;
+  font-weight: 700;
+  border-bottom: 2px solid #dfe4e1;
+}
+
+.student-table td {
+  padding: 12px;
+  border-bottom: 1px solid #edf1ee;
+  color: #17221d;
+}
+
+.student-table tr:hover td {
+  background: #f9fbf9;
+}
+
+/* BADGES */
+.dlu-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.dlu-badge--green {
+  background: #e8f2e7;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.dlu-badge--orange {
+  background: #fff3df;
+  color: #c66911;
+  border: 1px solid #fed7aa;
+}
+
+.dlu-badge--red {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+}
+
+/* BUTTONS */
+.btn-dlu-primary {
+  height: 34px;
+  padding: 0 16px;
+  border: 1px solid #438249;
+  border-radius: 6px;
+  background: #438249;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s ease;
+}
+
+.btn-dlu-primary:hover {
+  background: #36753d;
+}
+
+.btn-dlu-secondary {
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid #d4ddd6;
+  border-radius: 6px;
+  background: white;
+  color: #344039;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.btn-dlu-secondary:hover {
+  border-color: #4b8a50;
+  background: #eef6ee;
+  color: #34783d;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .page {
+    grid-template-columns: 1fr;
+  }
+  .courses-grid,
+  .analytics-grid,
+  .summary-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .summary-grid,
+  .courses-grid,
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+}
