@@ -29,7 +29,7 @@ function Messages() {
       </button>
 
       <div className="simple-page-card">
-        <h1>Tin nhắn & thông báo</h1>
+        <h1>Thông báo hệ thống</h1>
 
         <div className="message-list">
           {items.map((item) => (

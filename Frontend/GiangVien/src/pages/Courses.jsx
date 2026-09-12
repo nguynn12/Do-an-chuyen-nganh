@@ -10,6 +10,7 @@ import {
   BookOpen,
   GraduationCap,
   Sparkles,
+  BarChart3,
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
@@ -249,6 +250,39 @@ function Courses() {
                   }
 
 
+                  const totalStudents = students.length || analytics.length;
+
+                  const passedStudents = analytics.filter(
+                    (s) =>
+                      s.Is_Passed === 1 ||
+                      (s.Average_Grade !== null && Number(s.Average_Grade) >= 5)
+                  ).length;
+
+                  const passRate =
+                    totalStudents > 0
+                      ? Math.round((passedStudents / totalStudents) * 100)
+                      : 0;
+
+                  const totalOnTime = analytics.reduce(
+                    (total, s) => total + Number(s.On_Time_Submissions || 0),
+                    0
+                  );
+
+                  const onTimeRate =
+                    submittedAssignments > 0
+                      ? Math.round((totalOnTime / submittedAssignments) * 100)
+                      : 0;
+
+                  const totalMinutes = analytics.reduce(
+                    (total, s) => total + Number(s.Total_Time_Spent_Minutes || 0),
+                    0
+                  );
+
+                  const avgHoursPerStudent =
+                    totalStudents > 0
+                      ? Number((totalMinutes / 60 / totalStudents).toFixed(1))
+                      : 0;
+
                   return {
                     id: String(
                       courseId
@@ -297,6 +331,12 @@ function Courses() {
                           ),
 
                     submissionRate,
+
+                    passRate,
+
+                    onTimeRate,
+
+                    avgHoursPerStudent,
 
                     attendance: null,
 
@@ -608,6 +648,110 @@ function Courses() {
         <CourseStats
           courses={courses}
         />
+
+        {courses.length >= 2 && (
+          <section className="course-comparison-section">
+            <div className="comparison-header">
+              <div className="comparison-title-wrap">
+                <div className="comparison-title-icon">
+                  <BarChart3 size={18} />
+                </div>
+                <div>
+                  <strong>Bảng so sánh các lớp đang phụ trách</strong>
+                  <p>So sánh tổng quan sĩ số, tỷ lệ hoàn thành, điểm trung bình và thời gian học giữa các lớp</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="comparison-table-wrap">
+              <table className="comparison-table">
+                <thead>
+                  <tr>
+                    <th>Khóa học</th>
+                    <th style={{ textAlign: "center" }}>Sĩ số</th>
+                    <th style={{ textAlign: "center" }}>Điểm TB</th>
+                    <th>Tỷ lệ Đạt (≥5.0)</th>
+                    <th>Nộp đúng hạn</th>
+                    <th style={{ textAlign: "center" }}>TG học TB/SV</th>
+                    <th style={{ textAlign: "center" }}>Trạng thái</th>
+                    <th style={{ textAlign: "right" }}>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {courses.map((c) => (
+                    <tr key={c.courseId}>
+                      <td>
+                        <div className="comparison-course-info">
+                          <span className="comparison-course-title">{c.title}</span>
+                          <span className="comparison-course-code">{c.code || `ID: ${c.courseId}`}</span>
+                        </div>
+                      </td>
+                      <td style={{ textAlign: "center", fontWeight: 600 }}>
+                        {c.studentCount || 0}
+                      </td>
+                      <td style={{ textAlign: "center", fontWeight: 700, color: c.averageScore >= 5 ? "#2e7d32" : "#c62828" }}>
+                        {c.averageScore !== null ? c.averageScore : "—"}
+                      </td>
+                      <td>
+                        <div className="comparison-mini-bar-wrap">
+                          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", fontWeight: 600 }}>
+                            <span>{c.passRate}%</span>
+                          </div>
+                          <div className="comparison-mini-track">
+                            <div
+                              className="comparison-mini-fill"
+                              style={{
+                                width: `${c.passRate}%`,
+                                background: c.passRate >= 80 ? "#37883e" : c.passRate >= 50 ? "#e66d1e" : "#dc2626",
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="comparison-mini-bar-wrap">
+                          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", fontWeight: 600 }}>
+                            <span>{c.onTimeRate}%</span>
+                          </div>
+                          <div className="comparison-mini-track">
+                            <div
+                              className="comparison-mini-fill"
+                              style={{
+                                width: `${c.onTimeRate}%`,
+                                background: c.onTimeRate >= 80 ? "#37883e" : c.onTimeRate >= 50 ? "#2563eb" : "#e66d1e",
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </td>
+                      <td style={{ textAlign: "center", fontWeight: 600 }}>
+                        {c.avgHoursPerStudent > 0 ? `${c.avgHoursPerStudent}h` : "—"}
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        <span
+                          className={`course-status ${
+                            c.status === "active" ? "course-active" : "course-ended"
+                          }`}
+                          style={{ display: "inline-block", fontSize: "10.5px", padding: "3px 8px" }}
+                        >
+                          {c.status === "active" ? "Đang dạy" : "Đã kết thúc"}
+                        </span>
+                      </td>
+                      <td style={{ textAlign: "right" }}>
+                        <button
+                          className="comparison-btn"
+                          onClick={() => handleManage(c)}
+                        >
+                          Quản lý lớp
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
 
 
         <section className="courses-panel">

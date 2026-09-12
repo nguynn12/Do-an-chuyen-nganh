@@ -164,6 +164,50 @@ export async function getCourseStudentAnalytics(
 
 
 // ======================================================
+// PHÂN BỐ ĐIỂM SỐ THEO TỪNG BÀI ĐÁNH GIÁ (HISTOGRAM)
+// GET /api/courses/:courseId/grade-distribution
+// ======================================================
+
+export async function getCourseGradeDistribution(
+  courseId
+) {
+  const response =
+    await fetch(
+      `${API_URL}/courses/${courseId}/grade-distribution`
+    );
+
+  const result =
+    await parseResponse(
+      response
+    );
+
+  return result.data;
+}
+
+
+// ======================================================
+// XU HƯỚNG ENGAGEMENT LỚP THEO TUẦN (LINE CHART)
+// GET /api/courses/:courseId/engagement-trend
+// ======================================================
+
+export async function getCourseEngagementTrend(
+  courseId
+) {
+  const response =
+    await fetch(
+      `${API_URL}/courses/${courseId}/engagement-trend`
+    );
+
+  const result =
+    await parseResponse(
+      response
+    );
+
+  return result.data || [];
+}
+
+
+// ======================================================
 // LẤY LỊCH GIẢNG VIÊN
 //
 // GET /api/teachers/:teacherId/schedule

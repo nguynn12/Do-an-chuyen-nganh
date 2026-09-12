@@ -3,7 +3,7 @@ import {
   Grid3X3,
   Layers3,
   CalendarDays,
-  Mail,
+  Bell,
   CircleHelp,
   LogOut,
 } from "lucide-react";
@@ -15,7 +15,7 @@ const menuItems = [
   { path: "/khoa-hoc", label: "Khóa học", icon: Grid3X3 },
   { path: "/phan-tich", label: "Phân tích", icon: Layers3 },
   { path: "/lich", label: "Lịch", icon: CalendarDays },
-  { path: "/tin-nhan", label: "Tin nhắn", icon: Mail },
+  { path: "/tin-nhan", label: "Thông báo hệ thống", icon: Bell },
   { path: "/ho-tro", label: "Hỗ trợ", icon: CircleHelp },
 ];
 

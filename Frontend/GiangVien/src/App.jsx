@@ -71,7 +71,7 @@ function App() {
         }
       />
 
-      {/* Tin nhắn */}
+      {/* Thông báo hệ thống */}
       <Route
         path="/tin-nhan"
         element={
@@ -100,12 +100,12 @@ function App() {
         }
       />
 
-      {/* Lịch */}
+      {/* Lịch giảng dạy */}
       <Route
         path="/lich"
         element={
           <PrivatePage>
-            <SimplePage title="Lịch giảng dạy" />
+            <TeacherOverview />
           </PrivatePage>
         }
       />
@@ -116,26 +116,6 @@ function App() {
         element={
           <PrivatePage>
             <Analytics />
-          </PrivatePage>
-        }
-      />
-
-      {/* Phúc khảo */}
-      <Route
-        path="/phuc-khao"
-        element={
-          <PrivatePage>
-            <SimplePage title="Xét duyệt phúc khảo" />
-          </PrivatePage>
-        }
-      />
-
-      {/* Đề thi */}
-      <Route
-        path="/de-thi"
-        element={
-          <PrivatePage>
-            <SimplePage title="Quản lý đề thi" />
           </PrivatePage>
         }
       />

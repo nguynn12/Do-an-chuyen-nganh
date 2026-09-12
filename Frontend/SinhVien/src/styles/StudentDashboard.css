@@ -1065,3 +1065,466 @@ button {
     grid-template-columns: 1fr;
   }
 }
+
+/* ========================================
+   SVG CHARTS & TREND VISUALIZATIONS
+======================================== */
+.chart-card {
+  padding: 18px;
+  border: 1px solid #dfe4e1;
+  border-radius: 11px;
+  background: white;
+  box-shadow: 0 2px 7px rgba(20, 45, 28, 0.04);
+  margin-bottom: 20px;
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.chart-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chart-title-wrap strong {
+  font-size: 14px;
+  color: #17221d;
+}
+
+.chart-filter-select {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid #d4ddd6;
+  border-radius: 6px;
+  background: white;
+  color: #17221d;
+  font-size: 12px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.chart-filter-select:focus {
+  border-color: #37883e;
+}
+
+.chart-legend {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  padding: 6px 10px;
+  background: #f8faf8;
+  border-radius: 6px;
+  font-size: 11px;
+  color: #4b5563;
+}
+
+.chart-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.chart-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.svg-chart-container {
+  width: 100%;
+  position: relative;
+  overflow-x: auto;
+}
+
+.svg-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ========================================
+   DONUT CHART & BREAKDOWN STYLES
+======================================== */
+.donut-chart-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 28px;
+  align-items: center;
+  padding: 8px 0;
+}
+
+@media (max-width: 768px) {
+  .donut-chart-layout {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+}
+
+.donut-svg-wrap {
+  width: 210px;
+  height: 210px;
+  position: relative;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.donut-breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.donut-breakdown-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 14px;
+  border: 1px solid #edf1ee;
+  border-radius: 8px;
+  background: #fbfdfb;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.donut-breakdown-item:hover,
+.donut-breakdown-item.active {
+  border-color: #37883e;
+  background: #f4f8f4;
+  box-shadow: 0 2px 6px rgba(55, 136, 62, 0.08);
+}
+
+.donut-breakdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
+  color: #17221d;
+}
+
+.donut-breakdown-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #66736b;
+}
+
+.donut-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: #e5eae6;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.donut-progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}
+
+/* ========================================
+   ACTIVITY HEATMAP STYLES
+======================================== */
+.heatmap-container {
+  overflow-x: auto;
+  padding: 10px 0 6px 0;
+  width: 100%;
+}
+
+.heatmap-grid-wrap {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  min-width: 620px;
+}
+
+.heatmap-weekdays {
+  display: grid;
+  grid-template-rows: repeat(7, 18px);
+  gap: 4px;
+  font-size: 10px;
+  color: #66736b;
+  font-weight: 600;
+  text-align: right;
+  padding-right: 2px;
+  align-items: center;
+}
+
+.heatmap-weeks-track {
+  display: flex;
+  gap: 5px;
+  flex: 1;
+}
+
+.heatmap-week-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.heatmap-month-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #66736b;
+  height: 14px;
+  margin-bottom: 2px;
+  white-space: nowrap;
+}
+
+.heatmap-cell {
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  background: #ebedf0;
+  cursor: pointer;
+  transition: transform 0.12s ease, outline 0.12s ease, box-shadow 0.12s ease;
+  position: relative;
+}
+
+.heatmap-cell:hover {
+  transform: scale(1.3);
+  z-index: 10;
+  outline: 2px solid #17221d;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.heatmap-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #edf1ee;
+  font-size: 11px;
+  color: #66736b;
+}
+
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.heatmap-legend-box {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+}
+
+/* ========================================
+   PEER BENCHMARK & PERCENTILE STYLES
+======================================== */
+.benchmark-card {
+  padding: 22px 24px;
+  border-radius: 16px;
+  background: white;
+  border: 1px solid #d4ddd6;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+}
+
+.benchmark-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.benchmark-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.benchmark-title-wrap strong {
+  font-size: 15px;
+  color: #17221d;
+  display: block;
+}
+
+.benchmark-title-wrap p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: #66736b;
+}
+
+.benchmark-badge-top {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  background: #eef6ee;
+  color: #37883e;
+  border: 1px solid #bce1c1;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.benchmark-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.benchmark-item-card {
+  padding: 16px;
+  border-radius: 12px;
+  background: #f8faf8;
+  border: 1px solid #e2ece3;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: all 0.15s ease;
+}
+
+.benchmark-item-card:hover {
+  background: #f4f8f4;
+  border-color: #37883e;
+  box-shadow: 0 4px 14px rgba(55, 136, 62, 0.08);
+}
+
+.benchmark-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.benchmark-course-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #17221d;
+}
+
+.benchmark-course-code {
+  font-size: 11px;
+  color: #66736b;
+}
+
+.benchmark-metrics-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.benchmark-metric-box {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: white;
+  border: 1px solid #e5eae6;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.benchmark-metric-box span {
+  font-size: 10.5px;
+  color: #66736b;
+}
+
+.benchmark-metric-box strong {
+  font-size: 13.5px;
+  color: #17221d;
+}
+
+.benchmark-insight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.benchmark-insight--green {
+  background: #eef6ee;
+  color: #27672d;
+  border: 1px solid #cce8cf;
+}
+
+.benchmark-insight--amber {
+  background: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.benchmark-bars-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #e5eae6;
+}
+
+.benchmark-bar-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 65px;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+}
+
+.benchmark-bar-label {
+  font-weight: 600;
+  color: #4b5563;
+  white-space: nowrap;
+}
+
+.benchmark-bar-track {
+  width: 100%;
+  height: 7px;
+  background: #eef2ef;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.benchmark-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.4s ease;
+}
+
+.benchmark-bar-fill--green {
+  background: #37883e;
+}
+
+.benchmark-bar-fill--blue {
+  background: #2563eb;
+}
+
+.benchmark-bar-fill--orange {
+  background: #e66d1e;
+}
+
+.benchmark-bar-val {
+  text-align: right;
+  font-weight: 700;
+  color: #17221d;
+}

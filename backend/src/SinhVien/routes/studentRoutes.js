@@ -6,6 +6,7 @@ import {
   getStudentGrades,
   getStudentSubmissions,
   getStudentEngagement,
+  getStudentBenchmark,
 } from "../controllers/studentController.js";
 
 const router = express.Router();
@@ -27,5 +28,8 @@ router.get("/submissions", getStudentSubmissions);
 
 // 6. Engagement
 router.get("/engagement", getStudentEngagement);
+
+// 7. Peer Benchmark & Percentile (So sánh ẩn danh với lớp)
+router.get("/benchmark", getStudentBenchmark);
 
 export default router;

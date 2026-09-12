@@ -17,6 +17,9 @@ import {
   Clock3,
   CalendarClock,
   CheckCircle2,
+  BarChart3,
+  Activity,
+  TrendingUp,
 } from "lucide-react";
 
 import {
@@ -35,6 +38,8 @@ import {
   getTeacherCourses,
   getCourseStudents,
   getCourseStudentAnalytics,
+  getCourseGradeDistribution,
+  getCourseEngagementTrend,
 } from "../services/teacherApi";
 
 import "../styles/TeacherOverview.css";
@@ -277,6 +282,59 @@ function getStudentAssessment(
   };
 }
 
+function getStudentRiskFlags(student) {
+  const flags = [];
+
+  // 1. Điểm trung bình thấp (< 50% hoặc < 5.0 hoặc Is_Passed === 0)
+  const score = student.averageScore;
+  const pct = student.averageGradePercentage;
+  if (
+    (score !== null && score < 5.0) ||
+    (pct !== null && pct < 50) ||
+    student.isPassed === 0
+  ) {
+    flags.push({
+      type: "grade",
+      label: "Điểm thấp",
+      badgeClass: "risk-flag-red",
+      detail:
+        score !== null
+          ? `ĐTB: ${score.toFixed(1)}/10`
+          : pct !== null
+          ? `ĐTB: ${pct}%`
+          : "Chưa đạt chuẩn",
+      severity: 3,
+    });
+  }
+
+  // 2. Tỷ lệ nộp bài đúng hạn thấp (< 50% hoặc trễ >= 2 bài hoặc chưa nộp nhiều)
+  const onTimeRate = Number(student.onTimeRate || 0);
+  const lateCount = Number(student.lateSubmissions || 0);
+  const subRate = Number(student.submissionRate || 0);
+  if (onTimeRate < 50 || lateCount >= 2 || subRate < 50) {
+    flags.push({
+      type: "submission",
+      label: "Nộp trễ nhiều",
+      badgeClass: "risk-flag-orange",
+      detail: `Đúng hạn: ${onTimeRate}% (${lateCount} bài trễ)`,
+      severity: 2,
+    });
+  }
+
+  // 3. Thời gian học ít (< 60 phút)
+  const minutes = Number(student.totalTimeSpentMinutes || 0);
+  if (minutes < 60) {
+    flags.push({
+      type: "engagement",
+      label: "Ít tương tác",
+      badgeClass: "risk-flag-amber",
+      detail: `Thời gian học: ${Math.round(minutes)} phút`,
+      severity: 1,
+    });
+  }
+
+  return flags;
+}
 
 function StudentMetric({
   icon,
@@ -649,6 +707,11 @@ function ClassManagement() {
     setSelectedStudent,
   ] = useState(null);
 
+  const [gradeDistributions, setGradeDistributions] = useState([]);
+  const [selectedActivityKey, setSelectedActivityKey] = useState("OVERALL");
+  const [engagementTrend, setEngagementTrend] = useState([]);
+  const [hoveredWeek, setHoveredWeek] = useState(null);
+
 
   // ====================================================
   // LOAD DATA
@@ -691,6 +754,8 @@ function ClassManagement() {
           teacherCourses,
           studentData,
           analyticsData,
+          distributionData,
+          trendData,
         ] = await Promise.all([
           getTeacher(
             teacherId
@@ -707,11 +772,33 @@ function ClassManagement() {
           getCourseStudentAnalytics(
             numericCourseId
           ),
+
+          getCourseGradeDistribution(
+            numericCourseId
+          ).catch((err) => {
+            console.error("Lỗi tải phân bố điểm:", err);
+            return [];
+          }),
+
+          getCourseEngagementTrend(
+            numericCourseId
+          ).catch((err) => {
+            console.error("Lỗi tải xu hướng tương tác:", err);
+            return [];
+          }),
         ]);
 
 
         if (cancelled) {
           return;
+        }
+
+        if (distributionData && distributionData.length > 0) {
+          setGradeDistributions(distributionData);
+        }
+
+        if (trendData && trendData.length > 0) {
+          setEngagementTrend(trendData);
         }
 
 
@@ -1206,6 +1293,122 @@ function ClassManagement() {
 
 
   // ====================================================
+  // RISK STUDENTS (DANH SÁCH CẦN CHÚ Ý)
+  // ====================================================
+
+  const riskStudents = useMemo(() => {
+    return students
+      .map((s) => ({
+        student: s,
+        flags: getStudentRiskFlags(s),
+      }))
+      .filter((item) => item.flags.length > 0)
+      .sort((a, b) => {
+        const maxSevA = Math.max(...a.flags.map((f) => f.severity));
+        const maxSevB = Math.max(...b.flags.map((f) => f.severity));
+        if (maxSevB !== maxSevA) return maxSevB - maxSevA;
+        if (b.flags.length !== a.flags.length) return b.flags.length - a.flags.length;
+        return (a.student.averageScore ?? 10) - (b.student.averageScore ?? 10);
+      });
+  }, [students]);
+
+  const currentDistribution = useMemo(() => {
+    if (!gradeDistributions || gradeDistributions.length === 0) return null;
+    return (
+      gradeDistributions.find(
+        (a) => String(a.Activity_Key) === String(selectedActivityKey)
+      ) || gradeDistributions[0]
+    );
+  }, [gradeDistributions, selectedActivityKey]);
+
+  const trendStats = useMemo(() => {
+    if (!engagementTrend || engagementTrend.length === 0) {
+      return {
+        maxWeek: null,
+        overallAvgHours: 0,
+        overallActiveRate: 0,
+        totalClassHours: 0,
+      };
+    }
+
+    const totalHours = engagementTrend.reduce((sum, w) => sum + (w.totalHours || 0), 0);
+    const avgHoursList = engagementTrend.map((w) => w.avgHoursPerStudent || 0);
+    const maxAvgHour = Math.max(...avgHoursList);
+    const maxWeek = engagementTrend.find((w) => w.avgHoursPerStudent === maxAvgHour) || engagementTrend[0];
+
+    const activeRateSum = engagementTrend.reduce((sum, w) => sum + (w.activeRate || 0), 0);
+    const overallActiveRate = Math.round(activeRateSum / engagementTrend.length);
+
+    const totalAvgSum = avgHoursList.reduce((sum, h) => sum + h, 0);
+    const overallAvgHours = Number((totalAvgSum / engagementTrend.length).toFixed(2));
+
+    return {
+      maxWeek,
+      overallAvgHours,
+      overallActiveRate,
+      totalClassHours: Number(totalHours.toFixed(1)),
+    };
+  }, [engagementTrend]);
+
+  const chartConfig = useMemo(() => {
+    if (!engagementTrend || engagementTrend.length === 0) return null;
+
+    const width = 800;
+    const height = 220;
+    const padding = { top: 30, right: 35, bottom: 45, left: 55 };
+    const chartWidth = width - padding.left - padding.right;
+    const chartHeight = height - padding.top - padding.bottom;
+
+    const maxVal = Math.max(...engagementTrend.map((d) => d.avgHoursPerStudent || 0), 0.5);
+    const maxY = Math.ceil(maxVal * 1.25 * 10) / 10;
+
+    const points = engagementTrend.map((d, index) => {
+      const x =
+        engagementTrend.length === 1
+          ? padding.left + chartWidth / 2
+          : padding.left + (index / (engagementTrend.length - 1)) * chartWidth;
+      const y = padding.top + chartHeight - ((d.avgHoursPerStudent || 0) / maxY) * chartHeight;
+      return {
+        ...d,
+        x,
+        y,
+      };
+    });
+
+    const linePath =
+      points.length === 1
+        ? `M ${points[0].x - 20} ${points[0].y} L ${points[0].x + 20} ${points[0].y}`
+        : `M ${points[0].x} ${points[0].y} ` +
+          points.slice(1).map((p) => `L ${p.x} ${p.y}`).join(" ");
+
+    const areaPath =
+      points.length === 1
+        ? ""
+        : `M ${points[0].x} ${padding.top + chartHeight} L ${points[0].x} ${points[0].y} ` +
+          points.slice(1).map((p) => `L ${p.x} ${p.y}`).join(" ") +
+          ` L ${points[points.length - 1].x} ${padding.top + chartHeight} Z`;
+
+    const gridLines = [0, 0.25, 0.5, 0.75, 1].map((ratio) => {
+      const y = padding.top + chartHeight - ratio * chartHeight;
+      const val = Number((ratio * maxY).toFixed(1));
+      return { y, val };
+    });
+
+    return {
+      width,
+      height,
+      padding,
+      chartWidth,
+      chartHeight,
+      maxY,
+      points,
+      linePath,
+      areaPath,
+      gridLines,
+    };
+  }, [engagementTrend]);
+
+  // ====================================================
   // COUNTERS
   // ====================================================
 
@@ -1427,46 +1630,509 @@ function ClassManagement() {
 
 
         {/* ==============================
-            ALERT
+            DANH SÁCH SINH VIÊN CẦN CHÚ Ý (RISK LIST)
         ============================== */}
+        <section className="risk-section">
+          <div className="risk-section-header">
+            <div className="risk-section-title">
+              <div className="risk-title-icon">
+                <AlertTriangle size={18} />
+              </div>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <strong>Danh sách sinh viên cần chú ý</strong>
+                  <span className="risk-badge-count">
+                    {riskStudents.length} sinh viên gắn cờ
+                  </span>
+                </div>
+                <p>
+                  Hệ thống tự động phát hiện sinh viên có dấu hiệu rủi ro (điểm thấp dưới chuẩn, nộp trễ nhiều bài hoặc ít tương tác học liệu).
+                </p>
+              </div>
+            </div>
+          </div>
 
-        {riskCount > 0 && (
-          <section className="class-alert">
+          {riskStudents.length === 0 ? (
+            <div className="risk-empty-box">
+              <CheckCircle2 size={22} style={{ color: "#37883e" }} />
+              <div>
+                <strong>Không phát hiện sinh viên nào có nguy cơ</strong>
+                <p>
+                  Toàn bộ sinh viên trong lớp đều đang duy trì kết quả và tiến độ học tập đạt chuẩn.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="risk-table-wrap">
+              <table className="risk-table">
+                <thead>
+                  <tr>
+                    <th>Sinh viên</th>
+                    <th>Cờ cảnh báo (Lý do gắn cờ)</th>
+                    <th>Điểm TB</th>
+                    <th>Tiến độ nộp bài</th>
+                    <th>Thời gian học</th>
+                    <th style={{ textAlign: "right" }}>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {riskStudents.map(({ student: s, flags }) => {
+                    const avatarLetter =
+                      s.fullName
+                        ?.trim()
+                        .split(" ")
+                        .slice(-1)[0]
+                        ?.charAt(0)
+                        ?.toUpperCase() || "S";
 
-            <div className="class-alert-icon">
-              <AlertTriangle
-                size={19}
-              />
+                    return (
+                      <tr key={s.userKey || s.id}>
+                        <td>
+                          <div className="risk-student-info">
+                            <div className="risk-avatar">{avatarLetter}</div>
+                            <div>
+                              <strong className="risk-student-name">
+                                {s.fullName}
+                              </strong>
+                              <span className="risk-student-code">
+                                {s.studentCode} • {s.email}
+                              </span>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <div className="risk-flags-wrap">
+                            {flags.map((f, fIdx) => (
+                              <span
+                                key={fIdx}
+                                className={`risk-flag-badge ${f.badgeClass}`}
+                                title={f.detail}
+                              >
+                                <i>●</i> {f.label}: <strong>{f.detail}</strong>
+                              </span>
+                            ))}
+                          </div>
+                        </td>
+                        <td>
+                          <strong
+                            style={{
+                              color:
+                                s.averageScore !== null && s.averageScore < 5
+                                  ? "#dc2626"
+                                  : "#203026",
+                            }}
+                          >
+                            {s.averageScore !== null
+                              ? `${s.averageScore.toFixed(1)}/10`
+                              : "—"}
+                          </strong>
+                        </td>
+                        <td>
+                          <div>
+                            <span>
+                              {s.submittedAssignments}/{s.totalAssignments} bài
+                            </span>
+                            <span
+                              style={{
+                                fontSize: "11px",
+                                color:
+                                  s.onTimeRate < 50 ? "#dc2626" : "#79867d",
+                                marginLeft: "4px",
+                              }}
+                            >
+                              ({s.onTimeRate}% đúng hạn)
+                            </span>
+                          </div>
+                        </td>
+                        <td>
+                          <span>
+                            {formatLearningTime(s.totalTimeSpentMinutes)}
+                          </span>
+                        </td>
+                        <td style={{ textAlign: "right" }}>
+                          <button
+                            type="button"
+                            className="risk-action-btn"
+                            onClick={() => handleViewStudent(s)}
+                          >
+                            Xem chi tiết
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+
+
+        {/* ==============================
+            HISTOGRAM PHÂN BỐ ĐIỂM SỐ
+        ============================== */}
+        <section className="histogram-section">
+          <div className="histogram-header">
+            <div className="histogram-title-wrap">
+              <div className="histogram-title-icon">
+                <BarChart3 size={18} />
+              </div>
+              <div>
+                <strong>Phân bố điểm số sinh viên (Histogram)</strong>
+                <p>
+                  Theo dõi số lượng sinh viên đạt từng khoảng điểm theo toàn khóa hoặc từng bài kiểm tra.
+                </p>
+              </div>
             </div>
 
+            {gradeDistributions.length > 0 && (
+              <select
+                className="histogram-select"
+                value={selectedActivityKey}
+                onChange={(e) => setSelectedActivityKey(e.target.value)}
+              >
+                {gradeDistributions.map((act) => (
+                  <option key={act.Activity_Key} value={act.Activity_Key}>
+                    {act.Activity_Name}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
 
-            <div>
-              <strong>
-                Có {riskCount} sinh viên
-                cần chú ý
-              </strong>
+          {currentDistribution ? (
+            <div className="histogram-body">
+              {/* Bars */}
+              <div className="histogram-bars">
+                {[
+                  {
+                    key: "Under_5",
+                    label: "0 - 4.9 điểm (Yếu / Chưa đạt)",
+                    count: Number(currentDistribution.Under_5 || 0),
+                    color: "#dc2626",
+                  },
+                  {
+                    key: "Range_5_To_7",
+                    label: "5.0 - 6.9 điểm (Trung bình)",
+                    count: Number(currentDistribution.Range_5_To_7 || 0),
+                    color: "#e66d1e",
+                  },
+                  {
+                    key: "Range_7_To_85",
+                    label: "7.0 - 8.4 điểm (Khá)",
+                    count: Number(currentDistribution.Range_7_To_85 || 0),
+                    color: "#65c777",
+                  },
+                  {
+                    key: "Range_85_To_10",
+                    label: "8.5 - 10.0 điểm (Giỏi / Xuất sắc)",
+                    count: Number(currentDistribution.Range_85_To_10 || 0),
+                    color: "#37883e",
+                  },
+                ].map((range) => {
+                  const totalGraded =
+                    Number(currentDistribution.Total_Graded || 0) || 1;
+                  const pct = Math.round((range.count / totalGraded) * 100);
 
-              <p>
-                Phát hiện từ tiến độ
-                nộp bài hoặc kết quả
-                học tập hiện tại.
-              </p>
+                  return (
+                    <div key={range.key} className="analytics-bar-item">
+                      <div className="analytics-bar-meta">
+                        <span
+                          style={{
+                            fontWeight: 600,
+                            fontSize: "12px",
+                            color: "#1f2937",
+                          }}
+                        >
+                          {range.label}
+                        </span>
+                        <span
+                          style={{
+                            color: range.color,
+                            fontWeight: 700,
+                            fontSize: "12px",
+                          }}
+                        >
+                          {range.count} sinh viên ({pct}%)
+                        </span>
+                      </div>
+                      <div className="analytics-track">
+                        <div
+                          className="analytics-fill"
+                          style={{
+                            width: `${pct}%`,
+                            background: range.color,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Stats Card */}
+              <div className="histogram-stat-cards">
+                <div className="histogram-stat-card">
+                  <span>Điểm trung bình</span>
+                  <strong style={{ color: "#37883e" }}>
+                    {currentDistribution.Average_Grade !== null &&
+                    currentDistribution.Average_Grade !== undefined
+                      ? `${Number(currentDistribution.Average_Grade).toFixed(1)}/10`
+                      : "—"}
+                  </strong>
+                </div>
+
+                <div className="histogram-stat-card">
+                  <span>Tổng bài đã chấm</span>
+                  <strong>{currentDistribution.Total_Graded || 0} bài</strong>
+                </div>
+
+                <div className="histogram-stat-card">
+                  <span>Điểm cao nhất</span>
+                  <strong style={{ color: "#2563eb" }}>
+                    {currentDistribution.Max_Grade !== null &&
+                    currentDistribution.Max_Grade !== undefined
+                      ? `${Number(currentDistribution.Max_Grade).toFixed(1)}/10`
+                      : "—"}
+                  </strong>
+                </div>
+
+                <div className="histogram-stat-card">
+                  <span>Điểm thấp nhất</span>
+                  <strong
+                    style={{
+                      color:
+                        Number(currentDistribution.Min_Grade) < 5
+                          ? "#dc2626"
+                          : "#66736b",
+                    }}
+                  >
+                    {currentDistribution.Min_Grade !== null &&
+                    currentDistribution.Min_Grade !== undefined
+                      ? `${Number(currentDistribution.Min_Grade).toFixed(1)}/10`
+                      : "—"}
+                  </strong>
+                </div>
+              </div>
             </div>
-
-
-            <button
-              type="button"
-              onClick={() =>
-                setFilter(
-                  "risk"
-                )
-              }
+          ) : (
+            <div
+              style={{
+                padding: "24px",
+                textAlign: "center",
+                color: "#66736b",
+                fontSize: "12px",
+              }}
             >
-              Xem danh sách
-            </button>
+              Chưa có dữ liệu phân bố điểm cho bài kiểm tra này.
+            </div>
+          )}
+        </section>
 
-          </section>
-        )}
+
+        {/* ==============================
+            XU HƯỚNG ENGAGEMENT LỚP THEO TUẦN (WEEKLY ENGAGEMENT TREND)
+        ============================== */}
+        <section className="trend-section">
+          <div className="trend-header">
+            <div className="trend-title-wrap">
+              <div className="trend-title-icon">
+                <TrendingUp size={18} />
+              </div>
+              <div>
+                <strong>Xu hướng tương tác học tập của lớp theo tuần</strong>
+                <p>
+                  Theo dõi thời lượng học tập trung bình và số sinh viên hoạt động qua từng tuần để kịp thời nắm bắt mức độ tích cực của lớp.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {engagementTrend && engagementTrend.length > 0 ? (
+            <>
+              {/* Summary Cards */}
+              <div className="trend-summary-cards">
+                <div className="trend-summary-card">
+                  <span>Tuần cao điểm nhất</span>
+                  <strong style={{ color: "#37883e" }}>
+                    {trendStats.maxWeek ? `${trendStats.maxWeek.weekLabel} (${trendStats.maxWeek.avgHoursPerStudent}h/SV)` : "—"}
+                  </strong>
+                </div>
+
+                <div className="trend-summary-card">
+                  <span>Thời lượng TB / SV / tuần</span>
+                  <strong>{trendStats.overallAvgHours} giờ</strong>
+                </div>
+
+                <div className="trend-summary-card">
+                  <span>Tỷ lệ SV hoạt động TB</span>
+                  <strong style={{ color: "#2563eb" }}>{trendStats.overallActiveRate}%</strong>
+                </div>
+
+                <div className="trend-summary-card">
+                  <span>Tổng thời lượng cả lớp</span>
+                  <strong>{trendStats.totalClassHours} giờ</strong>
+                </div>
+              </div>
+
+              {/* Chart */}
+              <div className="trend-chart-container">
+                <div className="trend-svg-wrap">
+                  {chartConfig && (
+                    <svg
+                      viewBox={`0 0 ${chartConfig.width} ${chartConfig.height}`}
+                      className="trend-svg"
+                      style={{ overflow: "visible" }}
+                    >
+                      <defs>
+                        <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#37883e" stopOpacity="0.32" />
+                          <stop offset="100%" stopColor="#37883e" stopOpacity="0.0" />
+                        </linearGradient>
+                      </defs>
+
+                      {/* Horizontal Gridlines & Y-labels */}
+                      {chartConfig.gridLines.map((g, idx) => (
+                        <g key={idx}>
+                          <line
+                            x1={chartConfig.padding.left}
+                            y1={g.y}
+                            x2={chartConfig.width - chartConfig.padding.right}
+                            y2={g.y}
+                            stroke="#e2ece3"
+                            strokeDasharray={idx === 0 ? "none" : "4 4"}
+                            strokeWidth="1"
+                          />
+                          <text
+                            x={chartConfig.padding.left - 10}
+                            y={g.y + 4}
+                            textAnchor="end"
+                            fontSize="11"
+                            fill="#79867d"
+                            fontWeight="500"
+                          >
+                            {g.val}h
+                          </text>
+                        </g>
+                      ))}
+
+                      {/* Area fill */}
+                      {chartConfig.areaPath && (
+                        <path
+                          d={chartConfig.areaPath}
+                          fill="url(#trendGradient)"
+                        />
+                      )}
+
+                      {/* Line */}
+                      <path
+                        d={chartConfig.linePath}
+                        fill="none"
+                        stroke="#37883e"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+
+                      {/* Data Points */}
+                      {chartConfig.points.map((p, idx) => {
+                        const isHovered = hoveredWeek?.weekIndex === p.weekIndex;
+                        return (
+                          <g key={idx}>
+                            <circle
+                              cx={p.x}
+                              cy={p.y}
+                              r={isHovered ? 6 : 4}
+                              fill={isHovered ? "#37883e" : "#ffffff"}
+                              stroke="#37883e"
+                              strokeWidth={isHovered ? 3 : 2}
+                              style={{ cursor: "pointer", transition: "all 0.15s ease" }}
+                              onMouseEnter={() => setHoveredWeek(p)}
+                              onMouseLeave={() => setHoveredWeek(null)}
+                            />
+
+                            {/* X-axis Label */}
+                            <text
+                              x={p.x}
+                              y={chartConfig.height - chartConfig.padding.bottom + 20}
+                              textAnchor="middle"
+                              fontSize="11"
+                              fill={isHovered ? "#37883e" : "#4a574f"}
+                              fontWeight={isHovered ? "700" : "500"}
+                            >
+                              {p.weekLabel}
+                            </text>
+                          </g>
+                        );
+                      })}
+                    </svg>
+                  )}
+                </div>
+
+                {/* Hover Tooltip Box */}
+                {hoveredWeek && (
+                  <div
+                    style={{
+                      marginTop: "10px",
+                      padding: "8px 14px",
+                      borderRadius: "8px",
+                      background: "#17221d",
+                      color: "white",
+                      fontSize: "12px",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                      gap: "10px",
+                    }}
+                  >
+                    <div>
+                      <strong>{hoveredWeek.weekLabel}</strong>
+                      <span style={{ color: "#a0b5a6", marginLeft: "8px" }}>
+                        ({hoveredWeek.dateRange})
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", gap: "16px" }}>
+                      <span>
+                        Thời lượng TB: <strong style={{ color: "#65c777" }}>{hoveredWeek.avgHoursPerStudent} giờ/SV</strong>
+                      </span>
+                      <span>
+                        SV hoạt động: <strong>{hoveredWeek.activeStudents}/{hoveredWeek.totalStudents} SV ({hoveredWeek.activeRate}%)</strong>
+                      </span>
+                      <span>
+                        Tổng giờ lớp: <strong>{hoveredWeek.totalHours} giờ</strong>
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Legend */}
+                <div className="trend-legend">
+                  <div className="trend-legend-item">
+                    <span className="trend-legend-color" style={{ background: "#37883e" }} />
+                    <span>Thời lượng học trung bình mỗi sinh viên (Giờ / SV)</span>
+                  </div>
+                  <div className="trend-legend-item">
+                    <span style={{ color: "#79867d", fontSize: "11px" }}>
+                      * Dữ liệu ghi nhận tự động từ nhật ký tương tác học tập hàng ngày
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div
+              style={{
+                padding: "24px",
+                textAlign: "center",
+                color: "#66736b",
+                fontSize: "12px",
+              }}
+            >
+              Chưa có dữ liệu tương tác học tập hàng tuần cho lớp học này.
+            </div>
+          )}
+        </section>
 
 
         {/* ==============================

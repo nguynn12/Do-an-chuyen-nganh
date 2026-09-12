@@ -61,9 +61,27 @@ export default function StudentOverview({
     calendarCells.push({ day: "", empty: true });
   }
   for (let d = 1; d <= daysInMonth; d++) {
-    const isToday = d === new Date().getDate() && month === new Date().getMonth();
-    const isMarked = [5, 10, 15, 20, 25].includes(d);
-    calendarCells.push({ day: d, isToday, isMarked });
+    const isToday =
+      d === new Date().getDate() &&
+      month === new Date().getMonth() &&
+      year === new Date().getFullYear();
+
+    const dayEvents = events.filter((ev) => {
+      if (!ev?.date) return false;
+      const parts = ev.date.split("/");
+      if (parts.length < 3) return false;
+      const evDay = parseInt(parts[0], 10);
+      const evMonth = parseInt(parts[1], 10) - 1;
+      const evYear = parseInt(parts[2], 10);
+      return evDay === d && evMonth === month && evYear === year;
+    });
+
+    const isMarked = dayEvents.length > 0;
+    const tooltip = isMarked
+      ? dayEvents.map((ev) => `${ev.title} (${ev.course}) - Hạn: ${ev.date}`).join("\n")
+      : undefined;
+
+    calendarCells.push({ day: d, isToday, isMarked, tooltip });
   }
 
   return (
@@ -350,6 +368,7 @@ export default function StudentOverview({
                 className={`calendar-day ${cell.isToday ? "today" : ""} ${
                   cell.isMarked && !cell.isToday ? "marked" : ""
                 }`}
+                title={cell.tooltip}
               >
                 {cell.day}
                 {cell.isMarked && !cell.isToday && <span className="calendar-dot" />}

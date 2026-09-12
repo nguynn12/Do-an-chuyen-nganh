@@ -1,4 +1,4 @@
-import { Users, Clock3, MessageSquare, LifeBuoy } from "lucide-react";
+import { Users, Clock3, Bell, LifeBuoy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import SummaryCard from "./SummaryCard";
 
@@ -49,9 +49,9 @@ function WelcomeCard({ teacher, stats }) {
         />
 
         <SummaryCard
-          icon={<MessageSquare size={22} />}
-          label="Tin nhắn mới"
-          value={`${stats.unreadMessages} Tin chưa đọc`}
+          icon={<Bell size={22} />}
+          label="Thông báo mới"
+          value={`${stats.unreadMessages} Thông báo`}
           className="summary-light"
           onClick={() => navigate("/tin-nhan")}
         />

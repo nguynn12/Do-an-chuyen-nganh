@@ -2203,3 +2203,442 @@ tr:last-child td {
       1fr;
   }
 }
+
+/* =========================================================
+   RISK LIST SECTION (SINH VIÊN CẦN CHÚ Ý)
+========================================================= */
+.risk-section {
+  max-width: 1450px;
+  margin: 0 auto 20px;
+  padding: 20px 24px;
+  border-radius: 20px;
+  background: white;
+  border: 1px solid rgba(226, 137, 63, 0.25);
+  box-shadow: 0 10px 30px rgba(146, 91, 46, 0.05);
+  position: relative;
+}
+
+.risk-section-header {
+  margin-bottom: 16px;
+}
+
+.risk-section-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.risk-title-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #fef2f2;
+  color: #dc2626;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.risk-section-title strong {
+  font-size: 15px;
+  color: #1f2937;
+}
+
+.risk-section-title p {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.risk-badge-count {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: #fee2e2;
+  color: #dc2626;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.risk-empty-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: #f4fbf5;
+  border: 1px solid #d1fae5;
+  border-radius: 12px;
+}
+
+.risk-empty-box strong {
+  display: block;
+  font-size: 13px;
+  color: #065f46;
+}
+
+.risk-empty-box p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: #047857;
+}
+
+.risk-table-wrap {
+  overflow-x: auto;
+}
+
+.risk-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: left;
+}
+
+.risk-table th {
+  padding: 10px 12px;
+  background: #fef7f3;
+  color: #7c2d12;
+  font-weight: 700;
+  border-bottom: 1.5px solid #fed7aa;
+}
+
+.risk-table td {
+  padding: 12px;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: middle;
+  color: #1f2937;
+}
+
+.risk-table tr:hover td {
+  background: #fffbf9;
+}
+
+.risk-student-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.risk-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #fee2e2;
+  color: #dc2626;
+  font-weight: 700;
+  font-size: 12px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.risk-student-name {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.risk-student-code {
+  display: block;
+  font-size: 10.5px;
+  color: #6b7280;
+}
+
+.risk-flags-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.risk-flag-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 10.5px;
+  font-weight: 500;
+}
+
+.risk-flag-red {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+.risk-flag-orange {
+  background: #ffedd5;
+  color: #9a3412;
+  border: 1px solid #fdba74;
+}
+
+.risk-flag-amber {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.risk-action-btn {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: white;
+  color: #374151;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.risk-action-btn:hover {
+  background: #37883e;
+  color: white;
+  border-color: #37883e;
+}
+
+/* =========================================================
+   HISTOGRAM SECTION (PHÂN BỐ ĐIỂM SỐ)
+========================================================= */
+.histogram-section {
+  max-width: 1450px;
+  margin: 0 auto 20px;
+  padding: 22px 26px;
+  border-radius: 20px;
+  background: white;
+  border: 1px solid rgba(111, 150, 56, 0.20);
+  box-shadow: 0 10px 30px rgba(48, 72, 52, 0.05);
+}
+
+.histogram-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.histogram-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.histogram-title-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #eef6ee;
+  color: #37883e;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.histogram-title-wrap strong {
+  font-size: 15px;
+  color: #17221d;
+  display: block;
+}
+
+.histogram-title-wrap p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: #66736b;
+}
+
+.histogram-select {
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid #d4ddd6;
+  border-radius: 8px;
+  background: white;
+  color: #17221d;
+  font-size: 12px;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.histogram-select:focus {
+  border-color: #37883e;
+}
+
+.histogram-body {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 28px;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .histogram-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+.histogram-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.histogram-stat-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 16px;
+  background: #f8faf8;
+  border-radius: 14px;
+  border: 1px solid #e2ece3;
+}
+
+.histogram-stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.histogram-stat-card span {
+  font-size: 11px;
+  color: #66736b;
+}
+
+.histogram-stat-card strong {
+  font-size: 15px;
+  color: #17221d;
+}
+
+/* =========================================================
+   WEEKLY ENGAGEMENT TREND SECTION (XU HƯỚNG TƯƠNG TÁC THEO TUẦN)
+========================================================= */
+.trend-section {
+  max-width: 1450px;
+  margin: 0 auto 20px;
+  padding: 22px 26px;
+  border-radius: 20px;
+  background: white;
+  border: 1px solid rgba(111, 150, 56, 0.20);
+  box-shadow: 0 10px 30px rgba(48, 72, 52, 0.05);
+}
+
+.trend-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.trend-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.trend-title-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #eef6ee;
+  color: #37883e;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.trend-title-wrap strong {
+  font-size: 15px;
+  color: #17221d;
+  display: block;
+}
+
+.trend-title-wrap p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: #66736b;
+}
+
+.trend-summary-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+@media (max-width: 800px) {
+  .trend-summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.trend-summary-card {
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #f8faf8;
+  border: 1px solid #e2ece3;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.trend-summary-card span {
+  font-size: 11px;
+  color: #66736b;
+}
+
+.trend-summary-card strong {
+  font-size: 16px;
+  color: #17221d;
+  font-weight: 700;
+}
+
+.trend-chart-container {
+  width: 100%;
+  position: relative;
+  background: #fafdfa;
+  border-radius: 14px;
+  border: 1px solid #e9f0ea;
+  padding: 16px 12px 10px;
+}
+
+.trend-svg-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.trend-svg {
+  width: 100%;
+  height: auto;
+  min-height: 220px;
+  display: block;
+}
+
+.trend-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 14px;
+  font-size: 11.5px;
+  color: #556358;
+  flex-wrap: wrap;
+}
+
+.trend-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.trend-legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+

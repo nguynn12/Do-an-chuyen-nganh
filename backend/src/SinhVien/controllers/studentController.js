@@ -659,3 +659,165 @@ export async function getStudentEngagement(req, res) {
     });
   }
 }
+
+// ======================================================
+// 7. SO SÁNH BẢN THÂN VỚI TRUNG BÌNH LỚP (ẨN DANH)
+// GET /api/v1/student/benchmark
+// ======================================================
+export async function getStudentBenchmark(req, res) {
+  try {
+    const student = await resolveStudent(req);
+    if (!student) {
+      return res.status(404).json({ success: false, message: "Không tìm thấy sinh viên." });
+    }
+
+    const userKey = student.User_Key;
+
+    // 1. Lấy danh sách các môn học active của sinh viên
+    const [courses] = await pool.query(
+      `SELECT 
+         dc.Course_Key AS courseKey,
+         dc.Moodle_Course_ID AS courseId,
+         dc.Course_Code AS code,
+         dc.Course_Name AS name
+       FROM Fact_Enrolment fe
+       INNER JOIN Dim_Course dc ON dc.Course_Key = fe.Course_Key
+       WHERE fe.User_Key = ? AND fe.Status = 'Active'
+       ORDER BY dc.Course_Name`,
+      [userKey]
+    );
+
+    // 2. Với mỗi môn học, tính toán phân bố toàn lớp và xếp hạng ẩn danh
+    const benchmarks = await Promise.all(
+      courses.map(async (course) => {
+        const [classRows] = await pool.query(
+          `SELECT 
+             fe.User_Key,
+             COALESCE(grd.avg_grade, 0) AS avg_grade,
+             COALESCE(eng.total_hours, 0) AS total_hours,
+             COALESCE(sub.on_time_rate, 0) AS on_time_rate,
+             COALESCE(sub.submitted_count, 0) AS submitted_count
+           FROM Fact_Enrolment fe
+           INNER JOIN Dim_User du ON du.User_Key = fe.User_Key
+           LEFT JOIN (
+             SELECT User_Key, ROUND(AVG(Grade), 2) AS avg_grade
+             FROM Fact_Course_Grade
+             WHERE Course_Key = ?
+             GROUP BY User_Key
+           ) grd ON grd.User_Key = fe.User_Key
+           LEFT JOIN (
+             SELECT User_Key, ROUND(SUM(Time_Spent_Seconds) / 3600, 2) AS total_hours
+             FROM Fact_Daily_Engagement
+             WHERE Course_Key = ?
+             GROUP BY User_Key
+           ) eng ON eng.User_Key = fe.User_Key
+           LEFT JOIN (
+             SELECT 
+               User_Key,
+               COUNT(DISTINCT Activity_Key) AS submitted_count,
+               ROUND((SUM(CASE WHEN Is_Submitted_On_Time = 1 THEN 1 ELSE 0 END) / COUNT(DISTINCT Activity_Key)) * 100) AS on_time_rate
+             FROM Fact_Assignment_Submission
+             WHERE Course_Key = ? AND Submission_Status IS NOT NULL
+             GROUP BY User_Key
+           ) sub ON sub.User_Key = fe.User_Key
+           WHERE fe.Course_Key = ? AND du.Primary_Role = 'Student'`,
+          [course.courseKey, course.courseKey, course.courseKey, course.courseKey]
+        );
+
+        const totalStudents = classRows.length || 1;
+        const myRow = classRows.find((r) => r.User_Key === userKey) || {
+          avg_grade: 0,
+          total_hours: 0,
+          on_time_rate: 0,
+          submitted_count: 0,
+        };
+
+        const myGrade = Number(myRow.avg_grade || 0);
+        const myHours = Number(myRow.total_hours || 0);
+        const myOnTimeRate = Number(myRow.on_time_rate || 0);
+
+        // Sort by grade descending to find rank
+        const sortedByGrade = [...classRows].sort((a, b) => Number(b.avg_grade) - Number(a.avg_grade));
+        const gradeRank = sortedByGrade.findIndex((r) => r.User_Key === userKey) + 1 || totalStudents;
+        const topGradePct = Math.max(1, Math.round((gradeRank / totalStudents) * 100));
+
+        // Sort by hours descending
+        const sortedByHours = [...classRows].sort((a, b) => Number(b.total_hours) - Number(a.total_hours));
+        const hoursRank = sortedByHours.findIndex((r) => r.User_Key === userKey) + 1 || totalStudents;
+        const topHoursPct = Math.max(1, Math.round((hoursRank / totalStudents) * 100));
+
+        // Averages
+        const classAvgGrade = Number(
+          (classRows.reduce((sum, r) => sum + Number(r.avg_grade || 0), 0) / totalStudents).toFixed(1)
+        );
+        const classAvgHours = Number(
+          (classRows.reduce((sum, r) => sum + Number(r.total_hours || 0), 0) / totalStudents).toFixed(1)
+        );
+        const classAvgOnTimeRate = Math.round(
+          classRows.reduce((sum, r) => sum + Number(r.on_time_rate || 0), 0) / totalStudents
+        );
+
+        // Maxima
+        const classMaxGrade = Number(sortedByGrade[0]?.avg_grade || 10);
+        const classMaxHours = Number(sortedByHours[0]?.total_hours || 0);
+
+        const gradeDiff = Number((myGrade - classAvgGrade).toFixed(1));
+        const hoursDiff = Number((myHours - classAvgHours).toFixed(1));
+
+        return {
+          courseKey: course.courseKey,
+          courseId: course.courseId,
+          code: course.code,
+          name: course.name,
+          totalStudents,
+          myStats: {
+            grade: myGrade,
+            hours: myHours,
+            onTimeRate: myOnTimeRate,
+            gradeRank,
+            topGradePct,
+            hoursRank,
+            topHoursPct,
+          },
+          classStats: {
+            avgGrade: classAvgGrade,
+            maxGrade: classMaxGrade,
+            avgHours: classAvgHours,
+            maxHours: classMaxHours,
+            avgOnTimeRate: classAvgOnTimeRate,
+          },
+          comparison: {
+            gradeDiff,
+            hoursDiff,
+            isGradeHigher: gradeDiff >= 0,
+            isHoursHigher: hoursDiff >= 0,
+            gradeInsight:
+              gradeDiff > 0
+                ? `Bạn cao hơn điểm trung bình lớp +${gradeDiff} điểm (Top ${topGradePct}% lớp)`
+                : gradeDiff === 0
+                ? `Điểm của bạn bằng mức trung bình lớp (Top ${topGradePct}% lớp)`
+                : `Điểm của bạn thấp hơn trung bình lớp ${Math.abs(gradeDiff)} điểm (Top ${topGradePct}% lớp)`,
+            hoursInsight:
+              hoursDiff > 0
+                ? `Thời lượng học của bạn vượt trung bình lớp +${hoursDiff}h (Top ${topHoursPct}% tích cực)`
+                : `Thời lượng học của bạn đạt ${myHours}h (Trung bình lớp: ${classAvgHours}h)`,
+          },
+        };
+      })
+    );
+
+    return res.json({
+      success: true,
+      studentId: student.Moodle_User_ID,
+      studentName: student.Full_Name,
+      data: benchmarks,
+    });
+  } catch (error) {
+    console.error("Lỗi getStudentBenchmark:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Không thể lấy dữ liệu so sánh lớp học.",
+      error: error.message,
+    });
+  }
+}
