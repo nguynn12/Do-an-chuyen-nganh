@@ -18,6 +18,78 @@ async function seedAuth() {
         password: "123456",
         role: "teacher",
       },
+      {
+        moodleUserId: 101,
+        username: "sv2310001",
+        password: "123456",
+        role: "student",
+      },
+      {
+        moodleUserId: 102,
+        username: "sv2310002",
+        password: "123456",
+        role: "student",
+      },
+      {
+        moodleUserId: 103,
+        username: "sv2310003",
+        password: "123456",
+        role: "student",
+      },
+      {
+        moodleUserId: 104,
+        username: "sv2310004",
+        password: "123456",
+        role: "student",
+      },
+      {
+        moodleUserId: 105,
+        username: "sv2310005",
+        password: "123456",
+        role: "student",
+      },
+      {
+        moodleUserId: 106,
+        username: "sv2310006",
+        password: "123456",
+        role: "student",
+      },
+      {
+        moodleUserId: 107,
+        username: "sv2310007",
+        password: "123456",
+        role: "student",
+      },
+      {
+        moodleUserId: 108,
+        username: "sv2310008",
+        password: "123456",
+        role: "student",
+      },
+      {
+        moodleUserId: 109,
+        username: "sv2310009",
+        password: "123456",
+        role: "student",
+      },
+      {
+        moodleUserId: 110,
+        username: "sv2310010",
+        password: "123456",
+        role: "student",
+      },
+      {
+        moodleUserId: 111,
+        username: "sv2310011",
+        password: "123456",
+        role: "student",
+      },
+      {
+        moodleUserId: 112,
+        username: "sv2310012",
+        password: "123456",
+        role: "student",
+      },
     ];
 
     for (const account of accounts) {
@@ -76,7 +148,7 @@ async function seedAuth() {
       );
 
       console.log(
-        `✅ ${account.username} - ${user.Full_Name}`
+        `✅ ${account.username} - ${user.Full_Name} (${account.role})`
       );
     }
 
