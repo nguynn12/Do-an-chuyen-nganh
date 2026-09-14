@@ -1,15 +1,20 @@
-import React from "react";
 import { Search } from "lucide-react";
 
 export default function StudentHeader({ student, onSearch }) {
-  const initials = student?.fullName
-    ? student.fullName
-        .split(" ")
-        .map((w) => w[0])
-        .slice(-2)
-        .join("")
-        .toUpperCase()
-    : "SV";
+  const displayName =
+    student?.fullName || localStorage.getItem("studentName") || "Sinh viên";
+  const displayCode =
+    student?.studentCode ||
+    student?.username ||
+    localStorage.getItem("studentUsername") ||
+    "";
+
+  const initials = displayName
+    .split(" ")
+    .map((w) => w[0])
+    .slice(-2)
+    .join("")
+    .toUpperCase();
 
   return (
     <header className="header">
@@ -51,9 +56,9 @@ export default function StudentHeader({ student, onSearch }) {
         <div className="avatar">{initials}</div>
 
         <div className="teacher-mini">
-          <strong>{student?.fullName || "Nguyễn Văn An"}⌄</strong>
+          <strong>{displayName}⌄</strong>
           <span>
-            MSSV: {student?.studentCode || student?.username || "2310001"} - {student?.cohort || "Khoa CNTT"}
+            MSSV: {displayCode || "—"} - {student?.cohort || "Khoa CNTT"}
           </span>
         </div>
       </div>

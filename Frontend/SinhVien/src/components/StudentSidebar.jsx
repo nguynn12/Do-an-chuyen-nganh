@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Home,
   Grid3X3,
@@ -7,6 +6,8 @@ import {
   Clock,
   LogOut,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { clearAuthStorage } from "../services/studentAuth";
 
 const menuItems = [
   { id: "overview", label: "Tổng quan phân tích", icon: Home },
@@ -17,9 +18,11 @@ const menuItems = [
 ];
 
 export default function StudentSidebar({ activeTab, onSelectTab }) {
+  const navigate = useNavigate();
+
   const handleLogout = () => {
-    alert("Đã đăng xuất khỏi Cổng Sinh Viên.");
-    window.location.hash = "";
+    clearAuthStorage();
+    navigate("/dang-nhap", { replace: true });
   };
 
   return (

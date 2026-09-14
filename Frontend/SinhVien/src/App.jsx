@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { Route, Routes } from "react-router-dom";
 import "./styles/StudentDashboard.css";
 
 import StudentSidebar from "./components/StudentSidebar";
 import StudentHeader from "./components/StudentHeader";
+import StudentProtectedRoute from "./components/StudentProtectedRoute";
 
+import StudentLogin from "./pages/StudentLogin";
 import StudentOverview from "./pages/StudentOverview";
 import StudentCourses from "./pages/StudentCourses";
 import StudentCourseDetail from "./pages/StudentCourseDetail";
@@ -11,14 +14,17 @@ import StudentSubmissions from "./pages/StudentSubmissions";
 import StudentGrades from "./pages/StudentGrades";
 import StudentEngagement from "./pages/StudentEngagement";
 
-export default function App() {
+import { studentGet } from "./services/apiClient";
+import { getStudentUserId } from "./services/studentAuth";
+
+function StudentShell() {
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedCourseId, setSelectedCourseId] = useState(null);
   const [summary, setSummary] = useState(null);
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const studentUserKey = getStudentUserId();
 
-  // Parse route từ window.location.hash
   const parseRoute = (hash) => {
     if (!hash || hash === "#" || hash === "#overview") {
       setActiveTab("overview");
@@ -52,25 +58,20 @@ export default function App() {
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
 
-  // Fetch initial summary & courses
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [sumRes, crsRes] = await Promise.all([
-          fetch("/api/v1/student/dashboard-summary"),
-          fetch("/api/v1/student/courses"),
+        const [sumData, crsData] = await Promise.all([
+          studentGet("/dashboard-summary"),
+          studentGet("/courses"),
         ]);
 
-        if (sumRes.ok) {
-          const sumData = await sumRes.json();
+        if (sumData) {
           setSummary(sumData);
         }
 
-        if (crsRes.ok) {
-          const crsData = await crsRes.json();
-          setCourses(Array.isArray(crsData) ? crsData : []);
-        }
+        setCourses(Array.isArray(crsData) ? crsData : []);
       } catch (err) {
         console.error("Lỗi nạp dữ liệu dashboard sinh viên:", err);
       } finally {
@@ -79,30 +80,25 @@ export default function App() {
     };
 
     fetchData();
-  }, []);
+  }, [studentUserKey]);
 
-  // Chuyển tab
   const handleSelectTab = (tabId) => {
     window.location.hash = tabId === "overview" ? "" : tabId;
   };
 
-  // Xem chi tiết môn học
   const handleNavigateToCourse = (courseId) => {
     window.location.hash = `course-${courseId}`;
   };
 
   return (
     <div className="app">
-      {/* 1. Header cố định đỉnh màn hình (62px, #17221d, viền #41954c) */}
       <StudentHeader student={summary?.student} />
 
-      {/* 2. Sidebar cố định bên trái (45px, #19201c, icon active #3e8f46) */}
       <StudentSidebar
         activeTab={activeTab === "course-detail" ? "courses" : activeTab}
         onSelectTab={handleSelectTab}
       />
 
-      {/* 3. Nội dung trang */}
       {loading ? (
         <main className="page-full">
           <div
@@ -160,5 +156,21 @@ export default function App() {
         </>
       )}
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/dang-nhap" element={<StudentLogin />} />
+      <Route
+        path="/*"
+        element={
+          <StudentProtectedRoute>
+            <StudentShell />
+          </StudentProtectedRoute>
+        }
+      />
+    </Routes>
   );
 }
