@@ -1,0 +1,65 @@
+.pbi-embed-container {
+    margin: 24px 0;
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+  }
+  
+  .pbi-embed-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fafafa;
+  }
+  
+  .pbi-embed-title-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .pbi-embed-icon {
+    color: #0b3b24;
+  }
+  
+  .pbi-embed-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0b3b24;
+    margin: 0;
+  }
+  
+  .pbi-embed-badge {
+    font-size: 11px;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+  
+  .pbi-embed-frame-wrapper {
+    width: 100%;
+    position: relative;
+  }
+  
+  .pbi-embed-loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f9fafb;
+    color: #6b7280;
+    font-size: 13px;
+  }
+  
+  .pbi-embed-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }

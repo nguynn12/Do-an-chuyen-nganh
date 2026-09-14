@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { studentGet } from "../services/apiClient";
+import PowerBIEmbed from "../components/PowerBIEmbed";
 import {
   ArrowLeft,
   Award,
@@ -18,6 +19,12 @@ export default function StudentCourseDetail({ courseId, onBack }) {
   const [courseData, setCourseData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // =========================================================================
+  // CẤU HÌNH LIÊN KẾT BÁO CÁO POWER BI
+  // =========================================================================
+  // Thay thế đường link bên dưới bằng link nhúng Public từ app.powerbi.com của bạn
+  const BASE_POWERBI_URL = "https://app.powerbi.com/view?r=THAY_MA_NHUNG_POWER_BI_VAO_DAY";
 
   useEffect(() => {
     if (!courseId) return;
@@ -38,6 +45,16 @@ export default function StudentCourseDetail({ courseId, onBack }) {
       })
       .finally(() => setLoading(false));
   }, [courseId]);
+
+  // Tạo URL nhúng kèm bộ lọc tự động theo mã môn học hiện tại
+  const dynamicReportUrl = useMemo(() => {
+    if (!courseData?.code) return "";
+    if (!BASE_POWERBI_URL.includes("http") || BASE_POWERBI_URL.includes("THAY_MA_NHUNG")) {
+      return "";
+    }
+    // Gắn tham số lọc URL cho bảng dim_courses trong Data Warehouse
+    return `${BASE_POWERBI_URL}&$filter=dim_courses/course_code eq '${courseData.code}'`;
+  }, [courseData?.code]);
 
   if (loading) {
     return (
@@ -173,7 +190,37 @@ export default function StudentCourseDetail({ courseId, onBack }) {
         </div>
       </div>
 
-      {/* 3. ASSIGNMENTS TABLE */}
+      {/* ========================================================================= */}
+      {/* 3. BÁO CÁO PHÂN TÍCH POWER BI (EMBEDDED ANALYTICS)                        */}
+      {/* ========================================================================= */}
+      {dynamicReportUrl ? (
+        <PowerBIEmbed
+          title={`Phổ điểm & Đối sánh năng lực môn học (${courseData.code})`}
+          reportUrl={dynamicReportUrl}
+          height="460px"
+        />
+      ) : (
+        <div
+          style={{
+            margin: "20px 0",
+            padding: "28px",
+            background: "#ffffff",
+            border: "1px dashed #c2d6cb",
+            borderRadius: "14px",
+            textAlign: "center",
+            color: "#66736b",
+          }}
+        >
+          <strong style={{ display: "block", color: "#17422b", marginBottom: "4px" }}>
+            Khu vực Báo cáo Phân tích Trực quan Power BI ({courseData.code})
+          </strong>
+          <span style={{ fontSize: "12px" }}>
+            Dán liên kết báo cáo Power BI vào biến <code>BASE_POWERBI_URL</code> để kích hoạt biểu đồ phổ điểm và đối sánh lớp học.
+          </span>
+        </div>
+      )}
+
+      {/* 4. ASSIGNMENTS TABLE */}
       <div className="student-table-card">
         <div className="section-title">
           <div className="left">
@@ -244,7 +291,7 @@ export default function StudentCourseDetail({ courseId, onBack }) {
         </table>
       </div>
 
-      {/* 4. LEARNING RESOURCES TABLE */}
+      {/* 5. LEARNING RESOURCES TABLE */}
       {resourceTopics.length > 0 && (
         <div className="student-table-card" style={{ marginTop: "20px" }}>
           <div className="section-title">
