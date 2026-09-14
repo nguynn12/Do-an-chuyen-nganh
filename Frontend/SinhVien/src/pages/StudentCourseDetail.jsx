@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { studentGet } from "../services/apiClient";
 import {
   ArrowLeft,
   Award,
@@ -23,11 +24,7 @@ export default function StudentCourseDetail({ courseId, onBack }) {
     setLoading(true);
     setError(null);
 
-    fetch(`/api/v1/student/courses/${courseId}`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`Lỗi tải dữ liệu (${res.status})`);
-        return res.json();
-      })
+    studentGet(`/courses/${courseId}`)
       .then((data) => {
         if (data.course) {
           setCourseData(data.course);

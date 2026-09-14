@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { studentGet } from "../services/apiClient";
 import {
   CheckCircle2,
   Clock3,
@@ -19,8 +20,7 @@ export default function StudentSubmissions() {
   const [hoveredSlice, setHoveredSlice] = useState(null);
 
   useEffect(() => {
-    fetch("/api/v1/student/submissions")
-      .then((res) => res.json())
+    studentGet("/submissions")
       .then((data) => {
         if (data.data) {
           setSubmissions(data.data);

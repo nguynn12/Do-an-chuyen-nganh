@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
+import { studentGet } from "../services/apiClient";
 import {
   Clock3,
   TrendingUp,
@@ -55,8 +56,7 @@ export default function StudentEngagement() {
   const [hoveredCell, setHoveredCell] = useState(null);
 
   useEffect(() => {
-    fetch("/api/v1/student/engagement")
-      .then((res) => res.json())
+    studentGet("/engagement")
       .then((data) => {
         if (data.success) {
           setEngagementData(data);

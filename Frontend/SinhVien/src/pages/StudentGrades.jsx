@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { studentGet } from "../services/apiClient";
 import {
   Award,
   CheckCircle2,
@@ -42,10 +43,8 @@ export default function StudentGrades() {
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/v1/student/grades").then((res) => res.json()),
-      fetch("/api/v1/student/benchmark")
-        .then((res) => res.json())
-        .catch(() => ({ data: [] })),
+      studentGet("/grades"),
+      studentGet("/benchmark").catch(() => ({ data: [] })),
     ])
       .then(([gradesData, benchmarkData]) => {
         if (gradesData?.data) {
