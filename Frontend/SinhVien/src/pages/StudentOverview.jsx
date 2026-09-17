@@ -13,6 +13,7 @@ import {
   ExternalLink,
   Users,
 } from "lucide-react";
+import StudentCompetencyRadar from "../components/StudentCompetencyRadar";
 
 export default function StudentOverview({
   summary,
@@ -178,7 +179,13 @@ export default function StudentOverview({
           </div>
         </section>
 
-        {/* 2. SECTION: KHÓA HỌC CỦA TÔI */}
+        {/* 2. ĐÁNH GIÁ NĂNG LỰC TOÀN DIỆN & CẢNH BÁO SỚM (RADAR CHART) */}
+        <StudentCompetencyRadar
+          summary={summary}
+          onNavigateToAnalytics={() => onNavigateToTab("analytics")}
+        />
+
+        {/* 3. SECTION: KHÓA HỌC CỦA TÔI */}
         <section className="section">
           <div className="section-title">
             <div>
@@ -422,6 +429,18 @@ export default function StudentOverview({
               <span>Hệ thống LMS DLU</span>
             </div>
             <ExternalLink size={14} />
+          </button>
+
+          <button
+            type="button"
+            className="quick-link"
+            onClick={() => onNavigateToTab("analytics")}
+          >
+            <div>
+              <span>📊</span>
+              <span>Báo cáo Power BI sinh viên</span>
+            </div>
+            <ChevronRight size={14} />
           </button>
 
           <button
