@@ -137,6 +137,18 @@ export async function getTeacherById(
 
 // ======================================================
 // 2. LẤY CÁC MÔN GIẢNG VIÊN ĐANG DẠY
+// + TỰ ĐỘNG XÁC ĐỊNH HỌC KỲ TỪ START_DATE
+//
+// QUY ƯỚC:
+// Tháng 8 -> 12:
+// Học kỳ 1 của năm học bắt đầu trong năm đó
+//
+// Tháng 1 -> 6:
+// Học kỳ 2 của năm học bắt đầu từ năm trước
+//
+// Ví dụ:
+// 2026-08-03 -> Học kỳ 1 (2026–2027)
+// 2026-01-05 -> Học kỳ 2 (2025–2026)
 // ======================================================
 
 export async function getTeacherCourses(
@@ -151,6 +163,7 @@ export async function getTeacherCourses(
       await pool.query(
         `
         SELECT DISTINCT
+
           dc.Course_Key,
           dc.Moodle_Course_ID,
           dc.Course_Code,
@@ -159,44 +172,151 @@ export async function getTeacherCourses(
           dc.Category_Name,
           dc.Start_Date,
           dc.End_Date,
+
+
+          -- =============================================
+          -- TÊN HỌC KỲ
+          -- =============================================
+
+          CASE
+
+            WHEN MONTH(dc.Start_Date)
+              BETWEEN 8 AND 12
+
+            THEN CONCAT(
+              'Học kỳ 1 (',
+              YEAR(dc.Start_Date),
+              '–',
+              YEAR(dc.Start_Date) + 1,
+              ')'
+            )
+
+
+            WHEN MONTH(dc.Start_Date)
+              BETWEEN 1 AND 6
+
+            THEN CONCAT(
+              'Học kỳ 2 (',
+              YEAR(dc.Start_Date) - 1,
+              '–',
+              YEAR(dc.Start_Date),
+              ')'
+            )
+
+
+            ELSE
+              'Chưa xác định'
+
+          END AS Semester_Name,
+
+
+          -- =============================================
+          -- KEY HỌC KỲ
+          --
+          -- Ví dụ:
+          -- 2026-1 = Học kỳ 1 (2026–2027)
+          -- 2025-2 = Học kỳ 2 (2025–2026)
+          -- =============================================
+
+          CASE
+
+            WHEN MONTH(dc.Start_Date)
+              BETWEEN 8 AND 12
+
+            THEN CONCAT(
+              YEAR(dc.Start_Date),
+              '-1'
+            )
+
+
+            WHEN MONTH(dc.Start_Date)
+              BETWEEN 1 AND 6
+
+            THEN CONCAT(
+              YEAR(dc.Start_Date) - 1,
+              '-2'
+            )
+
+
+            ELSE
+              'unknown'
+
+          END AS Semester_Key,
+
+
           dc.Is_Visible
 
-        FROM lms_moodle_source.mdl_role_assignments ra
 
-        INNER JOIN lms_moodle_source.mdl_role r
-          ON r.id = ra.roleid
+        FROM
+          lms_moodle_source.mdl_role_assignments ra
 
-        INNER JOIN lms_moodle_source.mdl_context ctx
-          ON ctx.id = ra.contextid
-          AND ctx.contextlevel = 50
 
-        INNER JOIN Dim_Course dc
+        INNER JOIN
+          lms_moodle_source.mdl_role r
+
+          ON r.id =
+            ra.roleid
+
+
+        INNER JOIN
+          lms_moodle_source.mdl_context ctx
+
+          ON ctx.id =
+            ra.contextid
+
+          AND ctx.contextlevel =
+            50
+
+
+        INNER JOIN
+          Dim_Course dc
+
           ON dc.Moodle_Course_ID =
             ctx.instanceid
 
-        WHERE ra.userid = ?
+
+        WHERE
+          ra.userid = ?
+
 
           AND r.shortname IN (
             'teacher',
             'editingteacher'
           )
 
+
         ORDER BY
-          dc.Course_Name
+          dc.Start_Date DESC,
+          dc.Course_Name ASC
         `,
-        [teacherId]
+        [
+          teacherId,
+        ]
       );
+
 
     return res.json({
       success: true,
-      total: rows.length,
-      data: rows,
+
+      teacherId:
+        Number(
+          teacherId
+        ),
+
+      total:
+        rows.length,
+
+      data:
+        rows,
     });
+
   } catch (error) {
+
     console.error(
       "Lỗi getTeacherCourses:",
       error
     );
+
 
     return res.status(500).json({
       success: false,
@@ -209,7 +329,6 @@ export async function getTeacherCourses(
     });
   }
 }
-
 
 // ======================================================
 // 3. DASHBOARD TỔNG QUAN GIẢNG VIÊN

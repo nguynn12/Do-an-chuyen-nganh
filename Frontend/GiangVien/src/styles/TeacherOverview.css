@@ -208,23 +208,40 @@ button {
 ======================================== */
 
 .sidebar {
-  width: 45px;
+  width: 58px;
 
   position: fixed;
   top: 62px;
   left: 0;
   bottom: 0;
 
-  z-index: 10;
+  z-index: 30;
 
   display: flex;
   flex-direction: column;
   align-items: center;
 
-  padding-top: 14px;
+  padding:
+    15px 7px 14px;
 
-  background: #19201c;
+  background:
+    linear-gradient(
+      180deg,
+      #18231e 0%,
+      #141c18 100%
+    );
+
+  border-right:
+    1px solid rgba(255, 255, 255, 0.05);
+
+  box-shadow:
+    4px 0 18px rgba(15, 30, 20, 0.06);
 }
+
+
+/* ========================================
+   SIDEBAR MENU
+======================================== */
 
 .sidebar-menu {
   width: 100%;
@@ -233,56 +250,210 @@ button {
   flex-direction: column;
   align-items: center;
 
-  gap: 13px;
+  gap: 8px;
 }
 
+
+/* ========================================
+   SIDEBAR BUTTON
+======================================== */
+
 .sidebar-button {
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
+
+  position: relative;
+
+  flex-shrink: 0;
 
   display: grid;
   place-items: center;
 
+  padding: 0;
+
   border: none;
-  border-radius: 7px;
+  border-radius: 10px;
 
   background: transparent;
 
-  color: #87928b;
+  color: #7f8c85;
 
   transition:
-    background-color 0.2s ease,
-    color 0.2s ease;
+    background-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
 }
+
 
 .sidebar-button:hover {
-  background: #29352f;
+  background:
+    rgba(255, 255, 255, 0.065);
 
-  color: white;
+  color: #edf2ee;
+
+  transform:
+    translateY(-1px);
 }
+
+
+/* ========================================
+   ACTIVE
+======================================== */
 
 .sidebar-button.side-active {
-  background: #3e8f46;
+  background:
+    linear-gradient(
+      135deg,
+      #438f4b,
+      #367c3e
+    );
 
-  color: white;
+  color: #ffffff;
+
+  box-shadow:
+    0 5px 13px
+    rgba(54, 126, 63, 0.22);
 }
+
+
+.sidebar-button.side-active::before {
+  content: "";
+
+  width: 3px;
+  height: 20px;
+
+  position: absolute;
+
+  left: -9px;
+  top: 50%;
+
+  transform:
+    translateY(-50%);
+
+  border-radius:
+    0 4px 4px 0;
+
+  background: #65c777;
+}
+
+
+/* ========================================
+   TOOLTIP
+======================================== */
+
+.sidebar-tooltip {
+  min-width: max-content;
+
+  position: absolute;
+
+  left: 51px;
+  top: 50%;
+
+  z-index: 100;
+
+  transform:
+    translateY(-50%)
+    translateX(-4px);
+
+  padding: 7px 10px;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.07);
+
+  border-radius: 7px;
+
+  background: #222e28;
+
+  color: #f3f6f4;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  opacity: 0;
+  visibility: hidden;
+
+  pointer-events: none;
+
+  box-shadow:
+    0 7px 18px
+    rgba(0, 0, 0, 0.18);
+
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease,
+    visibility 0.15s ease;
+}
+
+
+.sidebar-tooltip::before {
+  content: "";
+
+  position: absolute;
+
+  left: -4px;
+  top: 50%;
+
+  width: 8px;
+  height: 8px;
+
+  transform:
+    translateY(-50%)
+    rotate(45deg);
+
+  background: #222e28;
+}
+
+
+.sidebar-button:hover
+.sidebar-tooltip {
+  opacity: 1;
+  visibility: visible;
+
+  transform:
+    translateY(-50%)
+    translateX(0);
+}
+
+
+/* ========================================
+   SIDEBAR BOTTOM
+======================================== */
 
 .side-bottom {
   width: 100%;
 
   margin-top: auto;
-  margin-bottom: 15px;
 
   display: flex;
   justify-content: center;
+
+  padding-top: 12px;
+
+  border-top:
+    1px solid rgba(255, 255, 255, 0.06);
 }
+
+
+/* ========================================
+   LOGOUT
+======================================== */
+
+.logout-button {
+  color: #7f8c85;
+}
+
 
 .logout-button:hover {
-  background: #49302e;
+  background:
+    rgba(220, 75, 70, 0.12);
 
   color: #ff7770;
-}
 
+  transform:
+    translateY(-1px);
+}
 
 /* ========================================
    PAGE
@@ -1206,26 +1377,49 @@ button {
   font-size: 9px;
 }
 
+/* ======================================================
+   NOTIFICATION
+====================================================== */
+
 .notification {
   margin-top: 15px;
-
   display: flex;
-
   gap: 10px;
-
   cursor: pointer;
 }
+
+
+/* ======================================================
+   CHẤM TRẠNG THÁI
+====================================================== */
 
 .notification i {
   width: 6px;
   height: 6px;
-
+  min-width: 6px;
   margin-top: 5px;
-
   border-radius: 50%;
+}
 
+
+/* CHƯA ĐỌC -> HIỆN CHẤM CAM */
+
+.notification-unread > i {
+  visibility: visible;
   background: #e16d28;
 }
+
+
+/* ĐÃ ĐỌC -> ẨN CHẤM CAM */
+
+.notification-read > i {
+  visibility: hidden;
+}
+
+
+/* ======================================================
+   TEXT
+====================================================== */
 
 .notification strong,
 .notification span {
@@ -1238,9 +1432,7 @@ button {
 
 .notification span {
   margin-top: 6px;
-
   color: #869188;
-
   font-size: 8px;
 }
 
@@ -2368,4 +2560,1518 @@ button:last-child {
     grid-template-columns:
       1fr;
   }
+}
+/* ========================================
+   DLU ACTIVITY DASHBOARD - LOWER OVERVIEW
+======================================== */
+.activity-dashboard { margin-top: 18px; display:grid; grid-template-columns: 1.25fr 1fr 1fr; gap:14px; }
+.activity-card { min-height:220px; padding:16px; overflow:hidden; position:relative; border:1px solid #dce5df; border-radius:14px; background:linear-gradient(180deg,#fff 0%,#fbfdfb 100%); box-shadow:0 5px 18px rgba(26,65,38,.055); }
+.activity-card::after { content:""; position:absolute; left:0; right:0; bottom:0; height:34px; pointer-events:none; opacity:.55; background:linear-gradient(165deg,transparent 0 45%,#e9f3ea 46% 62%,#f4f8f4 63%); }
+.activity-heading { min-height:32px; display:flex; align-items:center; gap:9px; color:#153b2a; }
+.activity-heading strong { font-size:13px; white-space:nowrap; }
+.activity-heading strong em { font-style:normal; font-weight:500; color:#48564e; }
+.activity-heading select { margin-left:auto; height:30px; padding:0 27px 0 10px; border:1px solid #d5dfd8; border-radius:7px; background:#fff; color:#425047; font-size:9px; font-weight:600; }
+.activity-icon { width:31px; height:31px; display:grid; place-items:center; border-radius:9px; background:#eaf4eb; color:#24723b; }
+.line-chart-wrap { height:154px; padding-top:8px; position:relative; z-index:1; }
+.line-chart-wrap svg { width:100%; height:125px; overflow:visible; }
+.grid-line { stroke:#e4ebe6; stroke-width:.45; }
+.chart-area { fill:#dcecdf; opacity:.72; }
+.chart-line { fill:none; stroke:#2f8747; stroke-width:1.4; vector-effect:non-scaling-stroke; }
+.chart-dot { fill:#2f8747; vector-effect:non-scaling-stroke; }
+.chart-dates { display:flex; justify-content:space-between; padding:0 5px; color:#637168; font-size:8px; }
+.donut-layout { height:160px; display:flex; align-items:center; justify-content:center; gap:24px; position:relative; z-index:1; }
+.donut { width:126px; height:126px; flex:0 0 auto; border-radius:50%; display:grid; place-items:center; }
+.donut-hole { width:72px; height:72px; display:grid; place-content:center; text-align:center; border-radius:50%; background:white; box-shadow:0 0 0 1px rgba(0,0,0,.02); }
+.donut-hole b { color:#153b2a; font-size:19px; line-height:1; }
+.donut-hole span { margin-top:5px; color:#536159; font-size:9px; }
+.donut-legend { min-width:145px; display:flex; flex-direction:column; gap:16px; }
+.donut-legend div { display:grid; grid-template-columns:10px 1fr auto; align-items:center; gap:7px; font-size:9px; }
+.donut-legend i { width:9px; height:9px; border-radius:3px; }
+.donut-legend i.good { background:#2f8b45; }.donut-legend i.watch { background:#f2b632; }.donut-legend i.risk { background:#ef4d45; }
+.donut-legend b { color:#2d7d40; }.donut-legend div:nth-child(2) b { color:#d79818; }.donut-legend div:nth-child(3) b { color:#e4443d; }
+.resource-grid { height:158px; padding-top:9px; display:grid; grid-template-columns:1fr 1fr; gap:9px; position:relative; z-index:1; }
+.resource-grid button { min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; border:1px solid #dfe7e1; border-radius:11px; background:linear-gradient(145deg,#fbfdfb,#f5f8f6); color:#174d36; transition:.18s ease; }
+.resource-grid button span { color:#34453b; font-size:9px; font-weight:600; }
+.resource-grid button:hover { transform:translateY(-2px); border-color:#bcd3c1; background:#f1f8f2; box-shadow:0 5px 12px rgba(30,90,48,.08); }
+
+/* Small polish only: keeps all existing top controls/actions intact */
+.welcome-card,.course-card,.right-card,.tasks-card { box-shadow:0 4px 16px rgba(24,57,34,.045); }
+.welcome-card { background:linear-gradient(135deg,#fff 0%,#fff 72%,#f4f9f2 100%); }
+.course-cover { background-image:linear-gradient(90deg,rgba(17,75,39,.08),rgba(255,255,255,.03)); }
+
+@media (max-width:1350px){ .activity-dashboard{grid-template-columns:1fr 1fr}.resources-card{grid-column:1/-1}.resources-card .resource-grid{grid-template-columns:repeat(4,1fr);height:100px}.resources-card{min-height:160px} }
+@media (max-width:950px){ .activity-dashboard{grid-template-columns:1fr}.resources-card{grid-column:auto}.resources-card .resource-grid{grid-template-columns:1fr 1fr;height:158px} }
+
+/* ==========================================================
+   DLU BRAND REFRESH — HEADER + SIDEBAR
+   Chỉ thay giao diện, giữ nguyên route/click handler hiện có.
+========================================================== */
+:root {
+  --dlu-green-950: #063e32;
+  --dlu-green-900: #084b3c;
+  --dlu-green-800: #0c5a47;
+  --dlu-green-700: #18734f;
+  --dlu-green-100: #e9f4ec;
+  --dlu-gold: #c9a45a;
+}
+
+.header.dlu-header {
+  height: 94px;
+  padding: 0 28px 0 26px;
+  border-bottom: 1px solid rgba(11, 85, 63, .18);
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.98) 0%, rgba(251,252,248,.94) 42%, rgba(255,255,255,.97) 100%);
+  color: #123d31;
+  box-shadow: 0 2px 12px rgba(27, 60, 46, .08);
+  overflow: hidden;
+}
+
+.header.dlu-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .13;
+  background:
+    linear-gradient(180deg, transparent 0 58%, rgba(22,102,67,.15) 59% 61%, transparent 62%),
+    radial-gradient(ellipse at 49% 100%, rgba(36,113,72,.34), transparent 29%),
+    radial-gradient(ellipse at 59% 100%, rgba(177,145,73,.22), transparent 24%);
+}
+
+.header.dlu-header::after {
+  content: "";
+  position: absolute;
+  left: 37%;
+  right: 18%;
+  bottom: 0;
+  height: 48px;
+  pointer-events: none;
+  opacity: .11;
+  background: repeating-linear-gradient(90deg, transparent 0 22px, #0a6648 23px 25px, transparent 26px 38px);
+  clip-path: polygon(0 78%, 7% 52%, 13% 70%, 20% 35%, 27% 66%, 35% 18%, 43% 61%, 52% 30%, 61% 68%, 70% 22%, 80% 60%, 89% 38%, 100% 72%, 100% 100%, 0 100%);
+}
+
+.dlu-brand { width: 270px; min-width: 270px; gap: 12px; position: relative; z-index: 1; }
+.school-logo.dlu-seal {
+  width: 58px; height: 58px; flex: 0 0 58px; border-radius: 50%;
+  border: 2px solid #d6b661;
+  background: radial-gradient(circle at 50% 50%, #f7fff5 0 52%, #e5f3e7 53% 100%);
+  box-shadow: inset 0 0 0 3px #fff, 0 2px 8px rgba(16,76,54,.12);
+  color: #197048;
+}
+.dlu-seal-mark { font-size: 13px; font-weight: 800; letter-spacing: .6px; }
+.dlu-school-copy { line-height: 1.05; }
+.dlu-header .school-name { color: #174e3c; font-size: 14px; font-weight: 800; letter-spacing: .15px; }
+.school-name-en { margin-top: 3px; color: #174e3c; font-size: 13px; font-weight: 800; }
+.dlu-header .school-sub { margin-top: 5px; color: #6f7d76; font-size: 9px; letter-spacing: .25px; }
+.dlu-header-divider { width: 1px; height: 48px; margin: 0 16px 0 4px; background: #9eb3a7; position: relative; z-index: 1; }
+.dlu-lms-title { width: 265px; min-width: 225px; position: relative; z-index: 1; }
+.dlu-lms-title strong { display: block; color: #163f34; font-size: 14px; line-height: 1.2; }
+.dlu-lms-title span { display: block; margin-top: 5px; color: #2f6654; font-family: Georgia, serif; font-size: 10px; font-style: italic; }
+
+.dlu-top-nav { display: none; }
+.dlu-header .header-right { position: relative; z-index: 2; gap: 15px; }
+.dlu-header .search-box { width: 245px; height: 34px; border: 1px solid #dbe4df; border-radius: 18px; background: rgba(255,255,255,.92); color: #667970; box-shadow: 0 2px 8px rgba(22,61,48,.05); }
+.dlu-header .search-box input { color: #243d34; font-size: 10px; }
+.dlu-header .search-box input::placeholder { color: #9aa8a1; }
+.header-profile { display: flex; align-items: center; gap: 9px; min-width: 155px; padding: 4px 7px; border-radius: 9px; cursor: pointer; transition: background .18s ease; }
+.header-profile:hover { background: rgba(13,92,67,.06); }
+.dlu-header .avatar { width: 37px; height: 37px; background: linear-gradient(145deg,#0c6048,#073f34); font-size: 11px; box-shadow: 0 3px 8px rgba(6,67,50,.16); }
+.dlu-header .teacher-mini strong { color: #1b3129; font-size: 10px; white-space: nowrap; }
+.dlu-header .teacher-mini span { margin-top: 3px; color: #65746d; font-size: 9px; }
+.profile-chevron { color: #53675e; }
+.dlu-motto { min-width: 112px; padding-left: 8px; transform: rotate(-2deg); color: #2c7659; font-family: Georgia, serif; font-style: italic; text-align: center; line-height: 1.15; }
+.dlu-motto span, .dlu-motto strong { display: block; font-weight: 500; font-size: 12px; }
+
+.sidebar.dlu-sidebar {
+  width: 170px;
+  top: 94px;
+  padding: 18px 0 15px;
+  align-items: stretch;
+  background: linear-gradient(180deg, #0a543f 0%, #063e32 55%, #07392f 100%);
+  border-right: 1px solid rgba(255,255,255,.08);
+  box-shadow: 4px 0 18px rgba(9,61,45,.12);
+  overflow: hidden;
+}
+.dlu-sidebar::before {
+  content: ""; position: absolute; inset: auto -40px 0 -40px; height: 230px; opacity: .10; pointer-events: none;
+  background: repeating-linear-gradient(70deg, transparent 0 15px, #d8c584 16px 18px, transparent 19px 30px);
+  clip-path: polygon(0 80%, 8% 64%, 17% 75%, 28% 47%, 38% 70%, 48% 25%, 58% 68%, 70% 49%, 81% 72%, 91% 55%, 100% 76%, 100% 100%, 0 100%);
+}
+.dlu-sidebar .sidebar-menu { align-items: stretch; gap: 3px; }
+.dlu-sidebar .sidebar-button {
+  width: 100%; height: 47px; padding: 0 15px; border-radius: 0;
+  display: flex; align-items: center; justify-content: flex-start; gap: 12px;
+  color: rgba(255,255,255,.82); transform: none;
+}
+.dlu-sidebar .sidebar-button:hover { background: rgba(255,255,255,.07); color: #fff; transform: none; }
+.dlu-sidebar .sidebar-button.side-active { background: linear-gradient(90deg, rgba(46,136,86,.68), rgba(35,122,76,.35)); box-shadow: none; color: #fff; }
+.dlu-sidebar .sidebar-button.side-active::before { left: 0; width: 4px; height: 100%; border-radius: 0; background: #9bd18e; }
+.sidebar-icon-wrap { width: 23px; display: inline-flex; align-items: center; justify-content: center; flex: 0 0 23px; }
+.sidebar-label { display: inline-block; font-size: 11px; font-weight: 500; white-space: nowrap; }
+.sidebar-badge { margin-left: auto; width: 21px; height: 21px; display: grid; place-items: center; border-radius: 50%; background: #e74f4a; color: #fff; font-size: 9px; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,.12); }
+.dlu-sidebar .sidebar-tooltip { display: none; }
+.dlu-sidebar-art { position: relative; z-index: 1; margin-top: auto; padding: 8px 10px 16px; color: rgba(224,211,153,.68); text-align: center; }
+.dlu-sidebar-art::before { content: ""; display: block; height: 68px; margin: 0 14px 8px; border-bottom: 1px solid rgba(220,202,137,.28); background: linear-gradient(90deg, transparent 46%, rgba(220,202,137,.6) 47% 53%, transparent 54%); clip-path: polygon(45% 100%,45% 35%,48% 20%,49% 0,51% 20%,55% 35%,55% 100%); }
+.dlu-sidebar-art strong { display: block; font-family: Georgia, serif; font-size: 11px; font-weight: 500; letter-spacing: .5px; }
+.dlu-sidebar-art small { display: block; margin-top: 5px; font-family: Georgia, serif; font-size: 8px; font-style: italic; }
+.dlu-sidebar .side-bottom { margin-top: 0; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.09); }
+.dlu-sidebar .logout-button { color: rgba(255,255,255,.82); }
+
+/* Đẩy toàn bộ nội dung sang phải/xuống đúng kích thước header + sidebar mới */
+.page { margin-left: 170px; padding-top: 94px; }
+
+@media (max-width: 1180px) {
+  .dlu-motto { display: none; }
+  .dlu-lms-title { width: 220px; }
+  .dlu-header .search-box { width: 210px; }
+}
+@media (max-width: 950px) {
+  .header.dlu-header { height: 72px; padding: 0 14px; }
+  .dlu-brand { min-width: 235px; width: 235px; }
+  .school-logo.dlu-seal { width: 45px; height: 45px; flex-basis: 45px; }
+  .dlu-header-divider, .dlu-lms-title, .dlu-header .search-box { display: none; }
+  .sidebar.dlu-sidebar { width: 58px; top: 72px; }
+  .dlu-sidebar .sidebar-button { width: 58px; padding: 0; justify-content: center; }
+  .dlu-sidebar .sidebar-label, .dlu-sidebar .sidebar-badge, .dlu-sidebar-art { display: none; }
+  .page { margin-left: 58px; padding-top: 72px; }
+}
+
+/* =========================================================
+   DLU COMPACT LAYOUT — HEADER + COLLAPSIBLE SIDEBAR
+   ========================================================= */
+:root {
+  --dlu-header-height: 58px;
+  --dlu-sidebar-width: 136px;
+}
+
+.header.dlu-header {
+  height: var(--dlu-header-height) !important;
+  min-height: var(--dlu-header-height);
+  padding: 0 18px !important;
+}
+
+.dlu-header .dlu-seal {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px;
+}
+
+.dlu-header .school-name { font-size: 12px !important; line-height: 1.12; }
+.dlu-header .school-name-en { font-size: 11px !important; line-height: 1.1; }
+.dlu-header .school-sub { margin-top: 2px !important; font-size: 7.5px !important; }
+.dlu-header .dlu-lms-title strong { font-size: 11.5px !important; }
+.dlu-header .dlu-lms-title span { font-size: 8px !important; margin-top: 2px !important; }
+.dlu-header .search-box { height: 30px !important; width: 250px !important; }
+.dlu-header .avatar { width: 31px !important; height: 31px !important; }
+.dlu-header .teacher-mini strong { font-size: 9px !important; }
+.dlu-header .teacher-mini span { font-size: 7.5px !important; }
+.dlu-header .dlu-motto { font-size: 8px !important; }
+
+/* Menu top phụ không cần chiếm chỗ trên màn hình nhỏ/vừa */
+@media (max-width: 1450px) {
+  .dlu-top-nav { display: none !important; }
+}
+
+.sidebar.dlu-sidebar {
+  width: var(--dlu-sidebar-width) !important;
+  top: var(--dlu-header-height) !important;
+  padding: 10px 8px 12px !important;
+  transition: width .2s ease;
+  overflow: hidden;
+}
+
+.sidebar-collapse-button {
+  width: 100%;
+  height: 34px;
+  margin: 0 0 8px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(255,255,255,.055);
+  color: rgba(255,255,255,.76);
+  font-size: 9px;
+  font-weight: 600;
+}
+.sidebar-collapse-button:hover { background: rgba(255,255,255,.10); color: #fff; }
+
+.dlu-sidebar .sidebar-menu { gap: 4px !important; }
+.dlu-sidebar .sidebar-button {
+  width: 100% !important;
+  height: 38px !important;
+  padding: 0 10px !important;
+  grid-template-columns: 22px minmax(0,1fr) !important;
+  gap: 8px !important;
+  justify-items: start !important;
+  border-radius: 8px !important;
+}
+.dlu-sidebar .sidebar-label {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 9.5px !important;
+}
+.dlu-sidebar .sidebar-icon-wrap { width: 20px; display: grid; place-items: center; }
+.dlu-sidebar .sidebar-button.side-active::before { display: none !important; }
+
+.dlu-sidebar.is-collapsed { padding-left: 7px !important; padding-right: 7px !important; }
+.dlu-sidebar.is-collapsed .sidebar-collapse-button {
+  width: 40px;
+  padding: 0;
+  justify-content: center;
+}
+.dlu-sidebar.is-collapsed .sidebar-button {
+  width: 40px !important;
+  padding: 0 !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  place-items: center !important;
+}
+.dlu-sidebar.is-collapsed .sidebar-label,
+.dlu-sidebar.is-collapsed .dlu-sidebar-art strong,
+.dlu-sidebar.is-collapsed .dlu-sidebar-art small { display: none !important; }
+.dlu-sidebar.is-collapsed .dlu-sidebar-art { transform: scale(.72); transform-origin: bottom center; }
+.dlu-sidebar.is-collapsed .dlu-tower { margin-left: auto; margin-right: auto; }
+
+/* Dashboard luôn né đúng header/sidebar, không bị che */
+.page {
+  margin-left: var(--dlu-sidebar-width) !important;
+  padding-top: var(--dlu-header-height) !important;
+  transition: margin-left .2s ease;
+}
+
+@media (max-width: 900px) {
+  :root { --dlu-sidebar-width: 56px; }
+  .dlu-header .dlu-lms-title, .dlu-header .dlu-motto { display: none !important; }
+  .dlu-header .search-box { width: 200px !important; }
+}
+/* =========================================================
+   DLU HEADER - FINAL TYPOGRAPHY OVERRIDE
+   XANH + CAM ĐẠI HỌC ĐÀ LẠT
+========================================================= */
+
+.dlu-header {
+  font-family:
+    "Segoe UI",
+    Arial,
+    Helvetica,
+    sans-serif;
+}
+
+/* =========================
+   LOGO
+========================= */
+
+.dlu-header .school-logo.dlu-seal {
+  border-color: #e6a23c !important;
+  background: #ffffff !important;
+}
+
+.dlu-header .dlu-seal-mark {
+  color: #08754b !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.2px;
+}
+
+
+/* =========================
+   TÊN TRƯỜNG
+========================= */
+
+.dlu-header .school-name {
+  color: #08754b !important;
+
+  font-family:
+    "Segoe UI",
+    Arial,
+    sans-serif !important;
+
+  font-size: 13px !important;
+  font-weight: 750 !important;
+
+  line-height: 1.08 !important;
+
+  letter-spacing: 0.15px !important;
+}
+
+
+/* DALAT UNIVERSITY */
+
+.dlu-header .school-name-en {
+  color: #e87524 !important;
+
+  font-family:
+    "Segoe UI",
+    Arial,
+    sans-serif !important;
+
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+
+  line-height: 1.08 !important;
+
+  letter-spacing: 0.3px !important;
+
+  margin-top: 2px !important;
+}
+
+
+/* Tri thức - Nhân văn - Hội nhập */
+
+.dlu-header .school-sub {
+  color: #708078 !important;
+
+  font-family:
+    "Segoe UI",
+    Arial,
+    sans-serif !important;
+
+  font-size: 8.5px !important;
+  font-weight: 400 !important;
+
+  line-height: 1.15 !important;
+
+  margin-top: 2px !important;
+
+  letter-spacing: 0 !important;
+}
+
+
+/* =========================
+   VẠCH PHÂN CÁCH
+========================= */
+
+.dlu-header .dlu-header-divider {
+  width: 1px !important;
+
+  height: 34px !important;
+
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(8, 117, 75, 0.25),
+      rgba(232, 117, 36, 0.65),
+      rgba(8, 117, 75, 0.25)
+    ) !important;
+
+  margin-left: 14px !important;
+  margin-right: 14px !important;
+
+  flex-shrink: 0;
+}
+
+
+/* =========================
+   LMS TITLE
+========================= */
+
+.dlu-header .dlu-lms-title {
+  display: flex !important;
+
+  flex-direction: column !important;
+
+  justify-content: center !important;
+
+  min-width: 250px;
+}
+
+
+/* HỆ THỐNG HỌC TẬP... */
+
+.dlu-header .dlu-lms-title strong {
+  color: #125840 !important;
+
+  font-family:
+    "Segoe UI",
+    Arial,
+    sans-serif !important;
+
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+
+  line-height: 1.12 !important;
+
+  letter-spacing: 0 !important;
+}
+
+
+/* Learning today... */
+
+.dlu-header .dlu-lms-title span {
+  color: #d9782b !important;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif !important;
+
+  font-size: 8.5px !important;
+
+  font-weight: 400 !important;
+
+  font-style: italic !important;
+
+  line-height: 1.15 !important;
+
+  margin-top: 3px !important;
+}
+
+
+/* =========================
+   PROFILE
+========================= */
+
+.dlu-header .teacher-mini strong {
+  color: #143e32 !important;
+
+  font-weight: 650 !important;
+}
+
+.dlu-header .teacher-mini span {
+  color: #718078 !important;
+
+  font-size: 9px !important;
+}
+
+
+/* =========================
+   MOTTO BÊN PHẢI
+========================= */
+
+.dlu-header .dlu-motto {
+  color: #34705b !important;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif !important;
+
+  font-style: italic;
+}
+
+.dlu-header .dlu-motto span,
+.dlu-header .dlu-motto strong {
+  color: #34705b !important;
+}
+
+
+/* =========================================================
+   HEADER COMPACT
+========================================================= */
+
+.dlu-header.header {
+  height: 58px !important;
+  min-height: 58px !important;
+
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+
+  align-items: center !important;
+}
+
+
+/* Logo nhỏ gọn */
+
+.dlu-header .school-logo {
+  width: 43px !important;
+  height: 43px !important;
+
+  min-width: 43px !important;
+}
+
+
+/* Search gọn hơn */
+
+.dlu-header .search-box {
+  height: 34px !important;
+}
+
+
+/* Profile gọn */
+
+.dlu-header .avatar {
+  width: 32px !important;
+  height: 32px !important;
+
+  min-width: 32px !important;
+
+  font-size: 11px !important;
+}
+/* =========================================================
+   DLU BACKGROUND - MATCH COURSES PAGE
+========================================================= */
+
+body {
+  background: #f5f7f1 !important;
+}
+
+/* NỀN CHÍNH */
+.page {
+  position: relative !important;
+  min-height: calc(100vh - 58px) !important;
+
+  background:
+    /* Mảng cam lớn góc phải */
+    radial-gradient(
+      ellipse 520px 300px at 98% 0%,
+      rgba(226, 166, 79, 0.20) 0%,
+      rgba(232, 184, 112, 0.12) 32%,
+      rgba(239, 209, 160, 0.06) 52%,
+      transparent 72%
+    ),
+
+    /* Mảng xanh lớn góc trái */
+    radial-gradient(
+      ellipse 560px 330px at 0% 0%,
+      rgba(132, 171, 83, 0.20) 0%,
+      rgba(151, 184, 108, 0.13) 34%,
+      rgba(180, 202, 151, 0.06) 54%,
+      transparent 73%
+    ),
+
+    /* Ánh xanh nhạt chạy xuống thân trang */
+    radial-gradient(
+      ellipse 850px 700px at 16% 40%,
+      rgba(116, 157, 87, 0.055) 0%,
+      transparent 68%
+    ),
+
+    /* Ánh kem bên phải */
+    radial-gradient(
+      ellipse 800px 650px at 91% 43%,
+      rgba(220, 184, 115, 0.045) 0%,
+      transparent 67%
+    ),
+
+    /* Màu nền cơ bản */
+    linear-gradient(
+      110deg,
+      #f3f7ed 0%,
+      #f7f9f4 34%,
+      #fafaf7 65%,
+      #faf7ef 100%
+    ) !important;
+}
+
+
+/* =========================================================
+   MẢNG CONG XANH TRÊN TRÁI
+========================================================= */
+
+.page::before {
+  content: "" !important;
+
+  position: absolute !important;
+
+  top: 0 !important;
+  left: 0 !important;
+
+  width: 430px !important;
+  height: 150px !important;
+
+  border-radius: 0 0 70% 0 !important;
+
+  background:
+    linear-gradient(
+      120deg,
+      rgba(125, 165, 79, 0.09),
+      rgba(158, 187, 118, 0.035)
+    ) !important;
+
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+
+/* =========================================================
+   MẢNG CONG CAM TRÊN PHẢI
+========================================================= */
+
+.page::after {
+  content: "" !important;
+
+  position: absolute !important;
+
+  top: 0 !important;
+  right: 0 !important;
+
+  width: 450px !important;
+  height: 155px !important;
+
+  border-radius: 0 0 0 75% !important;
+
+  background:
+    linear-gradient(
+      235deg,
+      rgba(229, 163, 66, 0.10),
+      rgba(235, 192, 125, 0.035)
+    ) !important;
+
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+
+/* Nội dung nằm trên background */
+.page > * {
+  position: relative;
+  z-index: 1;
+}
+/* ======================================================
+   CALENDAR DAY
+   Giữ giao diện lịch nhỏ gọn như ban đầu
+====================================================== */
+
+.calendar-day {
+  appearance: none;
+  -webkit-appearance: none;
+
+  width: 100%;
+  height: 27px;
+
+  margin: 0;
+  padding: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+
+  border: none;
+  border-radius: 6px;
+
+  background: transparent;
+
+  color: #34423a;
+  font-family: inherit;
+  font-size: 9px;
+  font-weight: 400;
+
+  cursor: default;
+}
+
+
+/* Không có nền xám mặc định của button */
+
+.calendar-day:hover {
+  background: transparent;
+}
+
+
+/* Ngày ngoài tháng */
+
+.calendar-day.outside-day {
+  color: #b8c0bb;
+}
+
+
+/* Ngày có sự kiện mới cho click */
+
+.calendar-day.marked {
+  cursor: pointer;
+}
+
+
+/* =========================
+   MÀU THEO EVENT
+========================= */
+
+.calendar-day.marked.event-class {
+  background: #edf5fc;
+  color: #3977ad;
+}
+
+.calendar-day.marked.event-exam {
+  background: #fdeceb;
+  color: #c9534e;
+}
+
+.calendar-day.marked.event-deadline {
+  background: #fff1e7;
+  color: #cf672c;
+}
+
+.calendar-day.marked.event-meeting {
+  background: #fff4d9;
+  color: #b98522;
+}
+
+.calendar-day.marked.event-personal {
+  background: #f2eef9;
+  color: #7965a1;
+}
+
+
+/* =========================
+   HOVER CHỈ CHO NGÀY CÓ EVENT
+========================= */
+
+.calendar-day.marked:hover {
+  filter: brightness(0.97);
+}
+
+
+/* =========================
+   NGÀY ĐANG CHỌN
+========================= */
+
+.calendar-day-selected {
+  outline: 1px solid #d8a16c;
+  outline-offset: 1px;
+}
+
+
+/* =========================
+   CHẤM EVENT
+========================= */
+
+.calendar-dot {
+  position: absolute;
+
+  bottom: 3px;
+  left: 50%;
+
+  width: 3px;
+  height: 3px;
+
+  border-radius: 50%;
+
+  background: currentColor;
+
+  transform: translateX(-50%);
+}
+/* ============================================================
+   SUPPORT PAGE
+============================================================ */
+
+.support-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(76, 145, 83, 0.08),
+      transparent 34%
+    ),
+    #f7f9f7;
+
+  padding: 32px 42px 50px;
+  box-sizing: border-box;
+}
+
+
+/* ============================================================
+   BACK BUTTON
+============================================================ */
+
+.support-back-button {
+  position: relative;
+  z-index: 2;
+}
+
+
+/* ============================================================
+   MAIN CONTAINER
+============================================================ */
+
+.support-container {
+  width: min(1080px, calc(100% - 32px));
+  margin: 18px auto 0;
+}
+
+
+/* ============================================================
+   HERO
+============================================================ */
+
+.support-hero {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+
+  padding: 28px 32px;
+
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #f4faf5 100%
+  );
+
+  border: 1px solid #dfe9e1;
+  border-radius: 20px;
+
+  box-shadow:
+    0 10px 35px rgba(31, 55, 39, 0.06);
+
+  position: relative;
+  overflow: hidden;
+}
+
+
+.support-hero::after {
+  content: "";
+  position: absolute;
+
+  width: 210px;
+  height: 210px;
+
+  right: -70px;
+  top: -100px;
+
+  border-radius: 50%;
+
+  background: rgba(73, 145, 81, 0.06);
+}
+
+
+.support-hero-icon {
+  width: 64px;
+  height: 64px;
+
+  border-radius: 18px;
+
+  background: linear-gradient(
+    135deg,
+    #e6f5e8,
+    #d8efdc
+  );
+
+  color: #2f7d39;
+
+  display: grid;
+  place-items: center;
+
+  flex-shrink: 0;
+
+  box-shadow:
+    inset 0 0 0 1px rgba(55, 136, 62, 0.08);
+}
+
+
+.support-hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+
+.support-eyebrow {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #37883e;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  letter-spacing: 0.8px;
+}
+
+
+.support-hero h1 {
+  margin: 0;
+
+  color: #17221d;
+
+  font-size: clamp(23px, 2.2vw, 31px);
+  font-weight: 800;
+
+  letter-spacing: -0.6px;
+}
+
+
+.support-hero p {
+  max-width: 700px;
+
+  margin: 8px 0 0;
+
+  color: #66736b;
+
+  font-size: 13.5px;
+  line-height: 1.65;
+}
+
+
+/* ============================================================
+   CONTACT GRID
+============================================================ */
+
+.support-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 18px;
+
+  margin-top: 20px;
+}
+
+
+.support-contact-card {
+  display: flex;
+  flex-direction: column;
+
+  min-height: 310px;
+
+  padding: 24px;
+
+  background: #ffffff;
+
+  border: 1px solid #e0e8e2;
+  border-radius: 18px;
+
+  box-shadow:
+    0 7px 24px rgba(30, 50, 37, 0.045);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+
+.support-contact-card:hover {
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 13px 32px rgba(30, 50, 37, 0.08);
+}
+
+
+.support-contact-green:hover {
+  border-color: #bcdac0;
+}
+
+
+.support-contact-blue:hover {
+  border-color: #c9d9f7;
+}
+
+
+/* ============================================================
+   CARD HEADER
+============================================================ */
+
+.support-card-heading {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 14px;
+
+  padding-bottom: 18px;
+
+  border-bottom: 1px solid #edf1ee;
+}
+
+
+.support-card-icon {
+  width: 44px;
+  height: 44px;
+
+  border-radius: 13px;
+
+  display: grid;
+  place-items: center;
+
+  flex-shrink: 0;
+}
+
+
+.support-icon-green {
+  color: #2f813a;
+  background: #eaf7ec;
+}
+
+
+.support-icon-blue {
+  color: #2563eb;
+  background: #edf4ff;
+}
+
+
+.support-card-heading h2 {
+  margin: 1px 0 5px;
+
+  color: #26342c;
+
+  font-size: 15px;
+  font-weight: 800;
+}
+
+
+.support-card-heading p {
+  margin: 0;
+
+  color: #7a857e;
+
+  font-size: 11.5px;
+  line-height: 1.55;
+}
+
+
+/* ============================================================
+   CONTACT INFO
+============================================================ */
+
+.support-info-list {
+  display: flex;
+  flex-direction: column;
+
+  gap: 15px;
+
+  margin-top: 19px;
+}
+
+
+.support-info-row {
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  color: #55705d;
+}
+
+
+.support-info-row > svg {
+  flex-shrink: 0;
+}
+
+
+.support-info-row div {
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+
+.support-info-row span {
+  color: #8a958e;
+
+  font-size: 10.5px;
+  font-weight: 500;
+}
+
+
+.support-info-row strong {
+  color: #35423a;
+
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+
+/* ============================================================
+   ACTION BUTTONS
+============================================================ */
+
+.support-action {
+  height: 42px;
+
+  margin-top: auto;
+
+  border-radius: 11px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  font-size: 12.5px;
+  font-weight: 800;
+
+  text-decoration: none;
+
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease;
+}
+
+
+.support-action:hover {
+  transform: translateY(-1px);
+}
+
+
+.support-action-green {
+  color: #287535;
+
+  background: #edf8ef;
+
+  border: 1px solid #d5ecd8;
+}
+
+
+.support-action-green:hover {
+  background: #e3f4e6;
+}
+
+
+.support-action-blue {
+  color: #2563eb;
+
+  background: #eff5ff;
+
+  border: 1px solid #d8e5fb;
+}
+
+
+.support-action-blue:hover {
+  background: #e6efff;
+}
+
+
+/* ============================================================
+   SYSTEM SCOPE
+============================================================ */
+
+.support-scope {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 15px;
+
+  margin-top: 18px;
+  padding: 18px 21px;
+
+  border-radius: 16px;
+
+  background: linear-gradient(
+    90deg,
+    #fff9e9,
+    #fffdf5
+  );
+
+  border: 1px solid #f4df9f;
+}
+
+
+.support-scope-icon {
+  width: 40px;
+  height: 40px;
+
+  border-radius: 12px;
+
+  display: grid;
+  place-items: center;
+
+  flex-shrink: 0;
+
+  color: #c97808;
+
+  background: #fff0c7;
+}
+
+
+.support-scope-content h3 {
+  margin: 0 0 5px;
+
+  color: #a95d08;
+
+  font-size: 13.5px;
+  font-weight: 800;
+}
+
+
+.support-scope-content p {
+  margin: 0;
+
+  color: #79531d;
+
+  font-size: 11.5px;
+  line-height: 1.65;
+}
+
+
+.support-scope-content a {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 3px;
+
+  color: #b45309;
+
+  font-weight: 800;
+
+  text-decoration: none;
+}
+
+
+.support-scope-content a:hover {
+  text-decoration: underline;
+}
+
+
+/* ============================================================
+   HIGHLIGHTS
+============================================================ */
+
+.support-highlights {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  margin-top: 22px;
+  padding: 20px 8px 8px;
+
+  border-top: 1px solid #e2e8e3;
+}
+
+
+.support-highlight {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 11px;
+
+  padding: 8px 18px;
+}
+
+
+.support-highlight + .support-highlight {
+  border-left: 1px solid #e5ebe6;
+}
+
+
+.support-highlight-icon {
+  width: 36px;
+  height: 36px;
+
+  display: grid;
+  place-items: center;
+
+  flex-shrink: 0;
+
+  border-radius: 10px;
+
+  color: #398342;
+
+  background: #edf7ef;
+}
+
+
+.support-highlight div:last-child {
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+
+.support-highlight strong {
+  color: #35423a;
+
+  font-size: 11.5px;
+}
+
+
+.support-highlight span {
+  color: #8a958e;
+
+  font-size: 10px;
+}
+
+
+/* ============================================================
+   FOOTER
+============================================================ */
+
+.support-footer {
+  margin-top: 19px;
+
+  color: #9aa39d;
+
+  text-align: center;
+
+  font-size: 10.5px;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 850px) {
+
+  .support-page {
+    padding: 22px 18px 40px;
+  }
+
+  .support-container {
+    width: 100%;
+  }
+
+  .support-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .support-highlights {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .support-highlight {
+    justify-content: flex-start;
+  }
+
+  .support-highlight + .support-highlight {
+    border-left: none;
+  }
+}
+
+
+@media (max-width: 560px) {
+
+  .support-hero {
+    align-items: flex-start;
+
+    padding: 22px;
+
+    border-radius: 16px;
+  }
+
+  .support-hero-icon {
+    width: 48px;
+    height: 48px;
+
+    border-radius: 13px;
+  }
+
+  .support-hero h1 {
+    font-size: 20px;
+  }
+
+  .support-hero p {
+    font-size: 12px;
+  }
+
+  .support-contact-card {
+    min-height: auto;
+
+    padding: 19px;
+  }
+
+  .support-action {
+    margin-top: 22px;
+  }
+
+  .support-scope {
+    padding: 16px;
+  }
+}
+
+/* ============================================================
+   SUPPORT PAGE - FINAL TYPOGRAPHY FIX
+   Đồng bộ typography với Dashboard
+============================================================ */
+
+.support-page {
+  font-family: "Segoe UI", Arial, Helvetica, sans-serif !important;
+}
+
+/* HERO */
+
+.support-eyebrow {
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px !important;
+}
+
+.support-hero h1 {
+  font-size: 21px !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+  letter-spacing: -0.25px !important;
+}
+
+.support-hero p {
+  margin-top: 6px !important;
+  font-size: 10px !important;
+  font-weight: 400 !important;
+  line-height: 1.55 !important;
+  color: #6b7770 !important;
+}
+
+
+/* CARD HEADER */
+
+.support-card-heading h2 {
+  margin: 1px 0 4px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+  color: #26342c !important;
+}
+
+.support-card-heading p {
+  font-size: 9px !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  color: #7a857e !important;
+}
+
+
+/* CONTACT INFORMATION */
+
+.support-info-row span {
+  font-size: 8px !important;
+  font-weight: 400 !important;
+  color: #8a958e !important;
+}
+
+.support-info-row strong {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  line-height: 1.35 !important;
+  color: #35423a !important;
+}
+
+
+/* BUTTON */
+
+.support-action {
+  font-size: 9px !important;
+  font-weight: 600 !important;
+}
+
+
+/* SYSTEM SCOPE */
+
+.support-scope-content h3 {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+}
+
+.support-scope-content p {
+  font-size: 9px !important;
+  font-weight: 400 !important;
+  line-height: 1.55 !important;
+}
+
+
+/* BOTTOM HIGHLIGHTS */
+
+.support-highlight strong {
+  font-size: 9.5px !important;
+  font-weight: 600 !important;
+}
+
+.support-highlight span {
+  font-size: 8px !important;
+  font-weight: 400 !important;
+}
+
+
+/* FOOTER */
+
+.support-footer {
+  font-size: 8px !important;
+  font-weight: 400 !important;
 }

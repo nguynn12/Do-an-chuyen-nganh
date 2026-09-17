@@ -9,22 +9,33 @@ function ScheduleModal({
   const [type, setType] = useState("class");
   const [time, setTime] = useState("");
   const [note, setNote] = useState("");
+  const [saving, setSaving] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!title.trim()) {
       return;
     }
 
-    onSave({
-      id: Date.now(),
-      date,
-      title,
-      type,
-      time,
-      note,
-    });
+    try {
+      setSaving(true);
+
+      await onSave({
+        date,
+        title: title.trim(),
+        type,
+        time: time || null,
+        description: note.trim() || null,
+      });
+    } catch (error) {
+      console.error(
+        "Lỗi khi lưu lịch:",
+        error
+      );
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -46,6 +57,7 @@ function ScheduleModal({
                 setTitle(e.target.value)
               }
               placeholder="Ví dụ: Chấm Lab 3"
+              required
             />
           </label>
 
@@ -108,12 +120,18 @@ function ScheduleModal({
             <button
               type="button"
               onClick={onClose}
+              disabled={saving}
             >
               Hủy
             </button>
 
-            <button type="submit">
-              Lưu lịch
+            <button
+              type="submit"
+              disabled={saving}
+            >
+              {saving
+                ? "Đang lưu..."
+                : "Lưu lịch"}
             </button>
           </div>
         </form>

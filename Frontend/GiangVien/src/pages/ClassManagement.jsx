@@ -11,15 +11,10 @@ import {
   UserCheck,
   Download,
   SlidersHorizontal,
-  X,
-  GraduationCap,
-  ClipboardCheck,
-  Clock3,
-  CalendarClock,
   CheckCircle2,
   BarChart3,
-  Activity,
   TrendingUp,
+
 } from "lucide-react";
 
 import {
@@ -32,7 +27,8 @@ import Sidebar from "../components/Sidebar";
 
 import ClassStats from "../components/class-management/ClassStats";
 import StudentTable from "../components/class-management/StudentTable";
-
+import StudentAnalyticsPanel from "../components/class-management/StudentAnalyticsPanel";
+import PowerBIClassReport from "../components/class-management/PowerBIClassReport";
 import {
   getTeacher,
   getTeacherCourses,
@@ -64,58 +60,23 @@ function normalizeTeacher(data) {
 }
 
 
-
 // ======================================================
-// STUDENT ANALYTICS PANEL HELPERS
+// STUDENT STATUS
+//
+// Cần chú ý:
+// - Chuyên cần < 70%
+// - Điểm TB < 5
+// - Nộp bài < 60%
+//
+// Theo dõi:
+// - Chuyên cần < 80%
+// - Điểm TB < 7
+// - Nộp bài < 75%
+// - >= 2 bài nộp trễ
+//
+// Ổn định:
+// - Không rơi vào các trường hợp trên
 // ======================================================
-
-function formatLearningTime(minutes) {
-  const value =
-    Number(minutes || 0);
-
-  if (value <= 0) {
-    return "Chưa có dữ liệu";
-  }
-
-  const hours =
-    Math.floor(value / 60);
-
-  const remainMinutes =
-    Math.round(value % 60);
-
-  if (hours <= 0) {
-    return `${remainMinutes} phút`;
-  }
-
-  if (remainMinutes === 0) {
-    return `${hours} giờ`;
-  }
-
-  return `${hours} giờ ${remainMinutes} phút`;
-}
-
-
-function formatDateTime(value) {
-  if (!value) {
-    return "Chưa có dữ liệu";
-  }
-
-  const date =
-    new Date(value);
-
-  if (
-    Number.isNaN(
-      date.getTime()
-    )
-  ) {
-    return "Chưa có dữ liệu";
-  }
-
-  return date.toLocaleString(
-    "vi-VN"
-  );
-}
-
 
 function getStudentAssessment(
   student
@@ -139,148 +100,106 @@ function getStudentAssessment(
     );
 
 
-  const riskReasons = [];
-
-  const warningReasons = [];
-
-  const noteReasons = [];
-
-
-  // ======================================
+  // ====================================================
   // CẦN CHÚ Ý
-  // ======================================
+  // ====================================================
 
-  if (
+  const lowAttendance =
     attendance !== null &&
     attendance !== undefined &&
-    Number(attendance) < 70
-  ) {
-    riskReasons.push(
-      "Chuyên cần dưới 70%"
-    );
-  }
+    Number(attendance) < 70;
 
 
-  if (
+  const veryLowScore =
     score !== null &&
     score !== undefined &&
-    Number(score) < 5
-  ) {
-    riskReasons.push(
-      "Điểm trung bình dưới 5.0"
-    );
-  }
+    Number(score) < 5;
+
+
+  const veryLowSubmission =
+    submissionRate < 60;
 
 
   if (
-    submissionRate < 60
-  ) {
-    riskReasons.push(
-      "Tỷ lệ nộp bài dưới 60%"
-    );
-  }
-
-
-  if (
-    riskReasons.length > 0
+    lowAttendance ||
+    veryLowScore ||
+    veryLowSubmission
   ) {
     return {
       key: "risk",
       label: "Cần chú ý",
-      reasons:
-        riskReasons,
     };
   }
 
 
-  // ======================================
+  // ====================================================
   // THEO DÕI
-  // ======================================
+  // ====================================================
 
-  if (
+  const warningAttendance =
     attendance !== null &&
     attendance !== undefined &&
-    Number(attendance) < 80
-  ) {
-    warningReasons.push(
-      "Chuyên cần dưới 80%"
-    );
-  }
+    Number(attendance) < 80;
 
 
-  if (
+  const warningScore =
     score !== null &&
     score !== undefined &&
-    Number(score) < 7
-  ) {
-    warningReasons.push(
-      "Điểm trung bình dưới 7.0"
-    );
-  }
+    Number(score) < 7;
+
+
+  const warningSubmission =
+    submissionRate < 75;
+
+
+  const warningLate =
+    lateSubmissions >= 2;
 
 
   if (
-    submissionRate < 75
-  ) {
-    warningReasons.push(
-      "Tỷ lệ nộp bài dưới 75%"
-    );
-  }
-
-
-  if (
-    lateSubmissions >= 2
-  ) {
-    warningReasons.push(
-      `Có ${lateSubmissions} bài nộp trễ`
-    );
-  }
-
-
-  if (
-    warningReasons.length > 0
+    warningAttendance ||
+    warningScore ||
+    warningSubmission ||
+    warningLate
   ) {
     return {
       key: "warning",
       label: "Theo dõi",
-      reasons:
-        warningReasons,
     };
   }
 
 
-  // ======================================
+  // ====================================================
   // ỔN ĐỊNH
-  //
-  // 1 bài trễ chỉ là ghi chú,
-  // chưa đủ để đổi trạng thái.
-  // ======================================
-
-  if (
-    lateSubmissions === 1
-  ) {
-    noteReasons.push(
-      "Có 1 bài nộp trễ, cần lưu ý ở các bài tiếp theo"
-    );
-  }
-
-
-  if (
-    noteReasons.length === 0
-  ) {
-    noteReasons.push(
-      "Tiến độ học tập hiện tại ổn định"
-    );
-  }
-
+  // ====================================================
 
   return {
     key: "good",
     label: "Ổn định",
-    reasons:
-      noteReasons,
   };
 }
+
+function formatLearningTime(minutes) {
+  const value = Number(minutes || 0);
+
+  if (value <= 0) {
+    return "Chưa có dữ liệu";
+  }
+
+  const hours = Math.floor(value / 60);
+  const remainMinutes = Math.round(value % 60);
+
+  if (hours <= 0) {
+    return `${remainMinutes} phút`;
+  }
+
+  if (remainMinutes === 0) {
+    return `${hours} giờ`;
+  }
+
+  return `${hours} giờ ${remainMinutes} phút`;
+}
+
 
 function getStudentRiskFlags(student) {
   const flags = [];
@@ -336,371 +255,63 @@ function getStudentRiskFlags(student) {
   return flags;
 }
 
-function StudentMetric({
-  icon,
-  label,
-  value,
-}) {
-  return (
-    <div className="student-analysis-metric">
-
-      <div className="student-analysis-metric-icon">
-        {icon}
-      </div>
-
-      <div>
-        <span>
-          {label}
-        </span>
-
-        <strong>
-          {value}
-        </strong>
-      </div>
-
-    </div>
-  );
-}
-
-
-function StudentAnalyticsPanel({
-  student,
-  onClose,
-}) {
-  if (!student) {
-    return null;
-  }
-
-
-  const assessment =
-    getStudentAssessment(
-      student
-    );
-
-
-  const avatarLetter =
-    student.fullName
-      ?.trim()
-      .split(" ")
-      .slice(-1)[0]
-      ?.charAt(0)
-      ?.toUpperCase() ||
-    "S";
-
-
-  return (
-    <div
-      className="student-analysis-overlay"
-      onMouseDown={
-        onClose
-      }
-    >
-
-      <aside
-        className="student-analysis-panel"
-        onMouseDown={(
-          event
-        ) =>
-          event.stopPropagation()
-        }
-      >
-
-        <div className="student-analysis-header">
-
-          <div>
-            <span>
-              Hồ sơ phân tích
-            </span>
-
-            <h2>
-              Sinh viên
-            </h2>
-          </div>
-
-
-          <button
-            type="button"
-            onClick={
-              onClose
-            }
-            title="Đóng"
-          >
-            <X size={18} />
-          </button>
-
-        </div>
-
-
-        <section className="student-analysis-profile">
-
-          <div className="student-analysis-avatar">
-            {avatarLetter}
-          </div>
-
-
-          <div>
-            <h3>
-              {student.fullName}
-            </h3>
-
-            <span>
-              {student.studentCode}
-            </span>
-
-            <p>
-              {student.email}
-            </p>
-          </div>
-
-        </section>
-
-
-        <section
-          className={`student-analysis-status ${assessment.key}`}
-        >
-
-          <div className="student-analysis-status-icon">
-            {assessment.key ===
-            "good" ? (
-              <CheckCircle2
-                size={19}
-              />
-            ) : (
-              <AlertTriangle
-                size={19}
-              />
-            )}
-          </div>
-
-
-          <div>
-            <span>
-              Đánh giá hiện tại
-            </span>
-
-            <strong>
-              {assessment.label}
-            </strong>
-          </div>
-
-        </section>
-
-
-        <section className="student-analysis-section">
-
-          <div className="student-analysis-section-title">
-            Chỉ số học tập
-          </div>
-
-
-          <div className="student-analysis-grid">
-
-            <StudentMetric
-              icon={
-                <GraduationCap
-                  size={18}
-                />
-              }
-              label="Điểm trung bình"
-              value={
-                student.averageScore ===
-                  null ||
-                student.averageScore ===
-                  undefined
-                  ? "—"
-                  : Number(
-                      student.averageScore
-                    ).toFixed(1)
-              }
-            />
-
-
-            <StudentMetric
-              icon={
-                <ClipboardCheck
-                  size={18}
-                />
-              }
-              label="Tỷ lệ nộp bài"
-              value={`${Number(
-                student.submissionRate ||
-                  0
-              )}%`}
-            />
-
-
-            <StudentMetric
-              icon={
-                <AlertTriangle
-                  size={18}
-                />
-              }
-              label="Bài nộp trễ"
-              value={
-                student.lateSubmissions ||
-                0
-              }
-            />
-
-
-            <StudentMetric
-              icon={
-                <Clock3
-                  size={18}
-                />
-              }
-              label="Thời gian học"
-              value={formatLearningTime(
-                student.totalTimeSpentMinutes
-              )}
-            />
-
-          </div>
-
-        </section>
-
-
-        <section className="student-analysis-section">
-
-          <div className="student-analysis-section-title">
-            Hoạt động gần đây
-          </div>
-
-
-          <div className="student-analysis-info-row">
-
-            <CalendarClock
-              size={17}
-            />
-
-            <div>
-              <span>
-                Truy cập gần nhất
-              </span>
-
-              <strong>
-                {formatDateTime(
-                  student.lastAccessTime
-                )}
-              </strong>
-            </div>
-
-          </div>
-
-
-          <div className="student-analysis-info-row">
-
-            <ClipboardCheck
-              size={17}
-            />
-
-            <div>
-              <span>
-                Bài đã nộp
-              </span>
-
-              <strong>
-                {student.submittedAssignments ||
-                  0}
-                {" / "}
-                {student.totalAssignments ||
-                  0}
-              </strong>
-            </div>
-
-          </div>
-
-
-          <div className="student-analysis-info-row">
-
-            <CheckCircle2
-              size={17}
-            />
-
-            <div>
-              <span>
-                Bài đã chấm
-              </span>
-
-              <strong>
-                {student.gradedSubmissions ||
-                  0}
-              </strong>
-            </div>
-
-          </div>
-
-        </section>
-
-
-        <section className="student-analysis-section">
-
-          <div className="student-analysis-section-title">
-            Nhận định
-          </div>
-
-
-          <div className="student-analysis-reasons">
-
-            {assessment.reasons.map(
-              (
-                reason,
-                index
-              ) => (
-                <div
-                  key={`${reason}-${index}`}
-                >
-                  <span />
-
-                  <p>
-                    {reason}
-                  </p>
-                </div>
-              )
-            )}
-
-          </div>
-
-        </section>
-
-      </aside>
-
-    </div>
-  );
-}
-
-
 // ======================================================
 // CLASS MANAGEMENT
 // ======================================================
 
 function ClassManagement() {
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
 
   const { courseId } =
     useParams();
 
 
-  const [teacher, setTeacher] =
-    useState(null);
+  // ====================================================
+  // STATE
+  // ====================================================
 
-  const [course, setCourse] =
-    useState(null);
+  const [
+    teacher,
+    setTeacher,
+  ] = useState(null);
 
-  const [students, setStudents] =
-    useState([]);
 
-  const [loading, setLoading] =
-    useState(true);
+  const [
+    course,
+    setCourse,
+  ] = useState(null);
 
-  const [error, setError] =
-    useState("");
 
-  const [searchTerm, setSearchTerm] =
-    useState("");
+  const [
+    students,
+    setStudents,
+  ] = useState([]);
 
-  const [filter, setFilter] =
-    useState("all");
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
+
+
+  const [
+    error,
+    setError,
+  ] = useState("");
+
+
+  const [
+    searchTerm,
+    setSearchTerm,
+  ] = useState("");
+
+
+  const [
+    filter,
+    setFilter,
+  ] = useState("all");
+
 
   const [
     selectedStudent,
@@ -712,6 +323,10 @@ function ClassManagement() {
   const [engagementTrend, setEngagementTrend] = useState([]);
   const [hoveredWeek, setHoveredWeek] = useState(null);
 
+  // Khóa đang xem trên dashboard.
+  // Bước tiếp theo backend sẽ nhận giá trị này để lọc dữ liệu K45/K46/K47.
+  const [selectedCohort, setSelectedCohort] = useState("K47");
+
 
   // ====================================================
   // LOAD DATA
@@ -720,10 +335,17 @@ function ClassManagement() {
   useEffect(() => {
     let cancelled = false;
 
+
     async function loadClass() {
       try {
         setLoading(true);
+
         setError("");
+
+
+        // ==============================================
+        // TEACHER ID
+        // ==============================================
 
         const teacherId =
           Number(
@@ -732,6 +354,7 @@ function ClassManagement() {
             )
           );
 
+
         if (!teacherId) {
           throw new Error(
             "Không tìm thấy giảng viên đang đăng nhập."
@@ -739,8 +362,13 @@ function ClassManagement() {
         }
 
 
+        // ==============================================
+        // COURSE ID
+        // ==============================================
+
         const numericCourseId =
           Number(courseId);
+
 
         if (!numericCourseId) {
           throw new Error(
@@ -748,6 +376,10 @@ function ClassManagement() {
           );
         }
 
+
+        // ==============================================
+        // CALL API
+        // ==============================================
 
         const [
           teacherData,
@@ -766,22 +398,26 @@ function ClassManagement() {
           ),
 
           getCourseStudents(
-            numericCourseId
+            numericCourseId,
+            selectedCohort
           ),
 
           getCourseStudentAnalytics(
-            numericCourseId
+            numericCourseId,
+            selectedCohort
           ),
 
           getCourseGradeDistribution(
-            numericCourseId
+            numericCourseId,
+            selectedCohort
           ).catch((err) => {
             console.error("Lỗi tải phân bố điểm:", err);
             return [];
           }),
 
           getCourseEngagementTrend(
-            numericCourseId
+            numericCourseId,
+            selectedCohort
           ).catch((err) => {
             console.error("Lỗi tải xu hướng tương tác:", err);
             return [];
@@ -823,6 +459,10 @@ function ClassManagement() {
         }
 
 
+        // ==============================================
+        // TEACHER
+        // ==============================================
+
         setTeacher(
           normalizeTeacher(
             teacherData
@@ -832,6 +472,8 @@ function ClassManagement() {
 
         // ==============================================
         // MAP ANALYTICS
+        //
+        // User_Key -> analytics student
         // ==============================================
 
         const analyticsMap =
@@ -861,6 +503,10 @@ function ClassManagement() {
                   )
                 );
 
+
+              // ========================================
+              // ASSIGNMENTS
+              // ========================================
 
               const totalAssignments =
                 Number(
@@ -918,6 +564,10 @@ function ClassManagement() {
                 );
 
 
+              // ========================================
+              // RETURN STUDENT
+              // ========================================
+
               return {
                 id:
                   student.Moodle_User_ID,
@@ -946,9 +596,35 @@ function ClassManagement() {
                   student.Enrolment_Status ||
                   "Active",
 
-                // Chưa có attendance thật
+
+                // ======================================
+                // ATTENDANCE
+                //
+                // Hiện tại backend chưa có dữ liệu
+                // chuyên cần thật.
+                // ======================================
+
                 attendance:
-                  null,
+  analytics?.Attendance_Rate === null ||
+  analytics?.Attendance_Rate === undefined
+    ? null
+    : Number(
+        analytics.Attendance_Rate
+      ),
+
+activeDays:
+  Number(
+    analytics?.Active_Days || 0
+  ),
+
+totalTrackedDays:
+  Number(
+    analytics?.Total_Tracked_Days || 0
+  ),
+
+                // ======================================
+                // ASSIGNMENTS
+                // ======================================
 
                 totalAssignments,
 
@@ -964,6 +640,11 @@ function ClassManagement() {
 
                 gradedSubmissions,
 
+
+                // ======================================
+                // SCORE
+                // ======================================
+
                 averageScore:
                   analytics
                     ?.Average_Grade ===
@@ -976,6 +657,7 @@ function ClassManagement() {
                         analytics
                           .Average_Grade
                       ),
+
 
                 averageGradePercentage:
                   analytics
@@ -990,6 +672,11 @@ function ClassManagement() {
                           .Average_Grade_Percentage
                       ),
 
+
+                // ======================================
+                // LEARNING ACTIVITY
+                // ======================================
+
                 totalTimeSpentMinutes:
                   Number(
                     analytics
@@ -997,10 +684,12 @@ function ClassManagement() {
                       0
                   ),
 
+
                 lastAccessTime:
                   analytics
                     ?.Last_Access_Time ||
                   null,
+
 
                 isPassed:
                   analytics
@@ -1024,10 +713,12 @@ function ClassManagement() {
             .filter(
               (score) =>
                 score !== null &&
+                score !== undefined &&
                 Number.isFinite(
-                  score
+                  Number(score)
                 )
-            );
+            )
+            .map(Number);
 
 
         const averageScore =
@@ -1056,7 +747,10 @@ function ClassManagement() {
               student
             ) =>
               total +
-              student.totalAssignments,
+              Number(
+                student.totalAssignments ||
+                  0
+              ),
             0
           );
 
@@ -1068,13 +762,17 @@ function ClassManagement() {
               student
             ) =>
               total +
-              student.submittedAssignments,
+              Number(
+                student.submittedAssignments ||
+                  0
+              ),
             0
           );
 
 
         const submissionRate =
-          totalAssignmentsExpected > 0
+          totalAssignmentsExpected >
+          0
             ? Math.round(
                 (
                   totalSubmittedAssignments /
@@ -1086,7 +784,7 @@ function ClassManagement() {
 
 
         // ==============================================
-        // TỶ LỆ ĐÚNG HẠN
+        // TỶ LỆ NỘP ĐÚNG HẠN
         // ==============================================
 
         const totalOnTime =
@@ -1096,13 +794,17 @@ function ClassManagement() {
               student
             ) =>
               total +
-              student.onTimeSubmissions,
+              Number(
+                student.onTimeSubmissions ||
+                  0
+              ),
             0
           );
 
 
         const onTimeRate =
-          totalSubmittedAssignments > 0
+          totalSubmittedAssignments >
+          0
             ? Math.round(
                 (
                   totalOnTime /
@@ -1111,7 +813,39 @@ function ClassManagement() {
                   100
               )
             : 0;
+        // ==============================================
+// TỶ LỆ CHUYÊN CẦN CẢ LỚP
+// ==============================================
 
+const validAttendances =
+  normalizedStudents
+    .map(
+      (student) =>
+        student.attendance
+    )
+    .filter(
+      (attendance) =>
+        attendance !== null &&
+        attendance !== undefined &&
+        Number.isFinite(
+          Number(attendance)
+        )
+    )
+    .map(Number);
+
+
+const averageAttendance =
+  validAttendances.length > 0
+    ? validAttendances.reduce(
+        (
+          total,
+          attendance
+        ) =>
+          total + attendance,
+        0
+      ) /
+      validAttendances.length
+    : null;
 
         // ==============================================
         // COURSE
@@ -1165,13 +899,22 @@ function ClassManagement() {
                   )
                 ),
 
+          // Chưa có attendance thật
           attendance:
-            null,
+  averageAttendance === null
+    ? null
+    : Number(
+        averageAttendance.toFixed(2)
+      ),
 
           color:
             "#6f9638",
         });
 
+
+        // ==============================================
+        // STUDENTS
+        // ==============================================
 
         setStudents(
           normalizedStudents
@@ -1182,6 +925,7 @@ function ClassManagement() {
           "Lỗi tải lớp:",
           err
         );
+
 
         if (!cancelled) {
           setError(
@@ -1205,7 +949,7 @@ function ClassManagement() {
       cancelled = true;
     };
 
-  }, [courseId]);
+  }, [courseId, selectedCohort]);
 
 
   // ====================================================
@@ -1222,7 +966,7 @@ function ClassManagement() {
 
 
   // ====================================================
-  // FILTER
+  // FILTERED STUDENTS
   // ====================================================
 
   const filteredStudents =
@@ -1241,11 +985,13 @@ function ClassManagement() {
                 ""
             ).toLowerCase();
 
+
           const studentCode =
             String(
               student.studentCode ||
                 ""
             ).toLowerCase();
+
 
           const email =
             String(
@@ -1253,6 +999,10 @@ function ClassManagement() {
                 ""
             ).toLowerCase();
 
+
+          // ============================================
+          // SEARCH
+          // ============================================
 
           const matchesSearch =
             !keyword ||
@@ -1266,6 +1016,10 @@ function ClassManagement() {
               keyword
             );
 
+
+          // ============================================
+          // STATUS FILTER
+          // ============================================
 
           const status =
             getStatus(
@@ -1410,29 +1164,33 @@ function ClassManagement() {
 
   // ====================================================
   // COUNTERS
+
   // ====================================================
 
   const riskCount =
     students.filter(
       (student) =>
-        getStatus(student) ===
-        "risk"
+        getStatus(
+          student
+        ) === "risk"
     ).length;
 
 
   const warningCount =
     students.filter(
       (student) =>
-        getStatus(student) ===
-        "warning"
+        getStatus(
+          student
+        ) === "warning"
     ).length;
 
 
   const goodCount =
     students.filter(
       (student) =>
-        getStatus(student) ===
-        "good"
+        getStatus(
+          student
+        ) === "good"
     ).length;
 
 
@@ -1459,12 +1217,15 @@ function ClassManagement() {
 
         <div className="class-spinner" />
 
+
         <strong>
           Đang tải dữ liệu lớp
         </strong>
 
+
         <p>
-          Đang đồng bộ thông tin sinh viên...
+          Đang đồng bộ thông tin
+          sinh viên...
         </p>
 
       </div>
@@ -1488,10 +1249,12 @@ function ClassManagement() {
           Không thể tải lớp học
         </h2>
 
+
         <p>
           {error ||
             "Không tìm thấy dữ liệu lớp học."}
         </p>
+
 
         <button
           type="button"
@@ -1516,6 +1279,10 @@ function ClassManagement() {
   return (
     <div className="class-page">
 
+      {/* ================================================
+          BACKGROUND
+      ================================================= */}
+
       <div className="class-bg-grid" />
 
       <div className="class-bg-orb one" />
@@ -1523,25 +1290,37 @@ function ClassManagement() {
       <div className="class-bg-orb two" />
 
 
+      {/* ================================================
+          HEADER / SIDEBAR
+      ================================================= */}
+
       <Header
-        teacher={teacher}
+        teacher={
+          teacher
+        }
       />
 
       <Sidebar />
 
 
+      {/* ================================================
+          CONTENT
+      ================================================= */}
+
       <main className="class-content">
 
-        {/* ==============================
+
+        {/* ==============================================
             HERO
-        ============================== */}
+        ============================================== */}
 
         <section className="class-hero">
 
           <div className="class-hero-main">
 
             <div className="class-hero-code">
-              {course.code || "DLU"}
+              {course.code ||
+                "DLU"}
             </div>
 
 
@@ -1560,9 +1339,11 @@ function ClassManagement() {
                   Khóa học
                 </button>
 
+
                 <span>
                   /
                 </span>
+
 
                 <strong>
                   {course.title}
@@ -1587,28 +1368,69 @@ function ClassManagement() {
                 kết quả học tập của lớp.
               </p>
 
+              <div className="class-hero-cohort-note">
+                Đang xem dữ liệu <strong>{selectedCohort}</strong>
+              </div>
+
             </div>
 
           </div>
 
 
-          <button
-            type="button"
-            className="class-export-button"
-          >
-            <Download
-              size={16}
-            />
+          <div className="class-hero-actions">
 
-            Xuất danh sách
-          </button>
+            <div className="cohort-selector">
+              <span className="cohort-selector-label">
+                Khóa đang xem
+              </span>
+
+              <div className="cohort-select-wrap">
+                <select
+                  className="cohort-select"
+                  value={selectedCohort}
+                  onChange={(event) => {
+                    const cohort = event.target.value;
+                    setSelectedCohort(cohort);
+
+                    // Reset các bộ lọc UI khi chuyển khóa.
+                    setSearchTerm("");
+                    setFilter("all");
+                    setSelectedStudent(null);
+                    setSelectedActivityKey("OVERALL");
+                  }}
+                  aria-label="Chọn khóa sinh viên"
+                >
+                  <option value="K47">Khóa 47</option>
+                  <option value="K46">Khóa 46</option>
+                  <option value="K45">Khóa 45</option>
+                </select>
+
+                <span className="cohort-current-badge">
+                  {selectedCohort}
+                </span>
+              </div>
+            </div>
+
+
+            <button
+              type="button"
+              className="class-export-button"
+            >
+              <Download
+                size={16}
+              />
+
+              Xuất danh sách
+            </button>
+
+          </div>
 
         </section>
 
 
-        {/* ==============================
-            KPI
-        ============================== */}
+        {/* ==============================================
+            KPI ĐẦU TRANG
+        ============================================== */}
 
         <ClassStats
           studentCount={
@@ -1783,6 +1605,7 @@ function ClassManagement() {
                   Theo dõi số lượng sinh viên đạt từng khoảng điểm theo toàn khóa hoặc từng bài kiểm tra.
                 </p>
               </div>
+
             </div>
 
             {gradeDistributions.length > 0 && (
@@ -1914,6 +1737,7 @@ function ClassManagement() {
                   </strong>
                 </div>
               </div>
+
             </div>
           ) : (
             <div
@@ -2135,43 +1959,71 @@ function ClassManagement() {
         </section>
 
 
-        {/* ==============================
+        {/* ==============================================
             STUDENT PANEL
-        ============================== */}
+        ============================================== */}
 
         <section className="student-panel">
+
+
+          {/* ============================================
+              PANEL HEADING
+          ============================================ */}
 
           <div className="student-panel-heading">
 
             <div>
+
               <span>
                 DANH SÁCH LỚP
               </span>
+
 
               <h2>
                 Sinh viên
               </h2>
 
+
               <p>
                 Hiển thị{" "}
+
                 <strong>
-                  {filteredStudents.length}
-                </strong>{" "}
+                  {
+                    filteredStudents.length
+                  }
+                </strong>
+
+                {" "}
                 / {students.length} sinh viên
               </p>
+
             </div>
 
 
             <div className="student-count-box">
-              {filteredStudents.length}
+              {
+                filteredStudents.length
+              }
             </div>
 
           </div>
 
 
+          {/* ============================================
+              TOOLBAR
+          ============================================ */}
+
           <div className="student-toolbar">
 
+
+            {/* ==========================================
+                TABS
+            ========================================== */}
+
             <div className="student-tabs">
+
+
+              {/* ALL */}
 
               <button
                 type="button"
@@ -2181,18 +2033,28 @@ function ClassManagement() {
                     : "student-tab"
                 }
                 onClick={() =>
-                  setFilter("all")
+                  setFilter(
+                    "all"
+                  )
                 }
               >
-                <Users size={14} />
+
+                <Users
+                  size={14}
+                />
 
                 Tất cả
 
                 <span>
-                  {students.length}
+                  {
+                    students.length
+                  }
                 </span>
+
               </button>
 
+
+              {/* GOOD */}
 
               <button
                 type="button"
@@ -2202,9 +2064,12 @@ function ClassManagement() {
                     : "student-tab"
                 }
                 onClick={() =>
-                  setFilter("good")
+                  setFilter(
+                    "good"
+                  )
                 }
               >
+
                 <UserCheck
                   size={14}
                 />
@@ -2212,10 +2077,15 @@ function ClassManagement() {
                 Ổn định
 
                 <span>
-                  {goodCount}
+                  {
+                    goodCount
+                  }
                 </span>
+
               </button>
 
+
+              {/* WARNING */}
 
               <button
                 type="button"
@@ -2230,13 +2100,19 @@ function ClassManagement() {
                   )
                 }
               >
+
                 Theo dõi
 
                 <span>
-                  {warningCount}
+                  {
+                    warningCount
+                  }
                 </span>
+
               </button>
 
+
+              {/* RISK */}
 
               <button
                 type="button"
@@ -2246,9 +2122,12 @@ function ClassManagement() {
                     : "student-tab"
                 }
                 onClick={() =>
-                  setFilter("risk")
+                  setFilter(
+                    "risk"
+                  )
                 }
               >
+
                 <AlertTriangle
                   size={14}
                 />
@@ -2256,12 +2135,19 @@ function ClassManagement() {
                 Cần chú ý
 
                 <span>
-                  {riskCount}
+                  {
+                    riskCount
+                  }
                 </span>
+
               </button>
 
             </div>
 
+
+            {/* ==========================================
+                SEARCH / FILTER
+            ========================================== */}
 
             <div className="student-tools">
 
@@ -2271,6 +2157,7 @@ function ClassManagement() {
                   size={17}
                 />
 
+
                 <input
                   value={
                     searchTerm
@@ -2279,7 +2166,8 @@ function ClassManagement() {
                     event
                   ) =>
                     setSearchTerm(
-                      event.target
+                      event
+                        .target
                         .value
                     )
                   }
@@ -2294,9 +2182,11 @@ function ClassManagement() {
                 className="student-filter-icon"
                 title="Bộ lọc"
               >
+
                 <SlidersHorizontal
                   size={17}
                 />
+
               </button>
 
             </div>
@@ -2304,8 +2194,13 @@ function ClassManagement() {
           </div>
 
 
+          {/* ============================================
+              STUDENT TABLE
+          ============================================ */}
+
           {filteredStudents.length >
           0 ? (
+
             <StudentTable
               students={
                 filteredStudents
@@ -2314,16 +2209,20 @@ function ClassManagement() {
                 handleViewStudent
               }
             />
+
           ) : (
+
             <div className="students-empty">
 
               <Users
                 size={35}
               />
 
+
               <strong>
                 Không tìm thấy sinh viên
               </strong>
+
 
               <p>
                 Thử thay đổi từ khóa
@@ -2331,23 +2230,34 @@ function ClassManagement() {
               </p>
 
             </div>
+
           )}
 
         </section>
 
+
+<PowerBIClassReport
+          courseKey={course.courseKey}
+          cohort={selectedCohort}
+        />
+
+
       </main>
 
 
-      <StudentAnalyticsPanel
-        student={
-          selectedStudent
-        }
-        onClose={() =>
-          setSelectedStudent(
-            null
-          )
-        }
-      />
+      {/* ================================================
+          STUDENT ANALYTICS DRAWER
+      ================================================= */}
+
+     <StudentAnalyticsPanel
+  student={selectedStudent}
+  classAverageScore={course.averageScore}
+  open={Boolean(selectedStudent)}
+  onClose={() =>
+    setSelectedStudent(null)
+  }
+/>
+
 
     </div>
   );

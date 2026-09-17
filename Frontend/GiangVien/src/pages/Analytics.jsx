@@ -54,13 +54,13 @@ function Analytics() {
           </div>
 
           <div className="powerbi-container">
-            <iframe
-              title="LMS Analytics"
-              src="https://app.powerbi.com/view?r=eyJrIjoiZTY2ZTBjYTEtNmEzMC00N2Y1LTg1MjktZGUxZTBiNGFmYjM0IiwidCI6Ijg0NTAzNjliLTExZmEtNDQxMy04ZGM3LTA2MGFiOWYzNGY0MSIsImMiOjEwfQ%3D%3D"
-              frameBorder="0"
-              allowFullScreen
-            />
-          </div>
+  <iframe
+    title="LMS_Analytics"
+    src="https://app.powerbi.com/view?r=eyJrIjoiN2NkMjk3MzUtMWU4MS00ODIwLWE5Y2YtYWYzNTA1N2EzMWI3IiwidCI6Ijg0NTAzNjliLTExZmEtNDQxMy04ZGM3LTA2MGFiOWYzNGY0MSIsImMiOjEwfQ%3D%3D&pageName=ee15a79c9e07c0ed161c"
+    frameBorder="0"
+    allowFullScreen
+  />
+</div>
 
         </div>
 
