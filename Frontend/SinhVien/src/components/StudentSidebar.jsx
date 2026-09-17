@@ -4,6 +4,7 @@ import {
   CheckCircle2,
   Award,
   Clock,
+  BarChart3,
   LogOut,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -15,6 +16,7 @@ const menuItems = [
   { id: "submissions", label: "Tình trạng nộp bài", icon: CheckCircle2 },
   { id: "grades", label: "Bảng điểm & Kết quả", icon: Award },
   { id: "engagement", label: "Thời gian học tập", icon: Clock },
+  { id: "analytics", label: "Phân tích học tập (Power BI)", icon: BarChart3 },
 ];
 
 export default function StudentSidebar({ activeTab, onSelectTab }) {

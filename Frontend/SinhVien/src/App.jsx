@@ -13,6 +13,7 @@ import StudentCourseDetail from "./pages/StudentCourseDetail";
 import StudentSubmissions from "./pages/StudentSubmissions";
 import StudentGrades from "./pages/StudentGrades";
 import StudentEngagement from "./pages/StudentEngagement";
+import StudentAnalytics from "./pages/StudentAnalytics";
 
 import { studentGet } from "./services/apiClient";
 import { getStudentUserId } from "./services/studentAuth";
@@ -40,7 +41,7 @@ function StudentShell() {
     }
 
     const cleanHash = hash.replace("#", "");
-    if (["courses", "submissions", "grades", "engagement"].includes(cleanHash)) {
+    if (["courses", "submissions", "grades", "engagement", "analytics"].includes(cleanHash)) {
       setActiveTab(cleanHash);
       setSelectedCourseId(null);
       return;
@@ -153,6 +154,8 @@ function StudentShell() {
           {activeTab === "grades" && <StudentGrades />}
 
           {activeTab === "engagement" && <StudentEngagement />}
+
+          {activeTab === "analytics" && <StudentAnalytics />}
         </>
       )}
     </div>
