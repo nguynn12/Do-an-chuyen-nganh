@@ -11,18 +11,37 @@ import Messages from "./pages/Messages";
 import Support from "./pages/Support";
 import SimplePage from "./pages/SimplePage";
 import Analytics from "./pages/Analytics";
+import TeacherProfile from "./pages/TeacherProfile";
+
+// ============================================================
+// THÊM - TRANG SO SÁNH LỚP HỌC
+// ============================================================
+import ClassComparison from "./pages/ClassComparison/ClassComparison";
+
 
 function PrivatePage({ children }) {
   return <ProtectedRoute>{children}</ProtectedRoute>;
 }
 
+
 function App() {
   return (
     <Routes>
-      {/* Đăng nhập */}
-      <Route path="/dang-nhap" element={<Login />} />
 
-      {/* Tổng quan */}
+      {/* =====================================================
+          ĐĂNG NHẬP
+      ===================================================== */}
+
+      <Route
+        path="/dang-nhap"
+        element={<Login />}
+      />
+
+
+      {/* =====================================================
+          TỔNG QUAN
+      ===================================================== */}
+
       <Route
         path="/"
         element={
@@ -32,7 +51,11 @@ function App() {
         }
       />
 
-      {/* Khóa học */}
+
+      {/* =====================================================
+          KHÓA HỌC
+      ===================================================== */}
+
       <Route
         path="/khoa-hoc"
         element={
@@ -42,7 +65,11 @@ function App() {
         }
       />
 
-      {/* Quản lý lớp */}
+
+      {/* =====================================================
+          QUẢN LÝ LỚP
+      ===================================================== */}
+
       <Route
         path="/quan-ly-lop/:courseId"
         element={
@@ -52,7 +79,11 @@ function App() {
         }
       />
 
-      {/* Chấm điểm */}
+
+      {/* =====================================================
+          CHẤM ĐIỂM
+      ===================================================== */}
+
       <Route
         path="/cham-diem/:courseId"
         element={
@@ -61,6 +92,11 @@ function App() {
           </PrivatePage>
         }
       />
+
+
+      {/* =====================================================
+          BÀI CHỜ CHẤM
+      ===================================================== */}
 
       <Route
         path="/bai-cho-cham"
@@ -71,7 +107,11 @@ function App() {
         }
       />
 
-      {/* Thông báo hệ thống */}
+
+      {/* =====================================================
+          THÔNG BÁO HỆ THỐNG
+      ===================================================== */}
+
       <Route
         path="/tin-nhan"
         element={
@@ -81,7 +121,11 @@ function App() {
         }
       />
 
-      {/* Hỗ trợ */}
+
+      {/* =====================================================
+          HỖ TRỢ
+      ===================================================== */}
+
       <Route
         path="/ho-tro"
         element={
@@ -100,7 +144,11 @@ function App() {
         }
       />
 
-      {/* Lịch giảng dạy */}
+
+      {/* =====================================================
+          LỊCH GIẢNG DẠY
+      ===================================================== */}
+
       <Route
         path="/lich"
         element={
@@ -110,7 +158,11 @@ function App() {
         }
       />
 
-      {/* POWER BI - PHÂN TÍCH */}
+
+      {/* =====================================================
+          POWER BI - PHÂN TÍCH
+      ===================================================== */}
+
       <Route
         path="/phan-tich"
         element={
@@ -120,10 +172,59 @@ function App() {
         }
       />
 
-      {/* Route không tồn tại */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+
+      {/* =====================================================
+          HỒ SƠ GIẢNG VIÊN
+      ===================================================== */}
+
+      <Route
+        path="/ho-so"
+        element={
+          <PrivatePage>
+            <TeacherProfile />
+          </PrivatePage>
+        }
+      />
+
+
+      {/* =====================================================
+          SO SÁNH LỚP HỌC
+          
+          Ví dụ URL:
+          /so-sanh-lop
+            ?courseA=12
+            &cohortA=K47
+            &courseB=10
+            &cohortB=K45
+      ===================================================== */}
+
+      <Route
+        path="/so-sanh-lop"
+        element={
+          <PrivatePage>
+            <ClassComparison />
+          </PrivatePage>
+        }
+      />
+
+
+      {/* =====================================================
+          ROUTE KHÔNG TỒN TẠI
+      ===================================================== */}
+
+      <Route
+        path="*"
+        element={
+          <Navigate
+            to="/"
+            replace
+          />
+        }
+      />
+
     </Routes>
   );
 }
+
 
 export default App;

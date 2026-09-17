@@ -1,18 +1,47 @@
 import express from "express";
 import cors from "cors";
 
-// Shared routes
+// ============================================================
+// SHARED ROUTES
+// ============================================================
+
 import authRoutes from "./shared/routes/authRoutes.js";
 import testRoutes from "./shared/routes/testRoutes.js";
 
-// Phân hệ Giảng viên
+
+// ============================================================
+// PHÂN HỆ GIẢNG VIÊN
+// ============================================================
+
 import teacherRoutes from "./GiangVien/routes/teacherRoutes.js";
 import courseRoutes from "./GiangVien/routes/courseRoutes.js";
 
-// Phân hệ Sinh viên
+
+// ===== SO SÁNH LỚP =====
+import comparisonRoutes from "./GiangVien/routes/comparisonRoutes.js";
+
+
+// ===== THÔNG BÁO =====
+import notificationRoutes from "./GiangVien/routes/notificationRoutes.js";
+
+
+// ===== LỊCH GIẢNG VIÊN =====
+import calendarRoutes from "./GiangVien/routes/calendarRoutes.js";
+
+
+// ============================================================
+// PHÂN HỆ SINH VIÊN
+// ============================================================
+
 import studentRoutes from "./SinhVien/routes/studentRoutes.js";
 
+
 const app = express();
+
+
+// ============================================================
+// CORS
+// ============================================================
 
 const allowedOrigins = [
   "http://localhost:5173",
@@ -24,18 +53,36 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Cho phép requests không có origin (curl/Postman) hoặc nằm trong danh sách
+      // Cho phép request không có origin
+      // như Postman / curl
       if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
+
       return callback(null, true);
     },
+
     credentials: true,
   })
 );
 
+
+// ============================================================
+// BODY PARSER
+// ============================================================
+
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
+
+
+// ============================================================
+// ROOT API
+// ============================================================
 
 app.get("/", (req, res) => {
   res.json({
@@ -44,17 +91,95 @@ app.get("/", (req, res) => {
   });
 });
 
-// 1. Shared APIs
-app.use("/api/auth", authRoutes);
-app.use("/api/test", testRoutes);
 
-// 2. Cổng Giảng viên APIs
-app.use("/api/teachers", teacherRoutes);
-app.use("/api/courses", courseRoutes);
+// ============================================================
+// 1. SHARED APIs
+// ============================================================
 
-// 3. Cổng Sinh viên APIs
-app.use("/api/v1/student", studentRoutes);
-app.use("/api/student", studentRoutes);
+app.use(
+  "/api/auth",
+  authRoutes
+);
+
+app.use(
+  "/api/test",
+  testRoutes
+);
+
+
+// ============================================================
+// 2. CỔNG GIẢNG VIÊN APIs
+// ============================================================
+
+
+// ------------------------------------------------------------
+// Thông tin / Dashboard giảng viên
+// ------------------------------------------------------------
+
+app.use(
+  "/api/teachers",
+  teacherRoutes
+);
+
+
+// ------------------------------------------------------------
+// Thông báo giảng viên
+// ------------------------------------------------------------
+
+app.use(
+  "/api/teachers",
+  notificationRoutes
+);
+
+
+// ------------------------------------------------------------
+// Lịch giảng viên + deadline Moodle
+// ------------------------------------------------------------
+
+app.use(
+  "/api/teachers",
+  calendarRoutes
+);
+
+
+// ------------------------------------------------------------
+// Khóa học
+// ------------------------------------------------------------
+
+app.use(
+  "/api/courses",
+  courseRoutes
+);
+
+
+// ------------------------------------------------------------
+// So sánh lớp học
+// ------------------------------------------------------------
+
+app.use(
+  "/api/comparison",
+  comparisonRoutes
+);
+
+
+// ============================================================
+// 3. CỔNG SINH VIÊN APIs
+// ============================================================
+
+app.use(
+  "/api/v1/student",
+  studentRoutes
+);
+
+app.use(
+  "/api/student",
+  studentRoutes
+);
+
+
+// ============================================================
+// 404 - API KHÔNG TỒN TẠI
+// ============================================================
 
 app.use((req, res) => {
   res.status(404).json({
@@ -62,5 +187,6 @@ app.use((req, res) => {
     message: "Không tìm thấy API.",
   });
 });
+
 
 export default app;

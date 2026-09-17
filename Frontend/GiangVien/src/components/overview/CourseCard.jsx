@@ -7,6 +7,7 @@ import {
   GraduationCap,
 } from "lucide-react";
 
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 
@@ -39,6 +40,58 @@ function formatScore(value) {
 function CourseCard({ courses }) {
   const navigate = useNavigate();
 
+  // Mỗi lần hiển thị tối đa 3 môn
+  const COURSES_PER_PAGE = 3;
+
+  const [currentPage, setCurrentPage] =
+    useState(0);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(
+      courses.length / COURSES_PER_PAGE
+    )
+  );
+
+  // Nếu dữ liệu thay đổi làm currentPage vượt quá
+  // số trang thì giới hạn lại.
+  const safePage = Math.min(
+    currentPage,
+    totalPages - 1
+  );
+
+  const startIndex =
+    safePage * COURSES_PER_PAGE;
+
+  const visibleCourses =
+    courses.slice(
+      startIndex,
+      startIndex + COURSES_PER_PAGE
+    );
+
+
+  function handlePrevious() {
+    setCurrentPage((page) => {
+      if (page <= 0) {
+        return totalPages - 1;
+      }
+
+      return page - 1;
+    });
+  }
+
+
+  function handleNext() {
+    setCurrentPage((page) => {
+      if (page >= totalPages - 1) {
+        return 0;
+      }
+
+      return page + 1;
+    });
+  }
+
+
   return (
     <section className="section">
 
@@ -62,6 +115,8 @@ function CourseCard({ courses }) {
           <button
             type="button"
             aria-label="Khóa học trước"
+            onClick={handlePrevious}
+            disabled={courses.length <= 3}
           >
             <ChevronLeft size={16} />
           </button>
@@ -69,6 +124,8 @@ function CourseCard({ courses }) {
           <button
             type="button"
             aria-label="Khóa học tiếp theo"
+            onClick={handleNext}
+            disabled={courses.length <= 3}
           >
             <ChevronRight size={16} />
           </button>
@@ -94,9 +151,8 @@ function CourseCard({ courses }) {
 
         <div className="courses-grid">
 
-          {courses
-            .slice(0, 3)
-            .map((course) => {
+          {visibleCourses.map(
+            (course) => {
 
               const courseId =
                 course.courseId ||
@@ -273,7 +329,8 @@ function CourseCard({ courses }) {
 
                 </div>
               );
-            })}
+            }
+          )}
 
         </div>
       )}

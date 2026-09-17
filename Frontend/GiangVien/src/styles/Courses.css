@@ -1585,4 +1585,48 @@
   background: #37883e;
   color: white;
 }
+/* =====================================================
+   SEMESTER SELECT
+===================================================== */
 
+.semester-select-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 210px;
+}
+
+.semester-select-wrap > span {
+  font-size: 11px;
+  font-weight: 600;
+  color: #7b867e;
+}
+
+.semester-select {
+  width: 100%;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  color: #26352b;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  padding: 2px 24px 2px 0;
+}
+
+.semester-select:hover {
+  color: #4f762d;
+}
+
+.semester-select option {
+  background: #ffffff;
+  color: #26352b;
+  font-weight: 600;
+}

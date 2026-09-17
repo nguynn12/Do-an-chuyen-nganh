@@ -9,7 +9,7 @@ import ErrorScreen from "../components/common/ErrorScreen";
 import WelcomeCard from "../components/overview/WelcomeCard";
 import CourseCard from "../components/overview/CourseCard";
 import UrgentTasks from "../components/overview/UrgentTasks";
-import AnalyticsOverview from "../components/overview/AnalyticsOverview";
+import ActivityDashboard from "../components/overview/ActivityDashboard";
 import Calendar from "../components/overview/Calendar";
 import SchedulePanel from "../components/overview/SchedulePanel";
 import Notifications from "../components/overview/Notifications";
@@ -21,18 +21,28 @@ import "../styles/TeacherOverview.css";
 
 
 function TeacherOverview() {
+  // ======================================================
+  // STATE MỞ / ĐÓNG QUẢN LÝ LỊCH
+  // ======================================================
+
   const [
     schedulePanelOpen,
     setSchedulePanelOpen,
   ] = useState(false);
 
 
+  // ======================================================
+  // DASHBOARD DATA
+  // ======================================================
+
   const {
     teacher,
     stats,
     courses,
     tasks,
+
     notifications,
+    setNotifications,
 
     schedule,
     setSchedule,
@@ -50,18 +60,18 @@ function TeacherOverview() {
   } = useTeacherDashboard();
 
 
-  // ==========================================
+  // ======================================================
   // LOADING
-  // ==========================================
+  // ======================================================
 
   if (loading) {
     return <LoadingScreen />;
   }
 
 
-  // ==========================================
+  // ======================================================
   // ERROR
-  // ==========================================
+  // ======================================================
 
   if (
     error ||
@@ -79,38 +89,49 @@ function TeacherOverview() {
   }
 
 
-  // ==========================================
+  // ======================================================
+  // MOODLE USER ID CỦA GIẢNG VIÊN
+  //
+  // teacher.id đã được normalize từ Moodle_User_ID
+  // trong useTeacherDashboard.
+  // ======================================================
+
+  const teacherId =
+    teacher.id;
+
+
+  // ======================================================
   // PAGE
-  // ==========================================
+  // ======================================================
 
   return (
     <div className="app">
 
-      {/* =========================
+      {/* ==================================================
           HEADER
-      ========================= */}
+      ================================================== */}
 
       <Header
         teacher={teacher}
       />
 
 
-      {/* =========================
+      {/* ==================================================
           SIDEBAR
-      ========================= */}
+      ================================================== */}
 
       <Sidebar />
 
 
-      {/* =========================
+      {/* ==================================================
           PAGE CONTENT
-      ========================= */}
+      ================================================== */}
 
       <main className="page">
 
-        {/* =========================
+        {/* ================================================
             MAIN CONTENT
-        ========================= */}
+        ================================================ */}
 
         <div className="main-content">
 
@@ -130,23 +151,25 @@ function TeacherOverview() {
           />
 
 
-          <AnalyticsOverview
-            analytics={analytics}
+          <ActivityDashboard
+            stats={stats}
           />
 
         </div>
 
 
-        {/* =========================
+        {/* ================================================
             RIGHT SIDEBAR
-        ========================= */}
+        ================================================ */}
 
         <aside className="right-panel">
 
-          {/* CALENDAR NHỎ */}
+          {/* ================= CALENDAR ================= */}
 
           <Calendar
-            date={calendarDate}
+            date={
+              calendarDate
+            }
 
             schedule={
               schedule
@@ -172,16 +195,24 @@ function TeacherOverview() {
           />
 
 
-          {/* NOTIFICATIONS */}
+          {/* ================= NOTIFICATIONS ================= */}
 
           <Notifications
             notifications={
               notifications
             }
+
+            onNotificationsChange={
+              setNotifications
+            }
+
+            teacherId={
+              teacherId
+            }
           />
 
 
-          {/* QUICK LINKS */}
+          {/* ================= QUICK LINKS ================= */}
 
           <QuickLinks />
 
@@ -190,9 +221,9 @@ function TeacherOverview() {
       </main>
 
 
-      {/* =========================
+      {/* ==================================================
           SCHEDULE MANAGER
-      ========================= */}
+      ================================================== */}
 
       <SchedulePanel
         open={

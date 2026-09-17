@@ -1,13 +1,173 @@
+/* =========================================================
+   GLOBAL STYLE - DLU LMS
+   ========================================================= */
+
+/*
+ * Font chính:
+ * Inter -> toàn bộ giao diện LMS
+ * Montserrat -> dùng cho các phần nhận diện DLU khi cần
+ */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700&display=swap");
+
+
+/* =========================
+   ROOT
+   ========================= */
+
+:root {
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  color: #17251f;
+  background: #f5f7f5;
+}
+
+
+/* =========================
+   PAGE
+   ========================= */
+
 html,
 body,
 #root {
   width: 100%;
   min-width: 100%;
   min-height: 100vh;
+
   margin: 0;
   padding: 0;
 }
 
+html {
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
 body {
   margin: 0;
+
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+
+  color: #17251f;
+  background: #f5f7f5;
+}
+
+
+/* =========================
+   FORM / BUTTON
+   ========================= */
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+
+/* =========================
+   TEXT
+   ========================= */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin-top: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: #14251e;
+  letter-spacing: -0.02em;
+}
+
+strong,
+b {
+  font-weight: 600;
+}
+
+
+/* =========================
+   LINKS
+   ========================= */
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+
+/* =========================
+   IMAGES
+   ========================= */
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+
+/* =========================
+   SCROLLBAR
+   ========================= */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f4f2;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #bcc9c2;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8fa499;
 }

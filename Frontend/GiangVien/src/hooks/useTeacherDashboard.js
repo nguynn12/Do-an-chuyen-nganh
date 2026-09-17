@@ -6,9 +6,12 @@ import {
 
 import {
   getTeacherTasks,
-  getTeacherNotifications,
   getTeacherAnalytics,
 } from "../services/dashboardService";
+
+import {
+  getNotifications,
+} from "../services/notificationApi";
 
 import {
   getTeacher,
@@ -21,6 +24,10 @@ import {
   getTeacherScheduleApi,
 } from "../services/teacherApi";
 
+
+// ============================================================
+// FORMAT MONTH
+// ============================================================
 
 function formatMonth(date) {
   const year =
@@ -37,6 +44,10 @@ function formatMonth(date) {
   return `${year}-${month}`;
 }
 
+
+// ============================================================
+// NORMALIZE TEACHER
+// ============================================================
 
 function normalizeTeacher(data) {
   return {
@@ -66,6 +77,10 @@ function normalizeTeacher(data) {
   };
 }
 
+
+// ============================================================
+// NORMALIZE STATS
+// ============================================================
 
 function normalizeStats(data) {
   return {
@@ -98,11 +113,15 @@ function normalizeStats(data) {
 }
 
 
+// ============================================================
+// HOOK
+// ============================================================
+
 export default function useTeacherDashboard() {
 
-  // ==========================================
+  // ==========================================================
   // MAIN DATA
-  // ==========================================
+  // ==========================================================
 
   const [
     teacher,
@@ -162,9 +181,9 @@ export default function useTeacherDashboard() {
     });
 
 
-  // ==========================================
+  // ==========================================================
   // CALENDAR
-  // ==========================================
+  // ==========================================================
 
   const [
     calendarDate,
@@ -210,9 +229,9 @@ export default function useTeacherDashboard() {
     );
 
 
-  // ==========================================
+  // ==========================================================
   // GIẢNG VIÊN ĐANG LOGIN
-  // ==========================================
+  // ==========================================================
 
   const teacherId =
     Number(
@@ -222,23 +241,30 @@ export default function useTeacherDashboard() {
     );
 
 
-  // ==========================================
+  // ==========================================================
   // LOAD DASHBOARD
-  // ==========================================
+  // ==========================================================
 
   useEffect(() => {
+
     let cancelled =
       false;
 
 
     async function load() {
+
       try {
+
         setLoading(
           true
         );
 
         setError("");
 
+
+        // ====================================================
+        // KIỂM TRA PHIÊN ĐĂNG NHẬP
+        // ====================================================
 
         if (!teacherId) {
           throw new Error(
@@ -247,9 +273,9 @@ export default function useTeacherDashboard() {
         }
 
 
-        // ======================================
+        // ====================================================
         // BACKEND THẬT
-        // ======================================
+        // ====================================================
 
         const [
           teacherData,
@@ -258,6 +284,7 @@ export default function useTeacherDashboard() {
           scheduleData,
         ] =
           await Promise.all([
+
             getTeacher(
               teacherId
             ),
@@ -275,6 +302,7 @@ export default function useTeacherDashboard() {
               teacherId,
               monthKey
             ),
+
           ]);
 
 
@@ -282,6 +310,10 @@ export default function useTeacherDashboard() {
           return;
         }
 
+
+        // ====================================================
+        // TEACHER
+        // ====================================================
 
         const normalizedTeacher =
           normalizeTeacher(
@@ -294,6 +326,10 @@ export default function useTeacherDashboard() {
         );
 
 
+        // ====================================================
+        // DASHBOARD STATS
+        // ====================================================
+
         setStats(
           normalizeStats(
             dashboardResponse.dashboard
@@ -301,29 +337,37 @@ export default function useTeacherDashboard() {
         );
 
 
+        // ====================================================
         // LỊCH THẬT
+        // ====================================================
+
         setSchedule(
           scheduleData ||
-            []
+          []
         );
 
 
-        // ======================================
+        // ====================================================
         // CHI TIẾT TỪNG MÔN
-        // ======================================
+        // ====================================================
 
         const courseDetails =
           await Promise.all(
+
             courseData.map(
+
               async (
                 course
               ) => {
+
                 try {
+
                   const [
                     students,
                     studentAnalytics,
                   ] =
                     await Promise.all([
+
                       getCourseStudents(
                         course.Moodle_Course_ID
                       ),
@@ -331,12 +375,13 @@ export default function useTeacherDashboard() {
                       getCourseStudentAnalytics(
                         course.Moodle_Course_ID
                       ),
+
                     ]);
 
 
-                  // ==============================
+                  // ==========================================
                   // ĐIỂM TRUNG BÌNH
-                  // ==============================
+                  // ==========================================
 
                   const validGrades =
                     studentAnalytics
@@ -374,9 +419,9 @@ export default function useTeacherDashboard() {
                       : 0;
 
 
-                  // ==============================
+                  // ==========================================
                   // NỘP BÀI
-                  // ==============================
+                  // ==========================================
 
                   const totalAssignments =
                     studentAnalytics.reduce(
@@ -387,8 +432,8 @@ export default function useTeacherDashboard() {
                         total +
                         Number(
                           student.Total_Assignments ||
-                            student.Total_Submissions ||
-                            0
+                          student.Total_Submissions ||
+                          0
                         ),
                       0
                     );
@@ -403,8 +448,8 @@ export default function useTeacherDashboard() {
                         total +
                         Number(
                           student.Submitted_Assignments ||
-                            student.Total_Submissions ||
-                            0
+                          student.Total_Submissions ||
+                          0
                         ),
                       0
                     );
@@ -418,12 +463,17 @@ export default function useTeacherDashboard() {
                             submittedAssignments /
                             totalAssignments
                           ) *
-                            100
+                          100
                         )
                       : 0;
 
 
+                  // ==========================================
+                  // COURSE NORMALIZED
+                  // ==========================================
+
                   return {
+
                     id:
                       course.Moodle_Course_ID,
 
@@ -468,11 +518,13 @@ export default function useTeacherDashboard() {
 
                     color:
                       "#3d7f3d",
+
                   };
 
                 } catch (
                   courseError
                 ) {
+
                   console.error(
                     "Lỗi course:",
                     course.Moodle_Course_ID,
@@ -481,6 +533,7 @@ export default function useTeacherDashboard() {
 
 
                   return {
+
                     id:
                       course.Moodle_Course_ID,
 
@@ -513,6 +566,7 @@ export default function useTeacherDashboard() {
 
                     color:
                       "#3d7f3d",
+
                   };
                 }
               }
@@ -530,12 +584,25 @@ export default function useTeacherDashboard() {
         );
 
 
-        // ======================================
-        // PHẦN CHƯA CÓ BACKEND
-        // TẠM THỜI VẪN DÙNG MOCK
-        // ======================================
+        // ====================================================
+        // DỮ LIỆU PHỤ
+        //
+        // TASK       : hiện giữ nguồn cũ
+        // NOTIFICATION: BACKEND + MYSQL THẬT
+        // ANALYTICS  : hiện giữ nguồn cũ
+        // ====================================================
 
         try {
+
+          /*
+            Task và Analytics hiện vẫn đang sử dụng
+            service cũ nên tạm giữ mockTeacherId.
+
+            Notification KHÔNG dùng mockTeacherId nữa.
+            Notification dùng teacherId của tài khoản
+            đang đăng nhập.
+          */
+
           const mockTeacherId =
             localStorage.getItem(
               "currentUsername"
@@ -547,21 +614,37 @@ export default function useTeacherDashboard() {
 
           const [
             taskData,
-            notificationData,
+            notificationResponse,
             analyticsData,
           ] =
             await Promise.all([
+
+              // ==============================================
+              // TASK - GIỮ NGUYÊN NGUỒN HIỆN TẠI
+              // ==============================================
+
               getTeacherTasks(
                 mockTeacherId
               ),
 
-              getTeacherNotifications(
-                mockTeacherId
+
+              // ==============================================
+              // NOTIFICATION - DỮ LIỆU THẬT MYSQL
+              // ==============================================
+
+              getNotifications(
+                teacherId
               ),
+
+
+              // ==============================================
+              // ANALYTICS - GIỮ NGUYÊN NGUỒN HIỆN TẠI
+              // ==============================================
 
               getTeacherAnalytics(
                 mockTeacherId
               ),
+
             ]);
 
 
@@ -570,16 +653,44 @@ export default function useTeacherDashboard() {
           }
 
 
+          // ================================================
+          // TASK
+          // ================================================
+
           setTasks(
-            taskData || []
+            taskData ||
+            []
           );
+
+
+          // ================================================
+          // NOTIFICATION THẬT
+          //
+          // API:
+          // {
+          //   success: true,
+          //   teacherId: 2,
+          //   total: 5,
+          //   data: [...]
+          // }
+          // ================================================
+
+          const realNotifications =
+            Array.isArray(
+              notificationResponse?.data
+            )
+              ? notificationResponse.data
+              : [];
 
 
           setNotifications(
-            notificationData ||
-              []
+            realNotifications
           );
 
+
+          // ================================================
+          // ANALYTICS
+          // ================================================
 
           setAnalytics(
             analyticsData || {
@@ -588,9 +699,11 @@ export default function useTeacherDashboard() {
             }
           );
 
+
         } catch (
           secondaryError
         ) {
+
           console.warn(
             "Dữ liệu phụ chưa tải được:",
             secondaryError
@@ -608,7 +721,9 @@ export default function useTeacherDashboard() {
           });
         }
 
+
       } catch (err) {
+
         console.error(
           "Lỗi dashboard:",
           err
@@ -616,18 +731,25 @@ export default function useTeacherDashboard() {
 
 
         if (!cancelled) {
+
           setError(
             err.message ||
-              "Không thể tải dữ liệu dashboard."
+            "Không thể tải dữ liệu dashboard."
           );
+
         }
 
+
       } finally {
+
         if (!cancelled) {
+
           setLoading(
             false
           );
+
         }
+
       }
     }
 
@@ -636,8 +758,10 @@ export default function useTeacherDashboard() {
 
 
     return () => {
+
       cancelled =
         true;
+
     };
 
   }, [
@@ -645,11 +769,12 @@ export default function useTeacherDashboard() {
   ]);
 
 
-  // ==========================================
+  // ==========================================================
   // RELOAD CALENDAR KHI ĐỔI THÁNG
-  // ==========================================
+  // ==========================================================
 
   useEffect(() => {
+
     if (
       !teacher ||
       !teacherId
@@ -663,15 +788,16 @@ export default function useTeacherDashboard() {
 
 
     async function reloadCalendar() {
+
       try {
+
         setCalendarLoading(
           true
         );
 
 
         /*
-          QUAN TRỌNG:
-          Không còn gọi mock schedule nữa.
+          Không còn gọi mock schedule.
           Đọc thẳng Teacher_Schedule trong MySQL.
         */
 
@@ -683,12 +809,17 @@ export default function useTeacherDashboard() {
 
 
         if (!cancelled) {
+
           setSchedule(
-            data || []
+            data ||
+            []
           );
+
         }
 
+
       } catch (err) {
+
         console.error(
           "Lỗi calendar:",
           err
@@ -696,18 +827,25 @@ export default function useTeacherDashboard() {
 
 
         if (!cancelled) {
+
           setError(
             err.message ||
-              "Không thể tải lịch."
+            "Không thể tải lịch."
           );
+
         }
 
+
       } finally {
+
         if (!cancelled) {
+
           setCalendarLoading(
             false
           );
+
         }
+
       }
     }
 
@@ -716,8 +854,10 @@ export default function useTeacherDashboard() {
 
 
     return () => {
+
       cancelled =
         true;
+
     };
 
   }, [
@@ -727,12 +867,13 @@ export default function useTeacherDashboard() {
   ]);
 
 
-  // ==========================================
+  // ==========================================================
   // PREVIOUS MONTH
-  // ==========================================
+  // ==========================================================
 
   const previousMonth =
     () => {
+
       setCalendarDate(
         (current) =>
           new Date(
@@ -742,15 +883,17 @@ export default function useTeacherDashboard() {
             1
           )
       );
+
     };
 
 
-  // ==========================================
+  // ==========================================================
   // NEXT MONTH
-  // ==========================================
+  // ==========================================================
 
   const nextMonth =
     () => {
+
       setCalendarDate(
         (current) =>
           new Date(
@@ -760,24 +903,27 @@ export default function useTeacherDashboard() {
             1
           )
       );
+
     };
 
 
-  // ==========================================
+  // ==========================================================
   // RELOAD SCHEDULE THỦ CÔNG
   //
   // SchedulePanel có thể gọi sau khi:
   // POST / PUT / DELETE
-  // ==========================================
+  // ==========================================================
 
   const reloadSchedule =
     async () => {
+
       if (!teacherId) {
         return;
       }
 
 
       try {
+
         setCalendarLoading(
           true
         );
@@ -791,55 +937,95 @@ export default function useTeacherDashboard() {
 
 
         setSchedule(
-          data || []
+          data ||
+          []
         );
 
+
       } catch (err) {
+
         console.error(
           "Lỗi reload schedule:",
           err
         );
 
+
         throw err;
 
+
       } finally {
+
         setCalendarLoading(
           false
         );
+
       }
+
     };
 
 
-  // ==========================================
+  // ==========================================================
   // RETURN
-  // ==========================================
+  // ==========================================================
 
   return {
-    teacher,
-    stats,
-    courses,
-    tasks,
-    notifications,
 
-    schedule,
-    setSchedule,
+  teacher,
 
-    /*
-      Dùng sau khi tạo / sửa / xóa lịch
-      để đồng bộ lại database.
-    */
+  stats,
 
-    reloadSchedule,
+  courses,
 
-    analytics,
+  tasks,
 
-    calendarDate,
 
-    loading,
-    calendarLoading,
-    error,
+  // ========================================================
+  // THÔNG BÁO
+  // ========================================================
 
-    previousMonth,
-    nextMonth,
-  };
+  notifications,
+
+  setNotifications,
+
+
+  // ========================================================
+  // LỊCH
+  // ========================================================
+
+  schedule,
+
+  setSchedule,
+
+  reloadSchedule,
+
+
+  // ========================================================
+  // ANALYTICS
+  // ========================================================
+
+  analytics,
+
+
+  // ========================================================
+  // CALENDAR
+  // ========================================================
+
+  calendarDate,
+
+  previousMonth,
+
+  nextMonth,
+
+
+  // ========================================================
+  // TRẠNG THÁI
+  // ========================================================
+
+  loading,
+
+  calendarLoading,
+
+  error,
+
+};
 }
