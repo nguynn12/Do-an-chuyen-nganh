@@ -7,7 +7,6 @@ import {
   Search,
   GraduationCap,
   Sparkles,
-  ChevronRight,
 } from "lucide-react";
 
 export default function StudentCourses({ courses, onNavigateToCourse }) {
@@ -78,65 +77,70 @@ export default function StudentCourses({ courses, onNavigateToCourse }) {
         </div>
       </div>
 
-      {/* 3. COURSES GRID (MATCHING GIANG VIEN STYLE) */}
+      {/* 3. COURSES GRID */}
       <div className="courses-grid" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))" }}>
-        {filteredCourses.map((c) => (
-          <div className="course-card" key={c.id}>
-            <div className="course-cover">
-              <div>
-                <span>{c.shortName}</span>
-              </div>
-              <span className="course-cover-badge">Đang học</span>
-            </div>
+        {filteredCourses.map((c) => {
+          // Tính tiến độ an toàn: ưu tiên trường progress, nếu không có thì mặc định 0%
+          const progressPercent = c.progress !== undefined && c.progress !== null ? c.progress : 0;
 
-            <div className="course-body">
-              <h3>{c.name}</h3>
-
-              <p>
-                <Award size={14} />
-                Điểm TB học phần:{" "}
-                <strong style={{ color: "#37883e" }}>
-                  {c.averageGrade ? `${c.averageGrade}/10` : "7.0/10"}
-                </strong>
-              </p>
-
-              <p>
-                <ClipboardCheck size={14} />
-                Tiến độ nộp bài: <strong>{c.progress || 100}%</strong>
-              </p>
-
-              <p>
-                <Clock3 size={14} />
-                Tổng giờ tương tác: <strong>{c.totalEngagementHours || 0} giờ</strong>
-              </p>
-
-              <div style={{ marginTop: "10px", marginBottom: "12px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", marginBottom: "4px", color: "#66736b" }}>
-                  <span>Tiến độ hoàn thành</span>
-                  <strong>{c.progress || 100}%</strong>
+          return (
+            <div className="course-card" key={c.id}>
+              <div className="course-cover">
+                <div>
+                  <span>{c.shortName}</span>
                 </div>
-                <div className="analytics-track">
-                  <div className="analytics-fill" style={{ width: `${c.progress || 100}%` }} />
-                </div>
+                <span className="course-cover-badge">Đang học</span>
               </div>
 
-              <div className="course-actions">
-                <button
-                  type="button"
-                  onClick={() => (window.location.hash = "grades")}
-                >
-                  Bảng điểm
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onNavigateToCourse(c.id)}
-                >
-                  Xem phân tích
-                </button>
+              <div className="course-body">
+                <h3>{c.name}</h3>
+
+                <p>
+                  <Award size={14} />
+                  Điểm TB học phần:{" "}
+                  <strong style={{ color: c.averageGrade ? "#37883e" : "#64748b" }}>
+                    {c.averageGrade ? `${c.averageGrade}/10` : "Chưa có"}
+                  </strong>
+                </p>
+
+                <p>
+                  <ClipboardCheck size={14} />
+                  Tiến độ nộp bài: <strong>{progressPercent}%</strong>
+                </p>
+
+                <p>
+                  <Clock3 size={14} />
+                  Tổng giờ tương tác: <strong>{c.totalEngagementHours || 0} giờ</strong>
+                </p>
+
+                <div style={{ marginTop: "10px", marginBottom: "12px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", marginBottom: "4px", color: "#66736b" }}>
+                    <span>Tiến độ hoàn thành</span>
+                    <strong>{progressPercent}%</strong>
+                  </div>
+                  <div className="analytics-track">
+                    <div className="analytics-fill" style={{ width: `${progressPercent}%` }} />
+                  </div>
+                </div>
+
+                <div className="course-actions">
+                  <button
+                    type="button"
+                    onClick={() => (window.location.hash = "grades")}
+                  >
+                    Bảng điểm
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onNavigateToCourse(c.id)}
+                  >
+                    Xem phân tích
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </main>
   );
