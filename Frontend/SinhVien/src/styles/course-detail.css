@@ -1,0 +1,91 @@
+/* Layout & Spacing */
+.course-detail-header {
+  margin-bottom: 14px;
+}
+
+.course-detail-back-btn {
+  margin-bottom: 12px;
+}
+
+.course-detail-metrics {
+  margin-bottom: 20px;
+}
+
+.course-detail-pbi-wrapper {
+  margin-bottom: 24px;
+}
+
+/* Empty & Error State Cards */
+.welcome-card--center {
+  padding: 40px;
+  text-align: center;
+  color: #66736b;
+}
+
+.welcome-card--error {
+  padding: 40px;
+  text-align: center;
+}
+
+.welcome-card__error-icon {
+  color: #dc2626;
+  margin: 0 auto 12px;
+}
+
+.welcome-card__error-title {
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #17221d;
+}
+
+.table-empty-cell {
+  text-align: center;
+  color: #64748b;
+  padding: 32px;
+}
+
+.table-empty-icon {
+  margin: 0 auto 8px;
+  color: #94a3b8;
+}
+
+/* Table Typography & Badge States */
+.table-item-title {
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.table-item-subtext {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.table-item-feedback {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.grade-high {
+  color: #15803d;
+}
+
+.grade-warning {
+  color: #ea580c;
+}
+
+.grade-pending-late {
+  color: #ea580c;
+  font-size: 12px;
+  font-style: italic;
+}
+
+.grade-pending {
+  color: #0284c7;
+  font-size: 12px;
+  font-style: italic;
+}
+
+.grade-none {
+  color: #94a3b8;
+  font-size: 12px;
+}
