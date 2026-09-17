@@ -28,106 +28,11 @@ import useTeacherDashboard from "../hooks/useTeacherDashboard";
 import "../styles/TeacherOverview.css";
 import "../styles/Messages.css";
 
-// Dữ liệu thông báo & cảnh báo học tập ban đầu
-const INITIAL_NOTIFICATIONS = [
-  {
-    id: 1,
-    type: "risk",
-    title: "Cảnh báo rủi ro: Sinh viên có điểm thực hành dưới trung bình",
-    desc: "Sinh viên Phạm Quốc Huy (MSSV: 2311004) có điểm trung bình bài thực hành 4.7/10 và tỷ lệ nộp bài đạt 55%, thuộc nhóm có nguy cơ cao cần đôn đốc học tập.",
-    courseName: "Phát triển ứng dụng Game nâng cao",
-    courseId: 10,
-    time: "15 phút trước",
-    unread: true,
-    priority: "high",
-    actionPath: "/quan-ly-lop/10",
-    actionLabel: "Xem phân tích lớp",
-  },
-  {
-    id: 2,
-    type: "deadline",
-    title: "Nhắc nhở chấm bài: 5 bài nộp muộn cần hoàn thành",
-    desc: "Bài thực hành Lab 3 môn Phát triển ứng dụng Game nâng cao đã hết hạn. Hiện có 5 bài nộp muộn đang chờ giảng viên chấm điểm.",
-    courseName: "Phát triển ứng dụng Game nâng cao",
-    courseId: 10,
-    time: "45 phút trước",
-    unread: true,
-    priority: "medium",
-    actionPath: "/cham-diem/10",
-    actionLabel: "Chấm điểm ngay",
-  },
-  {
-    id: 3,
-    type: "risk",
-    title: "Cảnh báo chuyên cần: Tỷ lệ truy cập học liệu giảm",
-    desc: "Lớp Trí tuệ nhân tạo (K47) có 8 sinh viên chưa truy cập slide bài giảng Chương 4 trong 7 ngày qua. Tỷ lệ tương tác tổng thể giảm 14%.",
-    courseName: "Trí tuệ nhân tạo",
-    courseId: 11,
-    time: "2 giờ trước",
-    unread: true,
-    priority: "high",
-    actionPath: "/quan-ly-lop/11",
-    actionLabel: "Xem báo cáo lớp",
-  },
-  {
-    id: 4,
-    type: "support",
-    title: "Yêu cầu hỗ trợ: Sinh viên xin gia hạn Assignment",
-    desc: "Sinh viên Lê Thị Thu Hà (MSSV: 2311003) gửi yêu cầu xin gia hạn nộp bài Lab 3 với lý do tham gia hoạt động nghiên cứu khoa học của trường.",
-    courseName: "Phát triển ứng dụng Game nâng cao",
-    courseId: 10,
-    time: "4 giờ trước",
-    unread: false,
-    priority: "normal",
-    actionPath: "/quan-ly-lop/10",
-    actionLabel: "Kiểm tra sinh viên",
-  },
-  {
-    id: 5,
-    type: "deadline",
-    title: "Hạn chót sắp tới: Lab 4 - Kiểm thử phần mềm",
-    desc: "Hạn nộp bài thực hành Lab 4 môn Kiểm thử phần mềm sẽ kết thúc vào 23:59 ngày mai (18/09). Hiện đã có 32/40 sinh viên nộp bài.",
-    courseName: "Kiểm thử phần mềm",
-    courseId: 13,
-    time: "1 ngày trước",
-    unread: false,
-    priority: "medium",
-    actionPath: "/cham-diem/13",
-    actionLabel: "Theo dõi bài nộp",
-  },
-  {
-    id: 6,
-    type: "system",
-    title: "Hệ thống LMS: Đồng bộ dữ liệu Data Warehouse thành công",
-    desc: "Toàn bộ dữ liệu tương tác học tập và bảng điểm tuần vừa qua đã được đồng bộ vào hệ thống Power BI Analytics phục vụ phân tích học tập.",
-    courseName: "Hệ thống DLU LMS",
-    courseId: null,
-    time: "2 ngày trước",
-    unread: false,
-    priority: "normal",
-    actionPath: "/phan-tich",
-    actionLabel: "Mở Power BI",
-  },
-  {
-    id: 7,
-    type: "system",
-    title: "Phòng Đào tạo: Thông báo kế hoạch thi giữa kỳ",
-    desc: "Phòng Đào tạo đã công bố dự kiến lịch thi giữa kỳ học kỳ 1 năm học 2026-2027. Giảng viên vui lòng rà soát danh sách cấm thi theo quy chế chuyên cần.",
-    courseName: "Phòng Đào tạo DLU",
-    courseId: null,
-    time: "3 ngày trước",
-    unread: false,
-    priority: "normal",
-    actionPath: null,
-    actionLabel: null,
-  },
-];
-
 export default function Messages() {
   const navigate = useNavigate();
   const { teacher, courses, loading, error } = useTeacherDashboard();
 
-  const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
+  const [notifications, setNotifications] = useState([]);
   const [activeTab, setActiveTab] = useState("all"); // all, risk, deadline, support, system
   const [searchKeyword, setSearchKeyword] = useState("");
   const [onlyUnread, setOnlyUnread] = useState(false);
@@ -136,8 +41,115 @@ export default function Messages() {
   // Form soạn thông báo
   const [newTitle, setNewTitle] = useState("");
   const [newDesc, setNewDesc] = useState("");
-  const [newCourse, setNewCourse] = useState("Tất cả các lớp");
+  const [newCourse, setNewCourse] = useState("Tất cả các lớp phụ trách");
   const [newType, setNewType] = useState("deadline");
+
+  // Tự động liên kết thông báo với các môn học THỰC TẾ của giảng viên
+  useEffect(() => {
+    if (!courses || courses.length === 0) return;
+
+    const c1 = courses[0];
+    const c2 = courses[1] || courses[0];
+    const c3 = courses[2] || courses[0];
+
+    const c1Id = c1.courseId || c1.id;
+    const c2Id = c2.courseId || c2.id;
+    const c3Id = c3.courseId || c3.id;
+
+    setNotifications([
+      {
+        id: 1,
+        type: "risk",
+        title: `Cảnh báo rủi ro: Sinh viên có điểm thực hành dưới trung bình`,
+        desc: `Sinh viên trong môn ${c1.name} (${c1.code || ""}) có điểm trung bình bài thực hành dưới 5.0 và tỷ lệ nộp bài đạt thấp, thuộc nhóm có nguy cơ cao cần đôn đốc học tập.`,
+        courseName: c1.name,
+        courseId: c1Id,
+        time: "15 phút trước",
+        unread: true,
+        priority: "high",
+        actionPath: `/quan-ly-lop/${c1Id}`,
+        actionLabel: "Xem phân tích lớp",
+      },
+      {
+        id: 2,
+        type: "deadline",
+        title: `Nhắc nhở chấm bài: Bài thực hành môn ${c1.name} cần hoàn thành`,
+        desc: `Bài thực hành môn ${c1.name} đã hết hạn. Hiện có các bài nộp mới đang chờ giảng viên chấm điểm.`,
+        courseName: c1.name,
+        courseId: c1Id,
+        time: "45 phút trước",
+        unread: true,
+        priority: "medium",
+        actionPath: `/cham-diem/${c1Id}`,
+        actionLabel: "Chấm điểm ngay",
+      },
+      {
+        id: 3,
+        type: "risk",
+        title: `Cảnh báo chuyên cần: Tỷ lệ tương tác tài liệu giảm tại ${c2.name}`,
+        desc: `Lớp ${c2.name} có sinh viên chưa truy cập tài liệu bài giảng trong tuần qua. Tỷ lệ tương tác tổng thể cần được theo dõi thêm.`,
+        courseName: c2.name,
+        courseId: c2Id,
+        time: "2 giờ trước",
+        unread: true,
+        priority: "high",
+        actionPath: `/quan-ly-lop/${c2Id}`,
+        actionLabel: "Xem báo cáo lớp",
+      },
+      {
+        id: 4,
+        type: "support",
+        title: "Yêu cầu hỗ trợ: Sinh viên xin gia hạn Assignment",
+        desc: `Sinh viên lớp ${c1.name} gửi yêu cầu xin gia hạn nộp bài thực hành với lý do tham gia hoạt động nghiên cứu khoa học của trường.`,
+        courseName: c1.name,
+        courseId: c1Id,
+        time: "4 giờ trước",
+        unread: false,
+        priority: "normal",
+        actionPath: `/quan-ly-lop/${c1Id}`,
+        actionLabel: "Kiểm tra sinh viên",
+      },
+      {
+        id: 5,
+        type: "deadline",
+        title: `Hạn chót sắp tới: Bài nộp học phần ${c3.name}`,
+        desc: `Hạn nộp bài thực hành môn ${c3.name} sẽ kết thúc vào 23:59 ngày mai. Giảng viên có thể theo dõi tiến độ nộp bài của sinh viên.`,
+        courseName: c3.name,
+        courseId: c3Id,
+        time: "1 ngày trước",
+        unread: false,
+        priority: "medium",
+        actionPath: `/cham-diem/${c3Id}`,
+        actionLabel: "Theo dõi bài nộp",
+      },
+      {
+        id: 6,
+        type: "system",
+        title: "Hệ thống LMS: Đồng bộ dữ liệu Data Warehouse thành công",
+        desc: "Toàn bộ dữ liệu tương tác học tập và bảng điểm tuần vừa qua đã được đồng bộ vào hệ thống Power BI Analytics phục vụ phân tích học tập.",
+        courseName: "Hệ thống DLU LMS",
+        courseId: null,
+        time: "2 ngày trước",
+        unread: false,
+        priority: "normal",
+        actionPath: "/phan-tich",
+        actionLabel: "Mở Power BI",
+      },
+      {
+        id: 7,
+        type: "system",
+        title: "Phòng Đào tạo: Thông báo kế hoạch thi giữa kỳ",
+        desc: "Phòng Đào tạo đã công bố dự kiến lịch thi giữa kỳ học kỳ 1 năm học 2026-2027. Giảng viên vui lòng rà soát danh sách cấm thi theo quy chế chuyên cần.",
+        courseName: "Phòng Đào tạo DLU",
+        courseId: null,
+        time: "3 ngày trước",
+        unread: false,
+        priority: "normal",
+        actionPath: null,
+        actionLabel: null,
+      },
+    ]);
+  }, [courses]);
 
   // Đếm thống kê
   const stats = useMemo(() => {
@@ -195,18 +207,21 @@ export default function Messages() {
     e.preventDefault();
     if (!newTitle.trim() || !newDesc.trim()) return;
 
+    const matchedCourse = courses.find((c) => c.name === newCourse);
+    const targetCourseId = matchedCourse ? (matchedCourse.courseId || matchedCourse.id) : null;
+
     const newItem = {
       id: Date.now(),
       type: newType,
       title: newTitle.trim(),
       desc: newDesc.trim(),
       courseName: newCourse,
-      courseId: null,
+      courseId: targetCourseId,
       time: "Vừa xong",
       unread: true,
       priority: newType === "risk" ? "high" : "medium",
-      actionPath: null,
-      actionLabel: null,
+      actionPath: targetCourseId ? `/quan-ly-lop/${targetCourseId}` : null,
+      actionLabel: targetCourseId ? "Xem phân tích lớp" : null,
     };
 
     setNotifications([newItem, ...notifications]);
@@ -562,15 +577,10 @@ export default function Messages() {
                     </option>
                     {Array.isArray(courses) &&
                       courses.map((c) => (
-                        <option key={c.id} value={c.name}>
+                        <option key={c.id || c.courseId} value={c.name}>
                           {c.name} ({c.code || "DLU"})
                         </option>
                       ))}
-                    <option value="Phát triển ứng dụng Game nâng cao">
-                      Phát triển ứng dụng Game nâng cao
-                    </option>
-                    <option value="Trí tuệ nhân tạo">Trí tuệ nhân tạo</option>
-                    <option value="Kiểm thử phần mềm">Kiểm thử phần mềm</option>
                   </select>
                 </div>
 
