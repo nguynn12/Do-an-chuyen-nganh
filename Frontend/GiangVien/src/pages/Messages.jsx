@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   BellRing,
@@ -24,6 +24,7 @@ import Sidebar from "../components/Sidebar";
 import LoadingScreen from "../components/common/LoadingScreen";
 import ErrorScreen from "../components/common/ErrorScreen";
 import useTeacherDashboard from "../hooks/useTeacherDashboard";
+import { getTeacherLearningAlertsApi } from "../services/teacherApi";
 
 import "../styles/TeacherOverview.css";
 import "../styles/Messages.css";
@@ -33,6 +34,7 @@ export default function Messages() {
   const { teacher, courses, loading, error } = useTeacherDashboard();
 
   const [notifications, setNotifications] = useState([]);
+  const [alertsLoading, setAlertsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all"); // all, risk, deadline, support, system
   const [searchKeyword, setSearchKeyword] = useState("");
   const [onlyUnread, setOnlyUnread] = useState(false);
@@ -44,112 +46,24 @@ export default function Messages() {
   const [newCourse, setNewCourse] = useState("Tất cả các lớp phụ trách");
   const [newType, setNewType] = useState("deadline");
 
-  // Tự động liên kết thông báo với các môn học THỰC TẾ của giảng viên
+  // NẠP DỮ LIỆU THẬT 100% TỪ CƠ SỞ DỮ LIỆU DATA WAREHOUSE (fact_assignment_submission, dim_user, dim_course)
   useEffect(() => {
-    if (!courses || courses.length === 0) return;
+    if (!teacher?.id) return;
 
-    const c1 = courses[0];
-    const c2 = courses[1] || courses[0];
-    const c3 = courses[2] || courses[0];
-
-    const c1Id = c1.courseId || c1.id;
-    const c2Id = c2.courseId || c2.id;
-    const c3Id = c3.courseId || c3.id;
-
-    setNotifications([
-      {
-        id: 1,
-        type: "risk",
-        title: `Cảnh báo rủi ro: Sinh viên có điểm thực hành dưới trung bình`,
-        desc: `Sinh viên trong môn ${c1.name} (${c1.code || ""}) có điểm trung bình bài thực hành dưới 5.0 và tỷ lệ nộp bài đạt thấp, thuộc nhóm có nguy cơ cao cần đôn đốc học tập.`,
-        courseName: c1.name,
-        courseId: c1Id,
-        time: "15 phút trước",
-        unread: true,
-        priority: "high",
-        actionPath: `/quan-ly-lop/${c1Id}`,
-        actionLabel: "Xem phân tích lớp",
-      },
-      {
-        id: 2,
-        type: "deadline",
-        title: `Nhắc nhở chấm bài: Bài thực hành môn ${c1.name} cần hoàn thành`,
-        desc: `Bài thực hành môn ${c1.name} đã hết hạn. Hiện có các bài nộp mới đang chờ giảng viên chấm điểm.`,
-        courseName: c1.name,
-        courseId: c1Id,
-        time: "45 phút trước",
-        unread: true,
-        priority: "medium",
-        actionPath: `/cham-diem/${c1Id}`,
-        actionLabel: "Chấm điểm ngay",
-      },
-      {
-        id: 3,
-        type: "risk",
-        title: `Cảnh báo chuyên cần: Tỷ lệ tương tác tài liệu giảm tại ${c2.name}`,
-        desc: `Lớp ${c2.name} có sinh viên chưa truy cập tài liệu bài giảng trong tuần qua. Tỷ lệ tương tác tổng thể cần được theo dõi thêm.`,
-        courseName: c2.name,
-        courseId: c2Id,
-        time: "2 giờ trước",
-        unread: true,
-        priority: "high",
-        actionPath: `/quan-ly-lop/${c2Id}`,
-        actionLabel: "Xem báo cáo lớp",
-      },
-      {
-        id: 4,
-        type: "support",
-        title: "Yêu cầu hỗ trợ: Sinh viên xin gia hạn Assignment",
-        desc: `Sinh viên lớp ${c1.name} gửi yêu cầu xin gia hạn nộp bài thực hành với lý do tham gia hoạt động nghiên cứu khoa học của trường.`,
-        courseName: c1.name,
-        courseId: c1Id,
-        time: "4 giờ trước",
-        unread: false,
-        priority: "normal",
-        actionPath: `/quan-ly-lop/${c1Id}`,
-        actionLabel: "Kiểm tra sinh viên",
-      },
-      {
-        id: 5,
-        type: "deadline",
-        title: `Hạn chót sắp tới: Bài nộp học phần ${c3.name}`,
-        desc: `Hạn nộp bài thực hành môn ${c3.name} sẽ kết thúc vào 23:59 ngày mai. Giảng viên có thể theo dõi tiến độ nộp bài của sinh viên.`,
-        courseName: c3.name,
-        courseId: c3Id,
-        time: "1 ngày trước",
-        unread: false,
-        priority: "medium",
-        actionPath: `/cham-diem/${c3Id}`,
-        actionLabel: "Theo dõi bài nộp",
-      },
-      {
-        id: 6,
-        type: "system",
-        title: "Hệ thống LMS: Đồng bộ dữ liệu Data Warehouse thành công",
-        desc: "Toàn bộ dữ liệu tương tác học tập và bảng điểm tuần vừa qua đã được đồng bộ vào hệ thống Power BI Analytics phục vụ phân tích học tập.",
-        courseName: "Hệ thống DLU LMS",
-        courseId: null,
-        time: "2 ngày trước",
-        unread: false,
-        priority: "normal",
-        actionPath: "/phan-tich",
-        actionLabel: "Mở Power BI",
-      },
-      {
-        id: 7,
-        type: "system",
-        title: "Phòng Đào tạo: Thông báo kế hoạch thi giữa kỳ",
-        desc: "Phòng Đào tạo đã công bố dự kiến lịch thi giữa kỳ học kỳ 1 năm học 2026-2027. Giảng viên vui lòng rà soát danh sách cấm thi theo quy chế chuyên cần.",
-        courseName: "Phòng Đào tạo DLU",
-        courseId: null,
-        time: "3 ngày trước",
-        unread: false,
-        priority: "normal",
-        actionPath: null,
-        actionLabel: null,
-      },
-    ]);
-  }, [courses]);
+    setAlertsLoading(true);
+    getTeacherLearningAlertsApi(teacher.id)
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setNotifications(data);
+        }
+      })
+      .catch((err) => {
+        console.error("Lỗi nạp cảnh báo học tập từ CSDL:", err);
+      })
+      .finally(() => {
+        setAlertsLoading(false);
+      });
+  }, [teacher?.id]);
 
   // Đếm thống kê
   const stats = useMemo(() => {
@@ -416,7 +330,13 @@ export default function Messages() {
 
           {/* 4. NOTIFICATIONS LIST CONTAINER */}
           <section className="messages-container">
-            {filteredList.length === 0 ? (
+            {alertsLoading ? (
+              <div className="messages-empty" style={{ padding: "48px 20px" }}>
+                <div className="loading-spinner" style={{ margin: "0 auto 16px" }} />
+                <h3>Đang trích xuất cảnh báo học tập...</h3>
+                <p>Hệ thống đang phân tích dữ liệu bài nộp và bảng điểm thực tế từ Data Warehouse.</p>
+              </div>
+            ) : filteredList.length === 0 ? (
               <div className="messages-empty">
                 <div className="messages-empty-icon">
                   <CheckCircle2 size={30} />

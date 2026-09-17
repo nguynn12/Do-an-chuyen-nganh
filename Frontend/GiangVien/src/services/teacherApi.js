@@ -413,3 +413,19 @@ export async function deleteTeacherScheduleApi(
     response
   );
 }
+
+
+// ======================================================
+// LẤY CẢNH BÁO HỌC TẬP TỪ CƠ SỞ DỮ LIỆU THẬT
+//
+// GET /api/teachers/:teacherId/learning-alerts
+// ======================================================
+
+export async function getTeacherLearningAlertsApi(teacherId) {
+  const response = await fetch(
+    `${API_URL}/teachers/${teacherId}/learning-alerts`
+  );
+
+  const result = await parseResponse(response);
+  return result.data || [];
+}

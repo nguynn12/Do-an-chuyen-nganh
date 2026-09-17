@@ -5,6 +5,7 @@ import {
   getTeacherCourses,
   getTeacherDashboard,
   getTeacherGrading,
+  getTeacherLearningAlerts,
 
   getTeacherSchedule,
   createTeacherSchedule,
@@ -15,6 +16,18 @@ import {
 
 const router =
   express.Router();
+
+
+// ======================================================
+// CẢNH BÁO HỌC TẬP TỰ ĐỘNG TỪ CƠ SỞ DỮ LIỆU THẬT
+//
+// GET /api/teachers/:teacherId/learning-alerts
+// ======================================================
+
+router.get(
+  "/:teacherId/learning-alerts",
+  getTeacherLearningAlerts
+);
 
 
 // ======================================================
