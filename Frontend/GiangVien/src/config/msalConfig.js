@@ -1,13 +1,13 @@
 import { LogLevel } from "@azure/msal-browser";
+import { powerBiEnv, POWERBI_SCOPES, getMsalRedirectUri } from "./powerBiConfig";
 
 export const msalConfig = {
   auth: {
-    clientId: "a8b09661-e072-43e9-945e-41512d641ccb",
-
-    authority:
-      "https://login.microsoftonline.com/8450369b-11fa-4413-8dc7-060ab9f34f41",
-
-    redirectUri: "http://localhost:5173",
+    clientId: powerBiEnv.clientId,
+    authority: `https://login.microsoftonline.com/${powerBiEnv.tenantId}`,
+    // Sử dụng trang callback riêng biệt /auth.html để chạy Redirect Bridge
+    // Tránh việc popup nạp lại toàn bộ ứng dụng React LMS gây lỗi timed_out
+    redirectUri: getMsalRedirectUri(),
   },
 
   cache: {
@@ -22,11 +22,11 @@ export const msalConfig = {
 
         switch (level) {
           case LogLevel.Error:
-            console.error(message);
+            console.error("[MSAL Error]:", message);
             break;
 
           case LogLevel.Warning:
-            console.warn(message);
+            console.warn("[MSAL Warning]:", message);
             break;
 
           default:
@@ -38,7 +38,5 @@ export const msalConfig = {
 };
 
 export const powerBIRequest = {
-  scopes: [
-    "https://analysis.windows.net/powerbi/api/Report.Read.All",
-  ],
+  scopes: POWERBI_SCOPES,
 };

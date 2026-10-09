@@ -28,6 +28,9 @@ import notificationRoutes from "./GiangVien/routes/notificationRoutes.js";
 // ===== LỊCH GIẢNG VIÊN =====
 import calendarRoutes from "./GiangVien/routes/calendarRoutes.js";
 
+// ===== QUẢN LÝ BÀI TẬP & CHẤM ĐIỂM =====
+import assignmentRoutes from "./GiangVien/routes/assignmentRoutes.js";
+
 
 // ============================================================
 // PHÂN HỆ SINH VIÊN
@@ -139,6 +142,16 @@ app.use(
 app.use(
   "/api/teachers",
   calendarRoutes
+);
+
+
+// ------------------------------------------------------------
+// Quản lý bài tập & Chấm điểm
+// ------------------------------------------------------------
+
+app.use(
+  "/api/teachers",
+  assignmentRoutes
 );
 
 

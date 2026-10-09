@@ -8,18 +8,21 @@ import {
   CircleHelp,
   PanelLeftClose,
   PanelLeftOpen,
+  ClipboardCheck,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const menuItems = [
   { path: "/", label: "Tổng quan", icon: Home },
   { path: "/khoa-hoc", label: "Khóa học", icon: BookOpen },
+  { path: "/quan-ly-bai-tap", label: "Quản lý bài tập", icon: ClipboardCheck },
   { path: "/phan-tich", label: "Phân tích học tập", icon: ChartNoAxesCombined },
   { path: "/lich", label: "Lịch giảng dạy", icon: CalendarDays },
   // Không hard-code badge thông báo. Khi có API thật thì truyền số thật vào đây sau.
   { path: "/tin-nhan", label: "Thông báo", icon: Bell },
   { path: "/ho-tro", label: "Trợ giúp", icon: CircleHelp },
 ];
+
 
 function Sidebar() {
   const navigate = useNavigate();
