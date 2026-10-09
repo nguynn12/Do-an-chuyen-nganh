@@ -29,6 +29,9 @@ import ClassStats from "../components/class-management/ClassStats";
 import StudentTable from "../components/class-management/StudentTable";
 import StudentAnalyticsPanel from "../components/class-management/StudentAnalyticsPanel";
 import PowerBIClassReport from "../components/class-management/PowerBIClassReport";
+import SubmissionBehaviorSection from "../components/class-management/SubmissionBehaviorSection";
+import SegmentsScatterSection from "../components/class-management/SegmentsScatterSection";
+import EarlyWarningRiskSection from "../components/class-management/EarlyWarningRiskSection";
 import {
   getTeacher,
   getTeacherCourses,
@@ -1452,142 +1455,13 @@ const averageAttendance =
 
 
         {/* ==============================
-            DANH SÁCH SINH VIÊN CẦN CHÚ Ý (RISK LIST)
+            DANH SÁCH SINH VIÊN CẦN CHÚ Ý (CẢNH BÁO SỚM & RISK SCORE)
         ============================== */}
-        <section className="risk-section">
-          <div className="risk-section-header">
-            <div className="risk-section-title">
-              <div className="risk-title-icon">
-                <AlertTriangle size={18} />
-              </div>
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <strong>Danh sách sinh viên cần chú ý</strong>
-                  <span className="risk-badge-count">
-                    {riskStudents.length} sinh viên gắn cờ
-                  </span>
-                </div>
-                <p>
-                  Hệ thống tự động phát hiện sinh viên có dấu hiệu rủi ro (điểm thấp dưới chuẩn, nộp trễ nhiều bài hoặc ít tương tác học liệu).
-                </p>
-              </div>
-            </div>
-          </div>
+        <EarlyWarningRiskSection
+          courseId={courseId}
+          onSelectStudent={handleViewStudent}
+        />
 
-          {riskStudents.length === 0 ? (
-            <div className="risk-empty-box">
-              <CheckCircle2 size={22} style={{ color: "#37883e" }} />
-              <div>
-                <strong>Không phát hiện sinh viên nào có nguy cơ</strong>
-                <p>
-                  Toàn bộ sinh viên trong lớp đều đang duy trì kết quả và tiến độ học tập đạt chuẩn.
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="risk-table-wrap">
-              <table className="risk-table">
-                <thead>
-                  <tr>
-                    <th>Sinh viên</th>
-                    <th>Cờ cảnh báo (Lý do gắn cờ)</th>
-                    <th>Điểm TB</th>
-                    <th>Tiến độ nộp bài</th>
-                    <th>Thời gian học</th>
-                    <th style={{ textAlign: "right" }}>Thao tác</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {riskStudents.map(({ student: s, flags }) => {
-                    const avatarLetter =
-                      s.fullName
-                        ?.trim()
-                        .split(" ")
-                        .slice(-1)[0]
-                        ?.charAt(0)
-                        ?.toUpperCase() || "S";
-
-                    return (
-                      <tr key={s.userKey || s.id}>
-                        <td>
-                          <div className="risk-student-info">
-                            <div className="risk-avatar">{avatarLetter}</div>
-                            <div>
-                              <strong className="risk-student-name">
-                                {s.fullName}
-                              </strong>
-                              <span className="risk-student-code">
-                                {s.studentCode} • {s.email}
-                              </span>
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="risk-flags-wrap">
-                            {flags.map((f, fIdx) => (
-                              <span
-                                key={fIdx}
-                                className={`risk-flag-badge ${f.badgeClass}`}
-                                title={f.detail}
-                              >
-                                <i>●</i> {f.label}: <strong>{f.detail}</strong>
-                              </span>
-                            ))}
-                          </div>
-                        </td>
-                        <td>
-                          <strong
-                            style={{
-                              color:
-                                s.averageScore !== null && s.averageScore < 5
-                                  ? "#dc2626"
-                                  : "#203026",
-                            }}
-                          >
-                            {s.averageScore !== null
-                              ? `${s.averageScore.toFixed(1)}/10`
-                              : "—"}
-                          </strong>
-                        </td>
-                        <td>
-                          <div>
-                            <span>
-                              {s.submittedAssignments}/{s.totalAssignments} bài
-                            </span>
-                            <span
-                              style={{
-                                fontSize: "11px",
-                                color:
-                                  s.onTimeRate < 50 ? "#dc2626" : "#79867d",
-                                marginLeft: "4px",
-                              }}
-                            >
-                              ({s.onTimeRate}% đúng hạn)
-                            </span>
-                          </div>
-                        </td>
-                        <td>
-                          <span>
-                            {formatLearningTime(s.totalTimeSpentMinutes)}
-                          </span>
-                        </td>
-                        <td style={{ textAlign: "right" }}>
-                          <button
-                            type="button"
-                            className="risk-action-btn"
-                            onClick={() => handleViewStudent(s)}
-                          >
-                            Xem chi tiết
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
 
 
         {/* ==============================
@@ -1957,6 +1831,21 @@ const averageAttendance =
             </div>
           )}
         </section>
+
+
+        {/* ==============================
+            HÀNH VI NỘP BÀI (NƯỚC RÚT / TRÌ HOÃN)
+        ============================== */}
+        <SubmissionBehaviorSection courseId={courseId} />
+
+
+        {/* ==============================
+            PHÂN KHÚC SINH VIÊN 2x2 (SCATTER CHART)
+        ============================== */}
+        <SegmentsScatterSection
+          courseId={courseId}
+          onSelectStudent={handleViewStudent}
+        />
 
 
         {/* ==============================================

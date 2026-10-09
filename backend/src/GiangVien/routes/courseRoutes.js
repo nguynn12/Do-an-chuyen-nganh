@@ -5,6 +5,9 @@ import {
   getCourseStudentAnalytics,
   getCourseGradeDistribution,
   getCourseEngagementTrend,
+  getCourseSubmissionBehavior,
+  getCourseSegments,
+  getCourseRisk,
 } from "../controllers/courseController.js";
 
 const router = express.Router();
@@ -25,8 +28,25 @@ router.get(
 );
 
 router.get(
+  "/:courseId/submission-behavior",
+  getCourseSubmissionBehavior
+);
+
+router.get(
+  "/:courseId/segments",
+  getCourseSegments
+);
+
+router.get(
+  "/:courseId/risk",
+  getCourseRisk
+);
+
+router.get(
   "/:courseId/students",
   getCourseStudents
 );
 
 export default router;
+
+

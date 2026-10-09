@@ -29,7 +29,7 @@ function Header({ teacher = {} }) {
           </div>
 
           <div className="school-sub">
-            Tri thức · Nhân văn · Hội nhập
+            Thụ Nhân, Khai Phóng, Bản Sắc
           </div>
         </div>
       </div>

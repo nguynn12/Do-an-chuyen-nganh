@@ -3873,3 +3873,30 @@ tr:last-child td {
     font-size: 20px;
   }
 }
+
+/* =========================================================
+   DLU LMS ANALYTICS CUSTOM SECTIONS (SCOPED & SAFE)
+========================================================= */
+.early-warning-risk-section,
+.segments-scatter-section,
+.submission-behavior-section {
+  width: 100%;
+  max-width: 1450px;
+  margin: 0 auto 28px;
+  display: block !important;
+  position: relative;
+  clear: both;
+}
+
+.early-warning-card,
+.segments-scatter-card,
+.submission-behavior-card {
+  width: 100% !important;
+  max-width: 1450px !important;
+  height: auto !important;
+  min-height: auto !important;
+  display: block !important;
+  box-sizing: border-box !important;
+  margin: 0 auto;
+  position: relative;
+}

@@ -1,4 +1,5 @@
 import pool from "../../config/database.js";
+import { calculateCourseBehaviorMetrics } from "../../shared/analytics/behaviorMetrics.js";
 
 
 // ======================================================
@@ -1434,3 +1435,207 @@ export async function getCourseEngagementTrend(
     });
   }
 }
+
+
+// ======================================================
+// HÀNH VI NỘP BÀI (NƯỚC RÚT / TRÌ HOÃN)
+//
+// GET:
+// /api/courses/:courseId/submission-behavior
+// ======================================================
+
+export async function getCourseSubmissionBehavior(req, res) {
+  try {
+    const { courseId } = req.params;
+
+    if (!courseId) {
+      return res.status(400).json({
+        success: false,
+        message: "Mã khóa học là bắt buộc.",
+      });
+    }
+
+    const metrics = await calculateCourseBehaviorMetrics(pool, courseId);
+
+    const submissionSummary = {
+      totalStudents: metrics.summary.totalStudents,
+      lowSample: metrics.summary.lowSample,
+      buckets: metrics.summary.submissionBuckets,
+      totalSubmissionsCount: metrics.summary.submissionBuckets.reduce(
+        (sum, b) => sum + b.count,
+        0
+      ),
+    };
+
+    const students = metrics.students.map((s) => ({
+      userKey: s.userKey,
+      moodleUserId: s.moodleUserId,
+      username: s.username,
+      fullName: s.fullName,
+      email: s.email,
+      totalAssignments: s.totalAssignments,
+      submittedCount: s.submittedCount,
+      onTimeCount: s.onTimeCount,
+      lateCount: s.lateCount,
+      onTimeRate: s.onTimeRate,
+      avgLeadDays: s.avgLeadDays,
+      submitStyle: s.submitStyle,
+      submissions: s.submissions,
+    }));
+
+    return res.json({
+      success: true,
+      course: metrics.course,
+      referenceDate: metrics.referenceDate,
+      summary: submissionSummary,
+      students,
+    });
+  } catch (error) {
+    console.error("Lỗi getCourseSubmissionBehavior:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Không thể lấy dữ liệu hành vi nộp bài của môn học.",
+      error: error.message,
+    });
+  }
+}
+
+
+// ======================================================
+// PHÂN KHÚC SINH VIÊN 2x2
+//
+// GET:
+// /api/courses/:courseId/segments
+// ======================================================
+
+export async function getCourseSegments(req, res) {
+  try {
+    const { courseId } = req.params;
+
+    if (!courseId) {
+      return res.status(400).json({
+        success: false,
+        message: "Mã khóa học là bắt buộc.",
+      });
+    }
+
+    const metrics = await calculateCourseBehaviorMetrics(pool, courseId);
+
+    const students = metrics.students.map((s) => ({
+      userKey: s.userKey,
+      moodleUserId: s.moodleUserId,
+      username: s.username,
+      name: s.fullName,
+      fullName: s.fullName,
+      email: s.email,
+      participationScore: s.participationScore,
+      avgGradePct: s.avgGradePct,
+      avgGrade10: s.avgGrade10,
+      segment: s.segment,
+      submitStyle: s.submitStyle,
+      onTimeRate: s.onTimeRate,
+      engagementHours: s.engagementHours,
+      inactiveDays: s.inactiveDays,
+      riskScore: s.riskScore,
+      riskLevel: s.riskLevel,
+    }));
+
+    return res.json({
+      success: true,
+      course: metrics.course,
+      referenceDate: metrics.referenceDate,
+      thresholds: metrics.summary.thresholds,
+      counts: metrics.summary.segmentCounts,
+      totalStudents: metrics.summary.totalStudents,
+      lowSample: metrics.summary.lowSample,
+      students,
+    });
+  } catch (error) {
+    console.error("Lỗi getCourseSegments:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Không thể lấy dữ liệu phân khúc 2x2 của môn học.",
+      error: error.message,
+    });
+  }
+}
+
+
+// ======================================================
+// CẢNH BÁO SỚM & ĐÁNH GIÁ RỦI RO HỌC TẬP
+//
+// GET:
+// /api/courses/:courseId/risk
+// ======================================================
+
+export async function getCourseRisk(req, res) {
+  try {
+    const { courseId } = req.params;
+
+    if (!courseId) {
+      return res.status(400).json({
+        success: false,
+        message: "Mã khóa học là bắt buộc.",
+      });
+    }
+
+    const metrics = await calculateCourseBehaviorMetrics(pool, courseId);
+
+    // Sắp xếp giảm dần theo riskScore
+    const sortedStudents = [...metrics.students].sort(
+      (a, b) => b.riskScore - a.riskScore
+    );
+
+    const riskCounts = {
+      high: sortedStudents.filter((s) => s.riskLevel === "cao").length,
+      medium: sortedStudents.filter((s) => s.riskLevel === "trung bình").length,
+      low: sortedStudents.filter((s) => s.riskLevel === "thấp").length,
+    };
+
+    const students = sortedStudents.map((s) => ({
+      userKey: s.userKey,
+      moodleUserId: s.moodleUserId,
+      username: s.username,
+      name: s.fullName,
+      fullName: s.fullName,
+      email: s.email,
+      riskScore: s.riskScore,
+      riskLevel: s.riskLevel,
+      riskReasons: s.riskReasons,
+      flags: s.flags,
+      avgGradePct: s.avgGradePct,
+      avgGrade10: s.avgGrade10,
+      onTimeRate: s.onTimeRate,
+      engagementHours: s.engagementHours,
+      inactiveDays: s.inactiveDays,
+      submitStyle: s.submitStyle,
+      submittedCount: s.submittedCount,
+      totalAssignments: s.totalAssignments,
+    }));
+
+    return res.json({
+      success: true,
+      course: metrics.course,
+      referenceDate: metrics.referenceDate,
+      summary: {
+        totalStudents: metrics.summary.totalStudents,
+        lowSample: metrics.summary.lowSample,
+        riskCounts,
+        riskDistribution: metrics.summary.riskDistribution,
+      },
+      students,
+    });
+  } catch (error) {
+    console.error("Lỗi getCourseRisk:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Không thể lấy dữ liệu cảnh báo rủi ro của môn học.",
+      error: error.message,
+    });
+  }
+}
+
+

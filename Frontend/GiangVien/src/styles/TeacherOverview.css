@@ -1007,25 +1007,17 @@ button {
 ======================================== */
 
 .analytics-card {
-  height: 165px;
-
+  min-height: 165px;
+  height: auto;
   margin-top: 5px;
-
   padding: 15px;
-
   display: grid;
-
-  grid-template-columns:
-    1fr 1fr;
-
+  grid-template-columns: 1fr 1fr;
   gap: 15px;
-
-  border:
-    1px solid #dfe4e1;
-
+  border: 1px solid #dfe4e1;
   border-radius: 9px;
-
   background: white;
+  box-sizing: border-box;
 }
 
 .chart-block > strong {

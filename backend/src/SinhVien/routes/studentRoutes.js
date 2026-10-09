@@ -7,6 +7,7 @@ import {
   getStudentSubmissions,
   getStudentEngagement,
   getStudentBenchmark,
+  getStudentBehaviorProfile,
 } from "../controllers/studentController.js";
 
 const router = express.Router();
@@ -32,4 +33,8 @@ router.get("/engagement", getStudentEngagement);
 // 7. Peer Benchmark & Percentile (So sánh ẩn danh với lớp)
 router.get("/benchmark", getStudentBenchmark);
 
+// 8. Hồ sơ hành vi của tôi (Behavior Profile)
+router.get("/behavior-profile", getStudentBehaviorProfile);
+
 export default router;
+

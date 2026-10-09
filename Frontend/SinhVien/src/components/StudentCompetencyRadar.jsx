@@ -104,21 +104,21 @@ export default function StudentCompetencyRadar({ summary, onNavigateToAnalytics 
       <div
         style={{
           background: "#ffffff",
-          border: "1px solid #dfe4e1",
-          borderRadius: "11px",
+          border: "1px solid rgba(11, 85, 63, 0.12)",
+          borderRadius: "14px",
           padding: "20px",
           display: "grid",
-          gridTemplateColumns: "330px 1fr",
+          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
           gap: "24px",
           alignItems: "center",
-          boxShadow: "0 2px 8px rgba(20, 45, 28, 0.03)",
+          boxShadow: "0 2px 10px rgba(16, 76, 54, 0.05)",
         }}
       >
         {/* CỘT 1: BIỂU ĐỒ RADAR SVG */}
-        <div style={{ textAlign: "center", position: "relative" }}>
+        <div style={{ textAlign: "center", position: "relative", width: "100%", maxWidth: "340px", margin: "0 auto" }}>
           <svg
             viewBox="0 0 320 290"
-            style={{ width: "100%", maxWidth: "320px", overflow: "visible" }}
+            style={{ width: "100%", height: "auto", overflow: "visible" }}
           >
             {/* Lưới đa giác nền */}
             {gridPolygons.map((poly, i) => (
@@ -151,8 +151,8 @@ export default function StudentCompetencyRadar({ summary, onNavigateToAnalytics 
             {/* Vùng dữ liệu năng lực (Gradient xanh lá DLU) */}
             <polygon
               points={dataPolygon}
-              fill="rgba(55, 136, 62, 0.22)"
-              stroke="#37883e"
+              fill="rgba(8, 117, 75, 0.2)"
+              stroke="#08754b"
               strokeWidth="2.5"
             />
 
@@ -167,7 +167,7 @@ export default function StudentCompetencyRadar({ summary, onNavigateToAnalytics 
                   cy={pt.y}
                   r="4.5"
                   fill="#ffffff"
-                  stroke="#37883e"
+                  stroke="#08754b"
                   strokeWidth="2.5"
                 />
               );
@@ -188,7 +188,7 @@ export default function StudentCompetencyRadar({ summary, onNavigateToAnalytics 
                   textAnchor={textAnchor}
                   fontSize="10.5"
                   fontWeight="600"
-                  fill="#374151"
+                  fill="#243d34"
                   dominantBaseline="middle"
                 >
                   {metrics[i].label}
@@ -200,8 +200,8 @@ export default function StudentCompetencyRadar({ summary, onNavigateToAnalytics 
           <div
             style={{
               fontSize: "11px",
-              color: "#66736b",
-              marginTop: "4px",
+              color: "#667970",
+              marginTop: "6px",
               fontStyle: "italic",
             }}
           >
@@ -210,28 +210,30 @@ export default function StudentCompetencyRadar({ summary, onNavigateToAnalytics 
         </div>
 
         {/* CỘT 2: PHÂN TÍCH INSIGHTS & KHUYẾN NGHỊ HỌC TẬP */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px", minWidth: 0 }}>
           <div
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
+              flexWrap: "wrap",
+              gap: "8px",
               paddingBottom: "10px",
               borderBottom: "1px solid #edf1ee",
             }}
           >
             <div>
-              <div style={{ fontSize: "11px", color: "#66736b", textTransform: "uppercase", fontWeight: 700 }}>
+              <div style={{ fontSize: "11px", color: "#667970", textTransform: "uppercase", fontWeight: 700 }}>
                 Chỉ số năng lực tổng hợp
               </div>
-              <div style={{ fontSize: "20px", fontWeight: 800, color: "#17221d", marginTop: "2px" }}>
+              <div style={{ fontSize: "20px", fontWeight: 800, color: "#14251e", marginTop: "2px" }}>
                 {averageCompetency}/100 Điểm{" "}
                 <span
                   style={{
-                    fontSize: "12px",
+                    fontSize: "11px",
                     fontWeight: 600,
-                    color: averageCompetency >= 75 ? "#2e7d32" : "#e65100",
-                    background: averageCompetency >= 75 ? "#e8f5e9" : "#fff3e0",
+                    color: averageCompetency >= 75 ? "#08754b" : "#e87524",
+                    background: averageCompetency >= 75 ? "#e9f4ec" : "#fff1dc",
                     padding: "2px 8px",
                     borderRadius: "10px",
                     marginLeft: "6px",
@@ -247,42 +249,47 @@ export default function StudentCompetencyRadar({ summary, onNavigateToAnalytics 
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "5px",
-                color: "#2e7d32",
-                background: "#eef6ee",
-                padding: "6px 12px",
+                color: "#08754b",
+                background: "#e9f4ec",
+                padding: "5px 10px",
                 borderRadius: "8px",
-                fontSize: "12px",
+                fontSize: "11.5px",
                 fontWeight: 600,
               }}
             >
-              <ShieldCheck size={16} /> Hồ sơ học tập an toàn
+              <ShieldCheck size={15} /> Hồ sơ học tập an toàn
             </div>
           </div>
 
-          {/* CHI TIẾT TỪNG TRỤC */}
+          {/* CHI TIẾT TỪNG TRỤC: HIỂN THỊ RÕ RÀNG KHÔNG BAO GIỜ BỊ RỚT CHỮ */}
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(2, 1fr)",
-              gap: "10px",
+              gridTemplateColumns: "repeat(auto-fit, minmax(135px, 1fr))",
+              gap: "8px",
             }}
           >
             {metrics.map((m, idx) => (
               <div
                 key={idx}
                 style={{
-                  background: "#f9faf9",
-                  border: "1px solid #edf1ee",
+                  background: "#f8faf8",
+                  border: "1px solid rgba(11, 85, 63, 0.08)",
                   borderRadius: "8px",
-                  padding: "8px 12px",
+                  padding: "8px 10px",
                   display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
+                  flexDirection: "column",
+                  gap: "2px",
                 }}
               >
-                <span style={{ fontSize: "12px", color: "#4b5850" }}>{m.label}:</span>
-                <span style={{ fontSize: "12px", fontWeight: 700, color: "#17221d" }}>
-                  {m.raw} ({m.value}%)
+                <span style={{ fontSize: "10.5px", color: "#667970", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                  {m.label}
+                </span>
+                <span style={{ fontSize: "12px", fontWeight: 700, color: "#14251e" }}>
+                  {m.raw}{" "}
+                  <span style={{ fontSize: "10px", fontWeight: 500, color: "#08754b" }}>
+                    ({m.value}%)
+                  </span>
                 </span>
               </div>
             ))}
@@ -291,17 +298,17 @@ export default function StudentCompetencyRadar({ summary, onNavigateToAnalytics 
           {/* KHUYẾN NGHỊ HỌC TẬP TỰ ĐỘNG */}
           <div
             style={{
-              background: "#f4faf4",
-              border: "1px solid #d3ebd5",
+              background: "#f0f7f2",
+              border: "1px solid rgba(8, 117, 75, 0.18)",
               borderRadius: "8px",
-              padding: "10px 14px",
+              padding: "10px 12px",
               display: "flex",
               alignItems: "flex-start",
               gap: "10px",
             }}
           >
-            <Sparkles size={18} color="#37883e" style={{ flexShrink: 0, marginTop: "2px" }} />
-            <div style={{ fontSize: "12px", color: "#234d28", lineHeight: "1.5" }}>
+            <Sparkles size={16} color="#08754b" style={{ flexShrink: 0, marginTop: "2px" }} />
+            <div style={{ fontSize: "11.5px", color: "#1b4d38", lineHeight: "1.45" }}>
               <strong>Khuyến nghị từ Learning Analytics:</strong> Bạn đang duy trì phong độ thực hành bài Lab rất tốt ({metrics[1].raw}). Hãy tiếp tục nộp đúng hạn các bài tập tiếp theo và phân bổ thời gian xem tài liệu đều đặn để tối ưu hóa điểm tổng kết cuối kỳ.
             </div>
           </div>

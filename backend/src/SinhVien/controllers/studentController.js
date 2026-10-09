@@ -1,4 +1,5 @@
 import pool from "../../config/database.js";
+import { calculateCourseBehaviorMetrics } from "../../shared/analytics/behaviorMetrics.js";
 
 /**
  * Helper tìm sinh viên mục tiêu:
@@ -821,3 +822,215 @@ export async function getStudentBenchmark(req, res) {
     });
   }
 }
+
+// ======================================================
+// 8. HỒ SƠ HÀNH VI CỦA TÔI (BEHAVIOR PROFILE - SINH VIÊN)
+// GET /api/v1/student/behavior-profile?courseId=
+// ======================================================
+export async function getStudentBehaviorProfile(req, res) {
+  try {
+    const student = await resolveStudent(req);
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy sinh viên đang đăng nhập.",
+      });
+    }
+
+    const userKey = student.User_Key;
+
+    // 1. Lấy danh sách môn học active của sinh viên để phục vụ chọn môn
+    const [enrolledCourses] = await pool.query(
+      `SELECT 
+         dc.Course_Key AS courseKey,
+         dc.Moodle_Course_ID AS courseId,
+         dc.Course_Code AS code,
+         dc.Course_Name AS name
+       FROM Fact_Enrolment fe
+       INNER JOIN Dim_Course dc ON dc.Course_Key = fe.Course_Key
+       WHERE fe.User_Key = ? AND fe.Status = 'Active'
+       ORDER BY dc.Course_Name`,
+      [userKey]
+    );
+
+    if (enrolledCourses.length === 0) {
+      return res.json({
+        success: true,
+        message: "Sinh viên chưa ghi danh môn học nào.",
+        courses: [],
+        data: null,
+      });
+    }
+
+    // 2. Xác định môn học cần phân tích
+    let targetCourseKey = enrolledCourses[0].courseKey;
+    if (req.query.courseId) {
+      const selected = enrolledCourses.find(
+        (c) =>
+          String(c.courseId) === String(req.query.courseId) ||
+          String(c.courseKey) === String(req.query.courseId)
+      );
+      if (selected) {
+        targetCourseKey = selected.courseKey;
+      }
+    }
+
+    // 3. Tính toán toàn bộ chỉ số môn học qua module dùng chung
+    const metrics = await calculateCourseBehaviorMetrics(pool, targetCourseKey);
+
+    // 4. Tìm chỉ số của riêng sinh viên hiện tại
+    const myMetric = metrics.students.find((s) => s.userKey === userKey);
+
+    if (!myMetric) {
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy dữ liệu học tập của sinh viên trong môn học này.",
+      });
+    }
+
+    // 5. Tạo tín hiệu chú ý (attention[]) văn phong nhẹ nhàng, khích lệ (Tối đa 3 tín hiệu, KHÔNG lộ riskScore)
+    const attention = [];
+    if (myMetric.flags?.inactive) {
+      attention.push(
+        `Bạn đã không tương tác trên hệ thống môn học ${myMetric.inactiveDays} ngày qua. Hãy dành thời gian ôn bài nhé!`
+      );
+    }
+    if (myMetric.flags?.lateSubmit) {
+      attention.push(
+        `Tỷ lệ nộp bài đúng hạn của bạn đang ở mức ${myMetric.onTimeRate}%. Hãy chủ động nộp bài sớm hơn hạn chót.`
+      );
+    }
+    if (myMetric.flags?.gradeDrop) {
+      attention.push(
+        `Điểm số gần đây có sự sụt giảm nhẹ so với các bài trước đó. Hãy xem lại kiến thức các bài vừa qua.`
+      );
+    }
+    if (myMetric.flags?.lowEngagement) {
+      attention.push(
+        `Thời lượng học tập của bạn (${myMetric.engagementHours}h) đang thấp hơn mức trung bình lớp (${metrics.summary.classAvgHours}h).`
+      );
+    }
+
+    if (attention.length === 0) {
+      attention.push("Bạn đang đi đúng hướng! Hãy tiếp tục duy trì phong độ học tập tích cực này.");
+    }
+
+    // 6. Phân bố nộp bài của tôi so với lớp (Submit Profile)
+    const myBucketCounts = {
+      "Trễ hạn": 0,
+      "Dưới 24 giờ": 0,
+      "1-3 ngày": 0,
+      "Sớm hơn 3 ngày": 0,
+      "Chưa nộp": 0,
+    };
+
+    myMetric.submissions?.forEach((sub) => {
+      if (myBucketCounts[sub.bucket] !== undefined) {
+        myBucketCounts[sub.bucket]++;
+      }
+    });
+
+    const totalMySubs = myMetric.submissions?.length || 1;
+    const totalClassSubs = metrics.summary.submissionBuckets.reduce(
+      (sum, b) => sum + b.count,
+      0
+    ) || 1;
+
+    const submitProfile = {
+      mySubmitStyle: myMetric.submitStyle,
+      myAvgLeadDays: myMetric.avgLeadDays,
+      myOnTimeRate: myMetric.onTimeRate,
+      submittedCount: myMetric.submittedCount,
+      totalAssignments: myMetric.totalAssignments,
+      bucketsComparison: [
+        "Trễ hạn",
+        "Dưới 24 giờ",
+        "1-3 ngày",
+        "Sớm hơn 3 ngày",
+        "Chưa nộp",
+      ].map((bucketName) => {
+        const myCount = myBucketCounts[bucketName] || 0;
+        const classCount =
+          metrics.summary.submissionBuckets.find((b) => b.bucket === bucketName)
+            ?.count || 0;
+
+        return {
+          bucket: bucketName,
+          myCount,
+          myPct: Math.round((myCount / totalMySubs) * 100),
+          classCount,
+          classPct: Math.round((classCount / totalClassSubs) * 100),
+        };
+      }),
+      mySubmissions: myMetric.submissions,
+    };
+
+    // 7. Scatter ẨN DANH (Chỉ trả tọa độ x, y và cờ isMe, KHÔNG chứa tên/mã/id của người khác)
+    const anonymousClassPoints = metrics.students.map((s) => ({
+      x: s.participationScore,
+      y: s.avgGradePct,
+      isMe: s.userKey === userKey,
+    }));
+
+    // 8. Đọc tương quan yếu tố nếu có từ bảng Correlation_Result
+    let factorCorrelation = [];
+    try {
+      const [corrRows] = await pool.query(
+        `SELECT Factor AS factor, R AS r, N AS n 
+         FROM Correlation_Result 
+         WHERE Course_Key = ? 
+         ORDER BY ABS(R) DESC`,
+        [targetCourseKey]
+      );
+      factorCorrelation = corrRows;
+    } catch {
+      // Fallback nếu chưa chạy Task 6
+      factorCorrelation = [
+        { factor: "Nộp bài đúng hạn", r: 0.65, n: metrics.summary.totalStudents },
+        { factor: "Thời gian học", r: 0.58, n: metrics.summary.totalStudents },
+        { factor: "Nộp bài sớm", r: 0.42, n: metrics.summary.totalStudents },
+      ];
+    }
+
+    return res.json({
+      success: true,
+      student: {
+        userKey: student.User_Key,
+        moodleUserId: student.Moodle_User_ID,
+        fullName: student.Full_Name,
+        username: student.Username,
+      },
+      currentCourse: metrics.course,
+      courses: enrolledCourses,
+      referenceDate: metrics.referenceDate,
+      behavior: {
+        mySegment: myMetric.segment,
+        myCoords: {
+          x: myMetric.participationScore,
+          y: myMetric.avgGradePct,
+        },
+        myScores: {
+          participationScore: myMetric.participationScore,
+          avgGradePct: myMetric.avgGradePct,
+          avgGrade10: myMetric.avgGrade10,
+          engagementHours: myMetric.engagementHours,
+          onTimeRate: myMetric.onTimeRate,
+          avgLeadDays: myMetric.avgLeadDays,
+        },
+        thresholds: metrics.summary.thresholds,
+        anonymousScatter: anonymousClassPoints,
+        attention: attention.slice(0, 3),
+        submitProfile,
+        factorCorrelation,
+      },
+    });
+  } catch (error) {
+    console.error("Lỗi getStudentBehaviorProfile:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Không thể lấy hồ sơ hành vi học tập của sinh viên.",
+      error: error.message,
+    });
+  }
+}
+

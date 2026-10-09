@@ -14,6 +14,7 @@ import StudentSubmissions from "./pages/StudentSubmissions";
 import StudentGrades from "./pages/StudentGrades";
 import StudentEngagement from "./pages/StudentEngagement";
 import StudentAnalytics from "./pages/StudentAnalytics";
+import StudentBehavior from "./pages/StudentBehavior";
 
 import { studentGet } from "./services/apiClient";
 import { getStudentUserId } from "./services/studentAuth";
@@ -41,7 +42,13 @@ function StudentShell() {
     }
 
     const cleanHash = hash.replace("#", "");
-    if (["courses", "submissions", "grades", "engagement", "analytics"].includes(cleanHash)) {
+    if (cleanHash === "hanh-vi" || cleanHash === "behavior") {
+      setActiveTab("behavior");
+      setSelectedCourseId(null);
+      return;
+    }
+
+    if (["courses", "behavior", "submissions", "grades", "engagement", "analytics"].includes(cleanHash)) {
       setActiveTab(cleanHash);
       setSelectedCourseId(null);
       return;
@@ -148,6 +155,8 @@ function StudentShell() {
               onBack={() => handleSelectTab("courses")}
             />
           )}
+
+          {activeTab === "behavior" && <StudentBehavior />}
 
           {activeTab === "submissions" && <StudentSubmissions />}
 

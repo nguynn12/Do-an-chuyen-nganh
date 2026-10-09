@@ -429,3 +429,50 @@ export async function getTeacherLearningAlertsApi(teacherId) {
   const result = await parseResponse(response);
   return result.data || [];
 }
+
+
+// ======================================================
+// HÀNH VI NỘP BÀI (NƯỚC RÚT / TRÌ HOÃN)
+//
+// GET /api/courses/:courseId/submission-behavior
+// ======================================================
+
+export async function getCourseSubmissionBehavior(courseId) {
+  const response = await fetch(
+    `${API_URL}/courses/${courseId}/submission-behavior`
+  );
+
+  return await parseResponse(response);
+}
+
+
+// ======================================================
+// PHÂN KHÚC SINH VIÊN 2x2
+//
+// GET /api/courses/:courseId/segments
+// ======================================================
+
+export async function getCourseSegments(courseId) {
+  const response = await fetch(
+    `${API_URL}/courses/${courseId}/segments`
+  );
+
+  return await parseResponse(response);
+}
+
+
+// ======================================================
+// CẢNH BÁO SỚM & ĐÁNH GIÁ RỦI RO
+//
+// GET /api/courses/:courseId/risk
+// ======================================================
+
+export async function getCourseRisk(courseId) {
+  const response = await fetch(
+    `${API_URL}/courses/${courseId}/risk`
+  );
+
+  return await parseResponse(response);
+}
+
+
