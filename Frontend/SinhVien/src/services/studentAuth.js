@@ -11,6 +11,43 @@ export function getStudentUserId() {
   return localStorage.getItem("studentUserKey") || "";
 }
 
+export function getStudentUsername() {
+  try {
+    const rawUser = localStorage.getItem("user");
+    if (rawUser) {
+      let parsedUser;
+      try {
+        parsedUser = JSON.parse(rawUser);
+      } catch {
+        parsedUser = rawUser;
+      }
+
+      if (typeof parsedUser === "object" && parsedUser !== null) {
+        const uname =
+          parsedUser.username ||
+          parsedUser.Username ||
+          parsedUser.studentUsername ||
+          parsedUser.user?.username;
+        if (uname && typeof uname === "string" && uname.trim()) {
+          return uname.trim();
+        }
+      } else if (typeof parsedUser === "string" && parsedUser.trim()) {
+        return parsedUser.trim();
+      }
+    }
+
+    const savedUsername =
+      localStorage.getItem("studentUsername") ||
+      localStorage.getItem("username");
+    if (savedUsername && savedUsername.trim()) {
+      return savedUsername.trim();
+    }
+  } catch (e) {
+    console.warn("Lỗi khi đọc username từ localStorage:", e);
+  }
+  return "sv2310002";
+}
+
 export function isStudentAuthenticated() {
   return (
     localStorage.getItem("isLoggedIn") === "true" &&
