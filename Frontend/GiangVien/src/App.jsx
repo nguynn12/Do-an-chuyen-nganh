@@ -12,6 +12,7 @@ import Support from "./pages/Support";
 import SimplePage from "./pages/SimplePage";
 import Analytics from "./pages/Analytics";
 import TeacherProfile from "./pages/TeacherProfile";
+import AssignmentManagement from "./pages/AssignmentManagement";
 
 // ============================================================
 // THÊM - TRANG SO SÁNH LỚP HỌC
@@ -81,7 +82,7 @@ function App() {
 
 
       {/* =====================================================
-          CHẤM ĐIỂM
+          THEO DÕI CHẤM ĐIỂM
       ===================================================== */}
 
       <Route
@@ -93,16 +94,43 @@ function App() {
         }
       />
 
+      <Route
+        path="/cham-diem"
+        element={
+          <PrivatePage>
+            <Grading />
+          </PrivatePage>
+        }
+      />
+
 
       {/* =====================================================
-          BÀI CHỜ CHẤM
+          QUẢN LÝ BÀI TẬP, GIAO BÀI & CHẤM ĐIỂM (MODULE MẠNH)
       ===================================================== */}
+
+      <Route
+        path="/quan-ly-bai-tap"
+        element={
+          <PrivatePage>
+            <AssignmentManagement />
+          </PrivatePage>
+        }
+      />
+
+      <Route
+        path="/quan-ly-bai-tap/:courseId"
+        element={
+          <PrivatePage>
+            <AssignmentManagement />
+          </PrivatePage>
+        }
+      />
 
       <Route
         path="/bai-cho-cham"
         element={
           <PrivatePage>
-            <Grading />
+            <AssignmentManagement />
           </PrivatePage>
         }
       />

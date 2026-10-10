@@ -6,7 +6,10 @@ import {
   AlertTriangle,
   CalendarClock,
   CheckCircle2,
+  BarChart3,
+  ExternalLink,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 
 function formatMinutes(minutes) {
@@ -361,10 +364,11 @@ function StudentAnalyticsPanel({
   open,
   onClose,
 }) {
+  const navigate = useNavigate();
+
   if (!open || !student) {
     return null;
   }
-
 
   const assessment =
     getStudentAssessment(student);
@@ -375,6 +379,10 @@ function StudentAnalyticsPanel({
       classAverageScore
     );
 
+  const handleOpenStudent360 = () => {
+    onClose();
+    navigate(`/phan-tich?tab=STUDENT_360`);
+  };
 
   return (
     <div
@@ -430,7 +438,7 @@ function StudentAnalyticsPanel({
           </div>
 
 
-          <div>
+          <div style={{ flex: 1 }}>
             <h3>
               {student.fullName}
             </h3>
@@ -442,6 +450,31 @@ function StudentAnalyticsPanel({
             <p>
               {student.email}
             </p>
+
+            <button
+              type="button"
+              onClick={handleOpenStudent360}
+              style={{
+                marginTop: "8px",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "6px 12px",
+                fontSize: "11px",
+                fontWeight: 600,
+                color: "#1e3a8a",
+                background: "#eff6ff",
+                border: "1px solid #bfdbfe",
+                borderRadius: "6px",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+              }}
+              title="Mở báo cáo Power BI Student 360 cho sinh viên này"
+            >
+              <BarChart3 size={13} />
+              Mở Power BI Student 360
+              <ExternalLink size={11} />
+            </button>
           </div>
 
         </section>

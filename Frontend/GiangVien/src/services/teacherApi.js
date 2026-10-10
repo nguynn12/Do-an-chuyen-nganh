@@ -475,4 +475,95 @@ export async function getCourseRisk(courseId) {
   return await parseResponse(response);
 }
 
-
+
+// NGÂN HÀNG BÀI TẬP & GIAO BÀI & CHẤM ĐIỂM
+// ======================================================
+
+export async function getAssignmentBankApi(teacherId, courseId, filters = {}) {
+  const params = new URLSearchParams({ courseId, ...filters });
+  const response = await fetch(
+    `${API_URL}/teachers/${teacherId}/assignments/bank?${params.toString()}`
+  );
+  return await parseResponse(response);
+}
+
+export async function createAssignmentBankItemApi(teacherId, data) {
+  const response = await fetch(
+    `${API_URL}/teachers/${teacherId}/assignments/bank`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    }
+  );
+  return await parseResponse(response);
+}
+
+export async function updateAssignmentBankItemApi(teacherId, itemId, data) {
+  const response = await fetch(
+    `${API_URL}/teachers/${teacherId}/assignments/bank/${itemId}`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    }
+  );
+  return await parseResponse(response);
+}
+
+export async function previewRandomDistributionApi(teacherId, payload) {
+  const response = await fetch(
+    `${API_URL}/teachers/${teacherId}/assignments/campaigns/preview-random`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }
+  );
+  return await parseResponse(response);
+}
+
+export async function confirmAssignmentCampaignApi(teacherId, payload) {
+  const response = await fetch(
+    `${API_URL}/teachers/${teacherId}/assignments/campaigns`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }
+  );
+  return await parseResponse(response);
+}
+
+export async function getAssignmentCampaignsApi(teacherId, courseId) {
+  const response = await fetch(
+    `${API_URL}/teachers/${teacherId}/assignments/campaigns?courseId=${encodeURIComponent(courseId)}`
+  );
+  return await parseResponse(response);
+}
+
+export async function getGradingSubmissionsApi(teacherId, filters = {}) {
+  const cleanParams = new URLSearchParams();
+  Object.entries(filters).forEach(([k, v]) => {
+    if (v !== undefined && v !== null && v !== "") {
+      cleanParams.append(k, v);
+    }
+  });
+
+  const response = await fetch(
+    `${API_URL}/teachers/${teacherId}/grading/submissions?${cleanParams.toString()}`
+  );
+  return await parseResponse(response);
+}
+
+export async function submitGradingApi(teacherId, submissionId, payload) {
+  const response = await fetch(
+    `${API_URL}/teachers/${teacherId}/grading/submissions/${submissionId}/grade`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }
+  );
+  return await parseResponse(response);
+}

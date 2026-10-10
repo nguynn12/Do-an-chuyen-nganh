@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import SecurePowerBIReport from "../powerbi/SecurePowerBIReport";
 
 // ============================================================
 // PowerBIClassReport.jsx
@@ -571,11 +572,23 @@ function PowerBIClassReport({ courseKey, cohort }) {
       ) : (
 
         /* ====================================================
-            POWER BI LỚP HIỆN TẠI
+            POWER BI LỚP HIỆN TẠI (SECURE EMBED POWER BI SDK)
+            - Tự động xác thực qua Microsoft Entra ID
+            - Lọc động môn học theo Course_Key trên Data Warehouse
+            - Bảo lưu mã iframe Publish to Web cũ làm dự phòng
         ==================================================== */
 
         <div className="powerbi-frame-wrap">
 
+          <SecurePowerBIReport
+            courseKey={currentCourseKey}
+            cohort={currentCohort}
+            targetPage="01 - Course Overview NEW"
+            height="auto"
+            hidePageNavigation={true}
+          />
+
+          {/* GHI CHÚ BẢO LƯU CODE IFRAME CŨ ĐỂ PHỤC HỒI KHI CẦN:
           <iframe
             key={`${currentCourseKey}-${currentCohort}`}
             title={`Power BI - ${courseName} - ${currentCohort}`}
@@ -584,6 +597,7 @@ function PowerBIClassReport({ courseKey, cohort }) {
             allowFullScreen
             loading="lazy"
           />
+          */}
 
         </div>
       )}

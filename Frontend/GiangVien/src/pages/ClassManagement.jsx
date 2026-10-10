@@ -32,6 +32,7 @@ import PowerBIClassReport from "../components/class-management/PowerBIClassRepor
 import SubmissionBehaviorSection from "../components/class-management/SubmissionBehaviorSection";
 import SegmentsScatterSection from "../components/class-management/SegmentsScatterSection";
 import EarlyWarningRiskSection from "../components/class-management/EarlyWarningRiskSection";
+import SimpleRiskList from "../components/class-management/SimpleRiskList";
 import {
   getTeacher,
   getTeacherCourses,
@@ -1459,6 +1460,12 @@ const averageAttendance =
         ============================== */}
         <EarlyWarningRiskSection
           courseId={courseId}
+          onSelectStudent={handleViewStudent}
+        />
+
+        {/* Danh sách lọc theo ngưỡng đơn giản (Bảo toàn nhánh Mạnh) */}
+        <SimpleRiskList
+          students={students}
           onSelectStudent={handleViewStudent}
         />
 
