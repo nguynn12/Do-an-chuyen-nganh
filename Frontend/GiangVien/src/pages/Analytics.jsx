@@ -258,7 +258,7 @@ export default function Analytics() {
       <Sidebar />
 
       {/* MAIN CONTENT */}
-      <main className="page analytics-layout">
+      <main className="analytics-layout">
         <div className="analytics-page">
           {/* 1. TOP HEADER & FILTER BAR */}
           <section className="analytics-header-card">

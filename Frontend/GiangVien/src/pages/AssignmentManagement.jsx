@@ -148,7 +148,7 @@ export default function AssignmentManagement() {
       <Sidebar />
 
       {/* MAIN CONTENT */}
-      <main className="page assignment-management-layout">
+      <main className="assignment-management-layout">
         <div className="assignment-page-container">
           {/* 1. HERO BANNER */}
           <section className="assignment-hero-card">
