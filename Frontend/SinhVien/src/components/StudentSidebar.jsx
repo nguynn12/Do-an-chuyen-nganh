@@ -9,7 +9,10 @@ import {
   Compass,
   PanelLeftClose,
   PanelLeftOpen,
+  LogOut,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { clearAuthStorage } from "../services/studentAuth";
 
 const menuItems = [
   { id: "overview", label: "Tổng quan", icon: Home },
@@ -37,6 +40,13 @@ export default function StudentSidebar({ activeTab, onSelectTab }) {
       document.documentElement.style.removeProperty("--dlu-sidebar-width");
     };
   }, [collapsed]);
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    clearAuthStorage();
+    navigate("/dang-nhap", { replace: true });
+  };
 
   return (
     <aside className={`sidebar dlu-sidebar ${collapsed ? "is-collapsed" : ""}`}>
@@ -77,6 +87,23 @@ export default function StudentSidebar({ activeTab, onSelectTab }) {
           );
         })}
       </nav>
+
+      {/* Nút Đăng xuất theo bản của Phước */}
+      <div className="sidebar-logout-wrap" style={{ padding: "6px 8px", marginTop: "auto" }}>
+        <button
+          type="button"
+          className="sidebar-button logout-button"
+          onClick={handleLogout}
+          aria-label="Đăng xuất"
+          title={collapsed ? "Đăng xuất" : undefined}
+          style={{ width: "100%", color: "#dc2626" }}
+        >
+          <span className="sidebar-icon-wrap">
+            <LogOut size={19} />
+          </span>
+          {!collapsed && <span className="sidebar-label" style={{ fontWeight: 600 }}>Đăng xuất</span>}
+        </button>
+      </div>
 
       {/* Chân Sidebar: Tháp DLU thanh lịch chuẩn Giảng viên */}
       <div className="dlu-sidebar-art" aria-hidden="true">
