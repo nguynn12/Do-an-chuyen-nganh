@@ -67,7 +67,7 @@ export default function StudentCourseDetail({ courseId, onBack }) {
         (courseData?.title && s.Course_Name?.trim().toLowerCase() === courseData.title?.trim().toLowerCase()) ||
         (s.Course_Key && String(s.Course_Key) === String(courseId))
     );
-    return (matchedSub?.Course_Name || courseData?.title || courseData?.name || "").trim();
+    return (matchedSub?.Course_Name || courseData?.courseName || courseData?.name || courseData?.title || "").trim();
   }, [allSubmissions, courseData, courseId]);
 
   // Cấu hình URL nhúng Power BI mới: Tab Dự báo điểm môn học kèm bộ lọc sinh viên & tên môn học
@@ -280,7 +280,7 @@ export default function StudentCourseDetail({ courseId, onBack }) {
           <PowerBIEmbed
             title={`LMS Analytics - Dự báo điểm học phần (${courseData.code}${courseTitle ? ` - ${courseTitle}` : ""})`}
             reportUrl={gradePredictionReportUrl}
-            height="560px"
+            height="720px"
           />
         </div>
       ) : (
