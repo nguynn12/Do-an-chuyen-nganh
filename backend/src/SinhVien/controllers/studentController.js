@@ -482,6 +482,8 @@ export async function getStudentCourseDetail(req, res) {
         id: course.Moodle_Course_ID,
         courseKey: course.Course_Key,
         title: course.Course_Name.toUpperCase(),
+        courseName: course.Course_Name,
+        name: course.Course_Name,
         code: course.Course_Code,
         category: course.Category_Name,
         startDate: course.Start_Date,
