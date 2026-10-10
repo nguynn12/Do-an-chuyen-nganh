@@ -91,7 +91,7 @@ export default function StudentOverview({
           CỘT CHÍNH (MAIN CONTENT)
       ========================= */}
       <div className="main-content">
-        {/* 1. WELCOME CARD */}
+        {/* 1. WELCOME CARD (TINH GỌN) */}
         <section className="welcome-card">
           <div className="welcome-user">
             <div className="big-avatar">{initials}</div>
@@ -103,79 +103,6 @@ export default function StudentOverview({
                 {student.currentSemester || "Học kỳ 1 (2026-2027)"}
               </p>
             </div>
-          </div>
-
-          {/* 4 SUMMARY METRIC CARDS (DLU GREEN THEME) */}
-          <div className="summary-grid">
-            <button
-              type="button"
-              className="summary-item summary-green"
-              onClick={() => onNavigateToTab("grades")}
-            >
-              <div className="summary-icon">
-                <Award size={22} />
-              </div>
-              <div className="summary-content">
-                <span>Điểm TB tích lũy</span>
-                <strong>{kpis.averageGrade ? `${kpis.averageGrade}/10` : "7.5/10"}</strong>
-                <small>Tỷ lệ đạt chuẩn: {kpis.averagePercentage || 75}%</small>
-              </div>
-              <ChevronRight size={14} className="summary-arrow" />
-            </button>
-
-            <button
-              type="button"
-              className="summary-item summary-orange"
-              onClick={() => onNavigateToTab("submissions")}
-            >
-              <div className="summary-icon">
-                <ClipboardCheck size={22} />
-              </div>
-              <div className="summary-content">
-                <span>Tiến độ nộp bài</span>
-                <strong>
-                  {kpis.submittedAssignments || 6}/{kpis.totalAssignments || 6} Đã nộp
-                </strong>
-                <small>
-                  {kpis.pendingAssignments > 0
-                    ? `Còn ${kpis.pendingAssignments} bài cần nộp`
-                    : "Đã hoàn thành 100%"}
-                </small>
-              </div>
-              <ChevronRight size={14} className="summary-arrow" />
-            </button>
-
-            <button
-              type="button"
-              className="summary-item summary-blue"
-              onClick={() => onNavigateToTab("courses")}
-            >
-              <div className="summary-icon">
-                <BookOpen size={22} />
-              </div>
-              <div className="summary-content">
-                <span>Khóa học đang học</span>
-                <strong>{kpis.totalCourses || courses.length || 3} Môn học</strong>
-                <small>Tất cả đang hoạt động</small>
-              </div>
-              <ChevronRight size={14} className="summary-arrow" />
-            </button>
-
-            <button
-              type="button"
-              className="summary-item summary-light"
-              onClick={() => onNavigateToTab("engagement")}
-            >
-              <div className="summary-icon">
-                <Clock3 size={22} />
-              </div>
-              <div className="summary-content">
-                <span>Tổng thời gian học</span>
-                <strong>{kpis.totalEngagementHours || 306} Giờ</strong>
-                <small>Ghi nhận từ Data Warehouse</small>
-              </div>
-              <ChevronRight size={14} className="summary-arrow" />
-            </button>
           </div>
         </section>
 

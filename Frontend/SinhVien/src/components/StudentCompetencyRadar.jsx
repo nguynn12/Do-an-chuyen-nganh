@@ -1,38 +1,36 @@
 import React, { useMemo } from "react";
 import {
   TrendingUp,
-  Award,
-  Sparkles,
-  ChevronRight,
-  ShieldCheck,
-  AlertCircle,
   BarChart3,
+  ShieldCheck,
+  Sparkles,
 } from "lucide-react";
+import "../styles/StudentCompetencyRadar.css";
 
 export default function StudentCompetencyRadar({ summary, onNavigateToAnalytics }) {
   const kpis = summary?.kpis || {};
 
   // Tính toán 5 trục năng lực (thang điểm 0 - 100)
   const metrics = useMemo(() => {
-    // 1. Chuyên cần (thời gian truy cập học liệu)
-    const hours = kpis.totalEngagementHours || 280;
+    // 1. Chuyên cần (thời gian học)
+    const hours = kpis.totalEngagementHours != null ? kpis.totalEngagementHours : 205.2;
     const engagementScore = Math.min(100, Math.round((hours / 320) * 100));
 
-    // 2. Kỹ năng thực hành (điểm Lab)
-    const avgGrade = parseFloat(kpis.averageGrade) || 7.5;
+    // 2. Kỹ năng thực hành (điểm Lab/thực hành)
+    const avgGrade = kpis.averageGrade != null ? parseFloat(kpis.averageGrade) : 7.8;
     const labScore = Math.min(100, Math.round(avgGrade * 10));
 
     // 3. Tính kỷ luật (nộp bài đúng hạn)
-    const submitted = kpis.submittedAssignments || 6;
+    const punctualityScore = kpis.punctualityScore != null ? kpis.punctualityScore : 85;
+
+    // 4. Tiến độ học tập (bài đã nộp / tổng bài)
+    const submitted = kpis.submittedAssignments != null ? kpis.submittedAssignments : 4;
     const pending = kpis.pendingAssignments || 0;
-    const total = submitted + pending || 6;
-    const punctualityScore = Math.max(60, Math.min(100, Math.round(85 - pending * 10)));
+    const total = kpis.totalAssignments != null ? kpis.totalAssignments : (submitted + pending || 4);
+    const progressScore = Math.min(100, Math.round((submitted / (total || 1)) * 100));
 
-    // 4. Tiến độ hoàn thành
-    const progressScore = Math.min(100, Math.round((submitted / total) * 100));
-
-    // 5. Kết quả tích lũy
-    const overallScore = Math.min(100, kpis.averagePercentage || 76);
+    // 5. Kết quả tích lũy (%)
+    const overallScore = kpis.averagePercentage != null ? kpis.averagePercentage : 78;
 
     return [
       { label: "Chuyên cần", value: engagementScore, raw: `${hours} giờ` },
@@ -43,10 +41,10 @@ export default function StudentCompetencyRadar({ summary, onNavigateToAnalytics 
     ];
   }, [kpis]);
 
-  // Tính tọa độ SVG cho biểu đồ Radar 5 cạnh
-  const centerX = 160;
-  const centerY = 145;
-  const radius = 95;
+  // Tính tọa độ SVG cho biểu đồ Radar 5 cạnh (rộng rãi, an toàn lề)
+  const centerX = 220;
+  const centerY = 150;
+  const radius = 82;
 
   const getCoordinates = (angleInDegrees, dist) => {
     const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180;
@@ -56,7 +54,7 @@ export default function StudentCompetencyRadar({ summary, onNavigateToAnalytics 
     };
   };
 
-  // 5 đỉnh góc (mỗi góc 72 độ)
+  // 5 góc đối xứng (mỗi góc 72 độ)
   const angles = [0, 72, 144, 216, 288];
 
   // Lưới đa giác nền (25%, 50%, 75%, 100%)
@@ -85,7 +83,7 @@ export default function StudentCompetencyRadar({ summary, onNavigateToAnalytics 
   );
 
   return (
-    <section className="section" style={{ marginTop: "22px" }}>
+    <section className="section competency-section">
       <div className="section-title">
         <div>
           <TrendingUp size={18} style={{ color: "#37883e" }} />
@@ -101,217 +99,153 @@ export default function StudentCompetencyRadar({ summary, onNavigateToAnalytics 
         </button>
       </div>
 
-      <div
-        style={{
-          background: "#ffffff",
-          border: "1px solid rgba(11, 85, 63, 0.12)",
-          borderRadius: "14px",
-          padding: "20px",
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          gap: "24px",
-          alignItems: "center",
-          boxShadow: "0 2px 10px rgba(16, 76, 54, 0.05)",
-        }}
-      >
-        {/* CỘT 1: BIỂU ĐỒ RADAR SVG */}
-        <div style={{ textAlign: "center", position: "relative", width: "100%", maxWidth: "340px", margin: "0 auto" }}>
-          <svg
-            viewBox="0 0 320 290"
-            style={{ width: "100%", height: "auto", overflow: "visible" }}
-          >
-            {/* Lưới đa giác nền */}
-            {gridPolygons.map((poly, i) => (
-              <polygon
-                key={i}
-                points={poly}
-                fill={i % 2 === 0 ? "#f9fbf9" : "#ffffff"}
-                stroke="#e2ebe3"
-                strokeWidth="1"
-              />
-            ))}
+      <div className="competency-card">
+        {/* ========================================================
+            TẦNG 1: TRÁI = ĐIỂM TỔNG TO, PHẢI = SƠ ĐỒ RADAR HÌNH SAO
+            ======================================================== */}
+        <div className="competency-top-split">
+          {/* CỘT TRÁI: ĐIỂM TỔNG NĂNG LỰC TO, NỔI BẬT */}
+          <div className="competency-hero">
+            <span className="competency-hero-tag">Chỉ số năng lực tổng hợp</span>
+            
+            <div className="competency-score-row">
+              <span className="competency-score-number">{averageCompetency}</span>
+              <span className="competency-score-scale">/100 Điểm</span>
+              <span className="competency-badge-rank">
+                {averageCompetency >= 80
+                  ? "Xuất sắc"
+                  : averageCompetency >= 70
+                  ? "Khá Tốt"
+                  : "Cần cố gắng"}
+              </span>
+            </div>
 
-            {/* Các trục nan hoa */}
-            {angles.map((angle, i) => {
-              const pt = getCoordinates(angle, radius);
-              return (
-                <line
+            <div className="competency-status-row">
+              <ShieldCheck size={16} /> Hồ sơ học tập an toàn
+            </div>
+
+            <p className="competency-hero-desc">
+              Đánh giá toàn diện dựa trên 5 khía cạnh học tập thời gian thực từ LMS và Data Warehouse.
+            </p>
+
+            <div className="competency-bar-track">
+              <div
+                className="competency-bar-fill"
+                style={{ width: `${Math.min(100, averageCompetency)}%` }}
+              />
+            </div>
+          </div>
+
+          {/* CỘT PHẢI: SƠ ĐỒ RADAR DẠNG SAO RỘNG RÃI, KHÔNG BỊ TRÀN CHỮ */}
+          <div className="competency-radar-box">
+            <svg
+              viewBox="0 0 440 300"
+              className="competency-radar-svg"
+            >
+              {/* Lưới đa giác nền */}
+              {gridPolygons.map((poly, i) => (
+                <polygon
                   key={i}
-                  x1={centerX}
-                  y1={centerY}
-                  x2={pt.x}
-                  y2={pt.y}
+                  points={poly}
+                  fill={i % 2 === 0 ? "#f9fbf9" : "#ffffff"}
                   stroke="#e2ebe3"
                   strokeWidth="1"
-                  strokeDasharray="3 3"
                 />
-              );
-            })}
+              ))}
 
-            {/* Vùng dữ liệu năng lực (Gradient xanh lá DLU) */}
-            <polygon
-              points={dataPolygon}
-              fill="rgba(8, 117, 75, 0.2)"
-              stroke="#08754b"
-              strokeWidth="2.5"
-            />
+              {/* Các trục nan hoa nối từ tâm */}
+              {angles.map((angle, i) => {
+                const pt = getCoordinates(angle, radius);
+                return (
+                  <line
+                    key={i}
+                    x1={centerX}
+                    y1={centerY}
+                    x2={pt.x}
+                    y2={pt.y}
+                    stroke="#e2ebe3"
+                    strokeWidth="1"
+                    strokeDasharray="3 3"
+                  />
+                );
+              })}
 
-            {/* Các điểm mốc tròn */}
-            {angles.map((angle, i) => {
-              const val = metrics[i].value / 100;
-              const pt = getCoordinates(angle, radius * Math.max(0.2, val));
-              return (
-                <circle
-                  key={i}
-                  cx={pt.x}
-                  cy={pt.y}
-                  r="4.5"
-                  fill="#ffffff"
-                  stroke="#08754b"
-                  strokeWidth="2.5"
-                />
-              );
-            })}
+              {/* Vùng diện tích năng lực */}
+              <polygon
+                points={dataPolygon}
+                fill="rgba(8, 117, 75, 0.22)"
+                stroke="#08754b"
+                strokeWidth="2.5"
+              />
 
-            {/* Nhãn văn bản 5 trục */}
-            {angles.map((angle, i) => {
-              const pt = getCoordinates(angle, radius + 22);
-              let textAnchor = "middle";
-              if (angle === 72 || angle === 144) textAnchor = "start";
-              if (angle === 216 || angle === 288) textAnchor = "end";
+              {/* Các điểm mốc tròn trên 5 đỉnh */}
+              {angles.map((angle, i) => {
+                const val = metrics[i].value / 100;
+                const pt = getCoordinates(angle, radius * Math.max(0.2, val));
+                return (
+                  <circle
+                    key={i}
+                    cx={pt.x}
+                    cy={pt.y}
+                    r="4.5"
+                    fill="#ffffff"
+                    stroke="#08754b"
+                    strokeWidth="2.5"
+                  />
+                );
+              })}
 
-              return (
-                <text
-                  key={i}
-                  x={pt.x}
-                  y={pt.y}
-                  textAnchor={textAnchor}
-                  fontSize="10.5"
-                  fontWeight="600"
-                  fill="#243d34"
-                  dominantBaseline="middle"
-                >
-                  {metrics[i].label}
-                </text>
-              );
-            })}
-          </svg>
+              {/* 5 Nhãn chữ có lề rộng rãi, không đè lấn */}
+              {angles.map((angle, i) => {
+                const pt = getCoordinates(angle, radius + 28);
+                let textAnchor = "middle";
+                if (angle === 72 || angle === 144) textAnchor = "start";
+                if (angle === 216 || angle === 288) textAnchor = "end";
 
-          <div
-            style={{
-              fontSize: "11px",
-              color: "#667970",
-              marginTop: "6px",
-              fontStyle: "italic",
-            }}
-          >
-            Mô hình Radar phân tích 5 khía cạnh học tập cá nhân
+                return (
+                  <text
+                    key={i}
+                    x={pt.x}
+                    y={pt.y}
+                    textAnchor={textAnchor}
+                    fontSize="11"
+                    fontWeight="600"
+                    fill="#243d34"
+                    dominantBaseline="middle"
+                  >
+                    {metrics[i].label}
+                  </text>
+                );
+              })}
+            </svg>
+
+            <span className="competency-radar-caption">
+              Mô hình Radar phân tích 5 khía cạnh học tập cá nhân
+            </span>
           </div>
         </div>
 
-        {/* CỘT 2: PHÂN TÍCH INSIGHTS & KHUYẾN NGHỊ HỌC TẬP */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px", minWidth: 0 }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              flexWrap: "wrap",
-              gap: "8px",
-              paddingBottom: "10px",
-              borderBottom: "1px solid #edf1ee",
-            }}
-          >
-            <div>
-              <div style={{ fontSize: "11px", color: "#667970", textTransform: "uppercase", fontWeight: 700 }}>
-                Chỉ số năng lực tổng hợp
-              </div>
-              <div style={{ fontSize: "20px", fontWeight: 800, color: "#14251e", marginTop: "2px" }}>
-                {averageCompetency}/100 Điểm{" "}
-                <span
-                  style={{
-                    fontSize: "11px",
-                    fontWeight: 600,
-                    color: averageCompetency >= 75 ? "#08754b" : "#e87524",
-                    background: averageCompetency >= 75 ? "#e9f4ec" : "#fff1dc",
-                    padding: "2px 8px",
-                    borderRadius: "10px",
-                    marginLeft: "6px",
-                  }}
-                >
-                  {averageCompetency >= 80 ? "Xuất sắc" : averageCompetency >= 70 ? "Khá Tốt" : "Cần cố gắng"}
-                </span>
+        {/* ========================================================
+            TẦNG 2: MỤC CỦA HÌNH 2 (5 THẺ CHI TIẾT & KHUYẾN NGHỊ)
+            ======================================================== */}
+        <div className="competency-metrics-grid">
+          {metrics.map((m, idx) => (
+            <div key={idx} className="competency-metric-card">
+              <span className="competency-metric-label">{m.label}</span>
+              <div className="competency-metric-value-row">
+                <span className="competency-metric-raw">{m.raw}</span>
+                <span className="competency-metric-pct">({m.value}%)</span>
               </div>
             </div>
+          ))}
+        </div>
 
-            <div
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "5px",
-                color: "#08754b",
-                background: "#e9f4ec",
-                padding: "5px 10px",
-                borderRadius: "8px",
-                fontSize: "11.5px",
-                fontWeight: 600,
-              }}
-            >
-              <ShieldCheck size={15} /> Hồ sơ học tập an toàn
-            </div>
-          </div>
-
-          {/* CHI TIẾT TỪNG TRỤC: HIỂN THỊ RÕ RÀNG KHÔNG BAO GIỜ BỊ RỚT CHỮ */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(135px, 1fr))",
-              gap: "8px",
-            }}
-          >
-            {metrics.map((m, idx) => (
-              <div
-                key={idx}
-                style={{
-                  background: "#f8faf8",
-                  border: "1px solid rgba(11, 85, 63, 0.08)",
-                  borderRadius: "8px",
-                  padding: "8px 10px",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "2px",
-                }}
-              >
-                <span style={{ fontSize: "10.5px", color: "#667970", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                  {m.label}
-                </span>
-                <span style={{ fontSize: "12px", fontWeight: 700, color: "#14251e" }}>
-                  {m.raw}{" "}
-                  <span style={{ fontSize: "10px", fontWeight: 500, color: "#08754b" }}>
-                    ({m.value}%)
-                  </span>
-                </span>
-              </div>
-            ))}
-          </div>
-
-          {/* KHUYẾN NGHỊ HỌC TẬP TỰ ĐỘNG */}
-          <div
-            style={{
-              background: "#f0f7f2",
-              border: "1px solid rgba(8, 117, 75, 0.18)",
-              borderRadius: "8px",
-              padding: "10px 12px",
-              display: "flex",
-              alignItems: "flex-start",
-              gap: "10px",
-            }}
-          >
-            <Sparkles size={16} color="#08754b" style={{ flexShrink: 0, marginTop: "2px" }} />
-            <div style={{ fontSize: "11.5px", color: "#1b4d38", lineHeight: "1.45" }}>
-              <strong>Khuyến nghị từ Learning Analytics:</strong> Bạn đang duy trì phong độ thực hành bài Lab rất tốt ({metrics[1].raw}). Hãy tiếp tục nộp đúng hạn các bài tập tiếp theo và phân bổ thời gian xem tài liệu đều đặn để tối ưu hóa điểm tổng kết cuối kỳ.
-            </div>
-          </div>
+        {/* Khối khuyến nghị từ Learning Analytics */}
+        <div className="competency-recommendation">
+          <Sparkles size={18} className="competency-recommendation-icon" />
+          <p className="competency-recommendation-text">
+            <strong>Khuyến nghị từ Learning Analytics:</strong> Bạn đang duy trì phong độ thực hành bài Lab rất tốt ({metrics[1].raw}). Hãy tiếp tục nộp đúng hạn các bài tập tiếp theo và phân bổ thời gian xem tài liệu đều đặn để tối ưu hóa điểm tổng kết cuối kỳ.
+          </p>
         </div>
       </div>
     </section>

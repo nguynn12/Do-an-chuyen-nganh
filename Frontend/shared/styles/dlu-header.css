@@ -1,0 +1,403 @@
+/* ==========================================================================
+   DLU UNIFIED HEADER STYLES (SINGLE SOURCE OF TRUTH)
+   Áp dụng đồng nhất 100% cho cả Cổng Giảng viên và Cổng Sinh viên
+   Đại học Đà Lạt - "Thụ Nhân, Khai Phóng, Bản Sắc"
+   Nguyên tắc: CSS Flexbox/Grid hiện đại, namespace cô lập, fluid responsive
+   ========================================================================== */
+
+/* Header Root: Thanh cố định trên cùng */
+.dlu-unified-header {
+  min-height: 58px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  padding: 0 clamp(10px, 1.6vw, 20px);
+  background: linear-gradient(90deg, rgba(255,255,255,0.98) 0%, rgba(251,252,248,0.95) 45%, rgba(255,255,255,0.98) 100%);
+  border-bottom: 1px solid rgba(11, 85, 63, 0.16);
+  box-shadow: 0 2px 10px rgba(27, 60, 46, 0.06);
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   1. KHỐI LOGO & THƯƠNG HIỆU TRƯỜNG (BÊN TRÁI)
+   ========================================================= */
+.dlu-uh-brand {
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 1vw, 12px);
+  flex-shrink: 0;
+  min-width: 0;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Con dấu DLU tròn viền cam */
+.dlu-uh-seal {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #e6a23c;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 2px 8px rgba(16, 76, 54, 0.12);
+  color: #08754b;
+}
+
+.dlu-uh-seal-mark {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  color: #08754b;
+}
+
+/* Chữ tên trường */
+.dlu-uh-school-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.15;
+}
+
+.dlu-uh-school-name {
+  color: #08754b;
+  font-size: clamp(11.5px, 1.1vw, 13px);
+  font-weight: 800;
+  letter-spacing: 0.15px;
+  white-space: nowrap;
+}
+
+.dlu-uh-school-en {
+  color: #e87524;
+  font-size: clamp(10px, 0.95vw, 11px);
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  margin-top: 1px;
+  white-space: nowrap;
+}
+
+.dlu-uh-school-motto {
+  color: #708078;
+  font-size: 8.5px;
+  font-weight: 500;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+
+/* Vạch phân cách xanh - cam DLU */
+.dlu-uh-divider {
+  width: 1px;
+  height: 32px;
+  background: linear-gradient(to bottom, rgba(8, 117, 75, 0.25), rgba(232, 117, 36, 0.65), rgba(8, 117, 75, 0.25));
+  margin: 0 clamp(8px, 1.2vw, 16px);
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   2. KHỐI TIÊU ĐỀ LMS & TAGLINE
+   ========================================================= */
+.dlu-uh-lms {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+.dlu-uh-lms-title {
+  color: #125840;
+  font-size: clamp(11px, 1.05vw, 12px);
+  font-weight: 750;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.dlu-uh-lms-tagline {
+  color: #2f6654;
+  font-family: Georgia, serif;
+  font-size: 9px;
+  font-style: italic;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   3. KHỐI TƯƠNG TÁC BÊN PHẢI (SEARCH, PROFILE, MOTTO)
+   ========================================================= */
+.dlu-uh-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 1.1vw, 14px);
+  flex-shrink: 0;
+}
+
+/* Thanh tìm kiếm bo tròn */
+.dlu-uh-search {
+  width: clamp(140px, 17vw, 235px);
+  height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 11px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid #dbe4df;
+  color: #667970;
+  box-shadow: 0 1px 4px rgba(22, 61, 48, 0.04);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.dlu-uh-search:focus-within {
+  border-color: #08754b;
+  box-shadow: 0 0 0 2px rgba(8, 117, 75, 0.12);
+  background: #ffffff;
+}
+
+.dlu-uh-search-icon {
+  color: #667970;
+  flex-shrink: 0;
+}
+
+.dlu-uh-search-input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #1b3129;
+  font-size: 11px;
+}
+
+.dlu-uh-search-input::placeholder {
+  color: #8c9c94;
+}
+
+/* Khối thông tin tài khoản (Profile & Avatar) */
+.dlu-uh-profile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  user-select: none;
+}
+
+.dlu-uh-profile:hover {
+  background: rgba(13, 92, 67, 0.06);
+}
+
+.dlu-uh-avatar {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #0c6048, #073f34);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 2px 7px rgba(6, 67, 50, 0.2);
+}
+
+.dlu-uh-user-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-width: clamp(90px, 13vw, 175px);
+  line-height: 1.2;
+}
+
+.dlu-uh-user-name-row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.dlu-uh-user-name {
+  color: #1b3129;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dlu-uh-user-chevron {
+  color: #55675e;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.dlu-uh-profile.is-open .dlu-uh-user-chevron {
+  transform: rotate(180deg);
+}
+
+.dlu-uh-user-sub {
+  color: #65746d;
+  font-size: 8.5px;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Menu Dropdown Tài khoản */
+.dlu-uh-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 190px;
+  background: #ffffff;
+  border: 1px solid rgba(11, 85, 63, 0.16);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(15, 45, 30, 0.12);
+  padding: 6px;
+  z-index: 110;
+  animation: dluFadeIn 0.15s ease-out;
+}
+
+@keyframes dluFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dlu-uh-dropdown-header {
+  padding: 8px 10px;
+  font-size: 11px;
+  color: #55675e;
+  border-bottom: 1px solid #f1f4f2;
+  margin-bottom: 4px;
+}
+
+.dlu-uh-dropdown-header strong {
+  color: #1b3129;
+  font-weight: 700;
+  display: block;
+}
+
+.dlu-uh-dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #34473e;
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.dlu-uh-dropdown-item:hover {
+  background: rgba(13, 92, 67, 0.08);
+  color: #08754b;
+}
+
+.dlu-uh-dropdown-item.is-logout {
+  color: #dc2626;
+  margin-top: 2px;
+  border-top: 1px solid #f7f9f8;
+  padding-top: 8px;
+}
+
+.dlu-uh-dropdown-item.is-logout:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+/* Slogan nghệ thuật góc phải Header */
+.dlu-uh-motto {
+  padding-left: 6px;
+  transform: rotate(-2deg);
+  color: #2c7659;
+  font-family: Georgia, serif;
+  font-style: italic;
+  text-align: center;
+  line-height: 1.15;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.dlu-uh-motto span,
+.dlu-uh-motto strong {
+  display: block;
+  font-weight: 500;
+  font-size: 11px;
+}
+
+/* =========================================================
+   4. RESPONSIVE BREAKPOINTS CÓ CĂN CỨ
+   ========================================================= */
+
+/* Dưới 1180px: Ẩn slogan nghệ thuật */
+@media (max-width: 1180px) {
+  .dlu-uh-motto {
+    display: none !important;
+  }
+}
+
+/* Dưới 920px: Ẩn divider và phụ đề LMS */
+@media (max-width: 920px) {
+  .dlu-uh-divider,
+  .dlu-uh-lms {
+    display: none !important;
+  }
+}
+
+/* Dưới 640px (Mobile): Tối giản giao diện */
+@media (max-width: 640px) {
+  .dlu-unified-header {
+    padding: 0 10px;
+  }
+
+  .dlu-uh-school-motto {
+    display: none;
+  }
+
+  .dlu-uh-search {
+    display: none;
+  }
+
+  .dlu-uh-user-info {
+    max-width: 100px;
+  }
+}
+
+/* Dưới 520px (Mobile hẹp): Ẩn nhãn text tài khoản, giữ avatar tròn để không cấn lề */
+@media (max-width: 520px) {
+  .dlu-uh-user-info {
+    display: none;
+  }
+
+  .dlu-uh-profile {
+    padding: 2px;
+  }
+
+  .dlu-uh-logo {
+    width: 38px;
+    height: 38px;
+  }
+
+  .dlu-uh-school-name {
+    font-size: 11px;
+  }
+
+  .dlu-uh-school-en {
+    font-size: 8px;
+  }
+}

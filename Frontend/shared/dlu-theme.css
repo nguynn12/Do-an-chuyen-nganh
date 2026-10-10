@@ -2,13 +2,14 @@
    DLU UNIFIED DESIGN SYSTEM & THEME (SHARED)
    Dùng chung 100% cho cả Cổng Giảng viên & Cổng Sinh viên
    Đại học Đà Lạt - "Thụ Nhân, Khai Phóng, Bản Sắc"
+   Quy tắc: Responsive thích ứng, không ép cứng magic numbers
    ========================================================================== */
 
 /* =========================================================
    1. DESIGN TOKENS & BIẾN MÀU DLU CHUẨN
    ========================================================= */
 :root {
-  /* Kích thước Header & Sidebar */
+  /* Kích thước cơ sở Header & Sidebar (Tokens tham chiếu) */
   --dlu-header-height: 58px;
   --dlu-sidebar-width: 56px;
   --dlu-sidebar-expanded-width: 175px;
@@ -28,13 +29,17 @@
   --dlu-gold: #c9a45a;
   --dlu-gold-seal: #e6a23c;
 
-  /* Màu nền & chữ */
+  /* Màu nền, chữ & border */
   --dlu-bg-main: #f5f7f5;
   --dlu-card-bg: #ffffff;
   --dlu-text-dark: #14251e;
   --dlu-text-muted: #667970;
   --dlu-border-soft: rgba(11, 85, 63, 0.12);
   --dlu-shadow-card: 0 2px 10px rgba(16, 76, 54, 0.05);
+
+  /* Radius tokens */
+  --dlu-radius-card: 14px;
+  --dlu-radius-btn: 8px;
 }
 
 /* =========================================================
@@ -46,7 +51,7 @@
 
 body {
   margin: 0;
-  font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Arial, sans-serif;
   background: var(--dlu-bg-main);
   color: var(--dlu-text-dark);
   min-height: 100vh;
@@ -65,112 +70,119 @@ button {
 }
 
 /* =========================================================
-   3. HEADER DLU CHUẨN (FIXED 58px)
+   3. HEADER DLU CHUẨN (MIN-HEIGHT 58px & FLUID ADAPTIVE)
    ========================================================= */
 .header.dlu-header {
-  height: var(--dlu-header-height) !important;
-  min-height: var(--dlu-header-height) !important;
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  z-index: 50 !important;
-  display: flex !important;
-  align-items: center !important;
-  padding: 0 18px !important;
-  background: linear-gradient(90deg, rgba(255,255,255,.98) 0%, rgba(251,252,248,.94) 42%, rgba(255,255,255,.97) 100%) !important;
-  border-bottom: 1px solid rgba(11, 85, 63, 0.18) !important;
-  box-shadow: 0 2px 12px rgba(27, 60, 46, 0.08) !important;
-  font-family: "Segoe UI", Arial, sans-serif !important;
+  min-height: var(--dlu-header-height);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  padding: 0 clamp(10px, 1.8vw, 18px);
+  background: linear-gradient(90deg, rgba(255,255,255,.98) 0%, rgba(251,252,248,.94) 42%, rgba(255,255,255,.97) 100%);
+  border-bottom: 1px solid rgba(11, 85, 63, 0.18);
+  box-shadow: 0 2px 12px rgba(27, 60, 46, 0.08);
+  font-family: "Segoe UI", Arial, sans-serif;
 }
 
 /* Khối Logo & Thương hiệu trường */
 .dlu-header .school.dlu-brand,
 .dlu-brand {
-  display: flex !important;
-  align-items: center !important;
-  gap: 10px !important;
-  flex-shrink: 0 !important;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  min-width: 0;
 }
 
 .school-logo.dlu-seal {
-  width: 40px !important;
-  height: 40px !important;
-  border-radius: 50% !important;
-  background: #ffffff !important;
-  border: 2px solid var(--dlu-gold-seal) !important;
-  display: grid !important;
-  place-items: center !important;
-  box-shadow: 0 2px 8px rgba(16, 76, 54, 0.12) !important;
-  flex-shrink: 0 !important;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid var(--dlu-gold-seal);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 2px 8px rgba(16, 76, 54, 0.12);
+  flex-shrink: 0;
 }
 
 .dlu-seal-mark {
-  color: #08754b !important;
-  font-weight: 800 !important;
-  font-size: 12px !important;
-  letter-spacing: 0.2px !important;
+  color: #08754b;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.2px;
 }
 
 .dlu-school-copy {
-  display: flex !important;
-  flex-direction: column !important;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .dlu-header .school-name {
-  color: #08754b !important;
-  font-size: 13px !important;
-  font-weight: 800 !important;
-  line-height: 1.1 !important;
-  letter-spacing: 0.15px !important;
+  color: #08754b;
+  font-size: clamp(11.5px, 1.2vw, 13px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: 0.15px;
+  white-space: nowrap;
 }
 
 .dlu-header .school-name-en {
-  color: var(--dlu-orange) !important;
-  font-size: 11.5px !important;
-  font-weight: 700 !important;
-  line-height: 1.1 !important;
-  letter-spacing: 0.3px !important;
-  margin-top: 1px !important;
+  color: var(--dlu-orange);
+  font-size: clamp(10px, 1vw, 11.5px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.3px;
+  margin-top: 1px;
+  white-space: nowrap;
 }
 
 .dlu-header .school-sub {
-  color: #708078 !important;
-  font-size: 8.5px !important;
-  font-weight: 400 !important;
-  margin-top: 2px !important;
+  color: #708078;
+  font-size: 8.5px;
+  font-weight: 400;
+  margin-top: 2px;
+  white-space: nowrap;
 }
 
 /* Vạch phân cách xanh - cam DLU */
 .dlu-header-divider {
-  width: 1px !important;
-  height: 34px !important;
-  background: linear-gradient(to bottom, rgba(8, 117, 75, 0.25), rgba(232, 117, 36, 0.65), rgba(8, 117, 75, 0.25)) !important;
-  margin: 0 16px !important;
-  flex-shrink: 0 !important;
+  width: 1px;
+  height: 32px;
+  background: linear-gradient(to bottom, rgba(8, 117, 75, 0.25), rgba(232, 117, 36, 0.65), rgba(8, 117, 75, 0.25));
+  margin: 0 clamp(8px, 1.2vw, 16px);
+  flex-shrink: 0;
 }
 
 /* Tiêu đề LMS */
 .dlu-header .dlu-lms-title {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  min-width: 240px !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  flex-shrink: 1;
 }
 
 .dlu-header .dlu-lms-title strong {
-  color: #125840 !important;
-  font-size: 12px !important;
-  font-weight: 750 !important;
-  line-height: 1.15 !important;
+  color: #125840;
+  font-size: clamp(11px, 1.1vw, 12px);
+  font-weight: 750;
+  line-height: 1.15;
+  white-space: nowrap;
 }
 
 .dlu-header .dlu-lms-title span {
-  color: #2f6654 !important;
-  font-family: Georgia, serif !important;
-  font-size: 9px !important;
-  font-style: italic !important;
-  margin-top: 2px !important;
+  color: #2f6654;
+  font-family: Georgia, serif;
+  font-size: 9px;
+  font-style: italic;
+  margin-top: 2px;
+  white-space: nowrap;
 }
 
 /* Ẩn hoàn toàn cụm menu phụ rườm rà ở cả hai bên */
@@ -181,285 +193,294 @@ button {
 
 /* Cụm chức năng bên phải */
 .dlu-header .header-right {
-  margin-left: auto !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 14px !important;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 1.2vw, 14px);
+  flex-shrink: 0;
 }
 
-/* Ô tìm kiếm bo tròn */
+/* Ô tìm kiếm bo tròn linh hoạt */
 .dlu-header .search-box {
-  width: 240px !important;
-  height: 32px !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  padding: 0 12px !important;
-  border-radius: 18px !important;
-  background: rgba(255, 255, 255, 0.92) !important;
-  border: 1px solid #dbe4df !important;
-  color: #667970 !important;
-  box-shadow: 0 2px 8px rgba(22, 61, 48, 0.05) !important;
-  transition: all 0.2s ease !important;
+  width: clamp(140px, 18vw, 240px);
+  height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid #dbe4df;
+  color: #667970;
+  box-shadow: 0 2px 8px rgba(22, 61, 48, 0.05);
+  transition: all 0.2s ease;
 }
 
 .dlu-header .search-box:focus-within {
-  border-color: #08754b !important;
-  background: #ffffff !important;
+  border-color: #08754b;
+  background: #ffffff;
 }
 
 .dlu-header .search-box input {
-  flex: 1 !important;
-  border: 0 !important;
-  outline: none !important;
-  background: transparent !important;
-  color: #243d34 !important;
-  font-size: 11px !important;
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #243d34;
+  font-size: 11px;
 }
 
 /* Profile Avatar */
 .dlu-header .header-profile {
-  display: flex !important;
-  align-items: center !important;
-  gap: 10px !important;
-  padding: 4px 8px !important;
-  border-radius: 20px !important;
-  cursor: pointer !important;
-  transition: background 0.15s ease !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  min-width: 0;
 }
 
 .dlu-header .header-profile:hover {
-  background: rgba(13, 92, 67, 0.06) !important;
+  background: rgba(13, 92, 67, 0.06);
 }
 
 .dlu-header .avatar {
-  width: 34px !important;
-  height: 34px !important;
-  border-radius: 50% !important;
-  background: linear-gradient(145deg, #0c6048, #073f34) !important;
-  color: white !important;
-  font-size: 11px !important;
-  font-weight: 700 !important;
-  display: grid !important;
-  place-items: center !important;
-  box-shadow: 0 3px 8px rgba(6, 67, 50, 0.18) !important;
-  flex-shrink: 0 !important;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #0c6048, #073f34);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 3px 8px rgba(6, 67, 50, 0.18);
+  flex-shrink: 0;
 }
 
 .dlu-header .teacher-mini {
-  display: flex !important;
-  flex-direction: column !important;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-width: clamp(90px, 14vw, 180px);
 }
 
 .dlu-header .dlu-profile-row {
-  display: flex !important;
-  align-items: center !important;
-  gap: 4px !important;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .dlu-header .teacher-mini strong {
-  font-size: 11px !important;
-  color: #1b3129 !important;
-  font-weight: 700 !important;
-  white-space: nowrap !important;
+  font-size: 11px;
+  color: #1b3129;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dlu-header .teacher-mini span {
-  font-size: 8.5px !important;
-  color: #65746d !important;
-  margin-top: 1px !important;
+  font-size: 8.5px;
+  color: #65746d;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Khẩu hiệu nghệ thuật DLU góc phải Header */
 .dlu-motto {
-  min-width: 110px !important;
-  padding-left: 8px !important;
-  transform: rotate(-2deg) !important;
-  color: #2c7659 !important;
-  font-family: Georgia, serif !important;
-  font-style: italic !important;
-  text-align: center !important;
-  line-height: 1.15 !important;
-  flex-shrink: 0 !important;
+  padding-left: 8px;
+  transform: rotate(-2deg);
+  color: #2c7659;
+  font-family: Georgia, serif;
+  font-style: italic;
+  text-align: center;
+  line-height: 1.15;
+  flex-shrink: 0;
 }
 
 .dlu-motto span,
 .dlu-motto strong {
-  display: block !important;
-  font-weight: 500 !important;
-  font-size: 11px !important;
+  display: block;
+  font-weight: 500;
+  font-size: 11px;
 }
 
 /* =========================================================
    4. SIDEBAR DLU CHUẨN (NỀN XANH THÔNG RỪNG ĐÀ LẠT)
    ========================================================= */
 .sidebar.dlu-sidebar {
-  width: var(--dlu-sidebar-width, 56px) !important;
-  position: fixed !important;
-  top: var(--dlu-header-height) !important;
-  left: 0 !important;
-  bottom: 0 !important;
-  z-index: 40 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  padding: 10px 8px 12px !important;
-  background: linear-gradient(180deg, #0a543f 0%, #063e32 55%, #07392f 100%) !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 4px 0 18px rgba(9, 61, 45, 0.12) !important;
-  transition: width 0.2s ease, padding 0.2s ease !important;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
+  width: var(--dlu-sidebar-width, 56px);
+  position: fixed;
+  top: var(--dlu-header-height);
+  left: 0;
+  bottom: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 8px 12px;
+  background: linear-gradient(180deg, #0a543f 0%, #063e32 55%, #07392f 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 4px 0 18px rgba(9, 61, 45, 0.12);
+  transition: width 0.2s ease, padding 0.2s ease, transform 0.25s ease;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* Nút Thu gọn / Mở rộng */
 .sidebar-collapse-button {
-  width: 100% !important;
-  height: 34px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  gap: 7px !important;
-  padding: 0 10px !important;
-  margin-bottom: 8px !important;
-  background: rgba(255, 255, 255, 0.055) !important;
-  border: 0 !important;
-  border-radius: 8px !important;
-  color: rgba(255, 255, 255, 0.76) !important;
-  font-size: 9.5px !important;
-  font-weight: 600 !important;
-  transition: all 0.2s ease !important;
+  width: 100%;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  padding: 0 10px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.055);
+  border: 0;
+  border-radius: var(--dlu-radius-btn);
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 9.5px;
+  font-weight: 600;
+  transition: all 0.2s ease;
 }
 
 .sidebar-collapse-button:hover {
-  background: rgba(255, 255, 255, 0.12) !important;
-  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
 }
 
 .dlu-sidebar .sidebar-menu {
-  width: 100% !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 4px !important;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .dlu-sidebar .sidebar-button {
-  width: 100% !important;
-  height: 38px !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 10px !important;
-  padding: 0 10px !important;
-  border: none !important;
-  border-radius: 8px !important;
-  background: transparent !important;
-  color: rgba(255, 255, 255, 0.82) !important;
-  font-size: 11px !important;
-  font-weight: 500 !important;
-  text-align: left !important;
-  white-space: nowrap !important;
-  transition: all 0.18s ease !important;
+  width: 100%;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px;
+  border: none;
+  border-radius: var(--dlu-radius-btn);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 11px;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+  transition: all 0.18s ease;
 }
 
 .dlu-sidebar .sidebar-icon-wrap {
-  width: 22px !important;
-  height: 22px !important;
-  display: grid !important;
-  place-items: center !important;
-  flex-shrink: 0 !important;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
 }
 
 .dlu-sidebar .sidebar-label {
-  flex: 1 !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  white-space: nowrap !important;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .dlu-sidebar .sidebar-button:hover {
-  background: rgba(255, 255, 255, 0.08) !important;
-  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
 }
 
 .dlu-sidebar .sidebar-button.side-active {
-  background: linear-gradient(90deg, rgba(46, 136, 86, 0.68), rgba(35, 122, 76, 0.35)) !important;
-  color: #ffffff !important;
-  box-shadow: none !important;
+  background: linear-gradient(90deg, rgba(46, 136, 86, 0.68), rgba(35, 122, 76, 0.35));
+  color: #ffffff;
+  box-shadow: none;
 }
 
 /* Chân Sidebar: Tháp DLU nghệ thuật */
 .dlu-sidebar-art {
-  margin-top: auto !important;
-  padding: 10px 6px 8px !important;
-  text-align: center !important;
-  color: rgba(224, 211, 153, 0.68) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  margin-top: auto;
+  padding: 10px 6px 8px;
+  text-align: center;
+  color: rgba(224, 211, 153, 0.68);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .dlu-tower {
-  width: 24px !important;
-  height: 32px !important;
-  margin: 0 auto 6px !important;
-  border: 1.5px solid rgba(220, 202, 137, 0.5) !important;
-  border-radius: 4px 4px 0 0 !important;
-  position: relative !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
+  width: 24px;
+  height: 32px;
+  margin: 0 auto 6px;
+  border: 1.5px solid rgba(220, 202, 137, 0.5);
+  border-radius: 4px 4px 0 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .tower-spire {
-  width: 2px !important;
-  height: 7px !important;
-  background: #d6b661 !important;
-  position: absolute !important;
-  top: -8px !important;
+  width: 2px;
+  height: 7px;
+  background: #d6b661;
+  position: absolute;
+  top: -8px;
 }
 
 .tower-clock {
-  font-size: 7.5px !important;
-  font-weight: 800 !important;
-  color: #e5d496 !important;
+  font-size: 7.5px;
+  font-weight: 800;
+  color: #e5d496;
 }
 
 .dlu-sidebar-art strong {
-  display: block !important;
-  font-family: Georgia, serif !important;
-  font-size: 10px !important;
-  font-weight: 500 !important;
-  letter-spacing: 0.5px !important;
-  color: rgba(255, 255, 255, 0.88) !important;
+  display: block;
+  font-family: Georgia, serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.88);
 }
 
 .dlu-sidebar-art small {
-  display: block !important;
-  font-family: Georgia, serif !important;
-  font-size: 8px !important;
-  color: rgba(224, 211, 153, 0.85) !important;
-  font-style: italic !important;
-  margin-top: 2px !important;
+  display: block;
+  font-family: Georgia, serif;
+  font-size: 8px;
+  color: rgba(224, 211, 153, 0.85);
+  font-style: italic;
+  margin-top: 2px;
 }
 
 /* Trạng thái THU GỌN (56px) */
 .dlu-sidebar.is-collapsed {
-  width: 56px !important;
-  padding-left: 7px !important;
-  padding-right: 7px !important;
+  width: 56px;
+  padding-left: 7px;
+  padding-right: 7px;
 }
 
 .dlu-sidebar.is-collapsed .sidebar-collapse-button {
-  width: 40px !important;
-  margin: 0 auto 8px !important;
-  justify-content: center !important;
-  padding: 0 !important;
+  width: 40px;
+  margin: 0 auto 8px;
+  justify-content: center;
+  padding: 0;
 }
 
 .dlu-sidebar.is-collapsed .sidebar-button {
-  width: 40px !important;
-  padding: 0 !important;
-  display: grid !important;
-  grid-template-columns: 1fr !important;
-  place-items: center !important;
+  width: 40px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  place-items: center;
 }
 
 .dlu-sidebar.is-collapsed .sidebar-label,
@@ -469,42 +490,43 @@ button {
 }
 
 .dlu-sidebar.is-collapsed .dlu-sidebar-art {
-  padding-top: 6px !important;
-  transform: scale(0.85) !important;
-  transform-origin: bottom center !important;
+  padding-top: 6px;
+  transform: scale(0.85);
+  transform-origin: bottom center;
 }
 
 /* =========================================================
-   5. PAGE LAYOUT CHUẨN (CHỐNG CHE HEADER & MARGIN CO GIÃN)
+   5. PAGE LAYOUT CHUẨN (ADAPTIVE & GRID CO GIÃN)
    ========================================================= */
 .app {
-  min-height: 100vh !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: var(--dlu-bg-main) !important;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background: var(--dlu-bg-main);
 }
 
 .page,
 .page-full {
-  min-height: 100vh !important;
-  margin-left: var(--dlu-sidebar-width, 56px) !important;
-  padding-top: calc(var(--dlu-header-height, 58px) + 20px) !important;
-  padding-left: 20px !important;
-  padding-right: 20px !important;
-  padding-bottom: 40px !important;
-  transition: margin-left 0.2s ease !important;
-  background: var(--dlu-bg-main) !important;
-  box-sizing: border-box !important;
+  min-height: 100vh;
+  margin-left: var(--dlu-sidebar-width, 56px);
+  padding-top: calc(var(--dlu-header-height, 58px) + 20px);
+  padding-left: clamp(12px, 2vw, 20px);
+  padding-right: clamp(12px, 2vw, 20px);
+  padding-bottom: 40px;
+  transition: margin-left 0.2s ease;
+  background: var(--dlu-bg-main);
+  box-sizing: border-box;
 }
 
 .page {
-  display: grid !important;
-  grid-template-columns: minmax(0, 1fr) 345px !important;
-  gap: 20px !important;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 330px);
+  gap: 20px;
+  min-width: 0;
 }
 
 .page-full {
-  display: block !important;
+  display: block;
 }
 
 /* =========================================================
@@ -515,9 +537,85 @@ button {
 .section-card,
 .panel-card,
 .course-card {
-  border-radius: 14px !important;
-  border: 1px solid var(--dlu-border-soft) !important;
-  background: #ffffff !important;
-  box-shadow: var(--dlu-shadow-card) !important;
-  box-sizing: border-box !important;
+  border-radius: var(--dlu-radius-card);
+  border: 1px solid var(--dlu-border-soft);
+  background: #ffffff;
+  box-shadow: var(--dlu-shadow-card);
+  box-sizing: border-box;
+}
+
+/* Khối cuộn bảng dữ liệu responsive nội bộ (chống tràn ngang trang) */
+.dlu-table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Lưới thẻ số liệu KPI thích ứng tự động */
+.dlu-kpi-grid,
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: 12px;
+}
+
+/* =========================================================
+   7. BREAKPOINTS THỐNG NHẤT (ADAPTIVE RESPONSIVE)
+   ========================================================= */
+
+/* Dưới 1180px: Ẩn slogan nghệ thuật, Dashboard chuyển thành 1 cột */
+@media (max-width: 1180px) {
+  .dlu-motto {
+    display: none !important;
+  }
+  .page {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Dưới 900px: Ẩn phụ đề LMS để Header thoáng */
+@media (max-width: 900px) {
+  .dlu-header-divider,
+  .dlu-header .dlu-lms-title {
+    display: none !important;
+  }
+  .dlu-header .search-box {
+    width: clamp(120px, 22vw, 180px);
+  }
+}
+
+/* Dưới 640px (Mobile): Chuyển Sidebar thành Overlay, padding co giãn */
+@media (max-width: 640px) {
+  :root {
+    --dlu-sidebar-width: 0px;
+  }
+
+  .header.dlu-header {
+    padding: 0 10px;
+  }
+
+  .dlu-header .school-sub {
+    display: none;
+  }
+
+  .dlu-header .search-box {
+    display: none;
+  }
+
+  .page,
+  .page-full {
+    margin-left: 0;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: calc(var(--dlu-header-height, 58px) + 12px);
+  }
+
+  .sidebar.dlu-sidebar {
+    transform: translateX(-100%);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.25);
+  }
+
+  .sidebar.dlu-sidebar.is-mobile-open {
+    transform: translateX(0);
+  }
 }

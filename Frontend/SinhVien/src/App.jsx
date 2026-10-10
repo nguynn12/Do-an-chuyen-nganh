@@ -22,9 +22,31 @@ import { getStudentUserId } from "./services/studentAuth";
 function StudentShell() {
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedCourseId, setSelectedCourseId] = useState(null);
-  const [summary, setSummary] = useState(null);
+  const isDemo = new URLSearchParams(window.location.search).get("demo") === "1";
+  const [summary, setSummary] = useState(
+    isDemo
+      ? {
+          student: {
+            fullName: "Trần Thị Bình",
+            cohort: "CTK47B",
+            studentCode: "sv2310002",
+            currentSemester: "Học kỳ 1 (2026-2027)",
+          },
+          kpis: {
+            totalCourses: 2,
+            totalAssignments: 4,
+            submittedAssignments: 4,
+            pendingAssignments: 0,
+            averageGrade: 7.8,
+            averagePercentage: 78,
+            totalEngagementHours: 205.2,
+            punctualityScore: 85,
+          },
+        }
+      : null
+  );
   const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!isDemo);
   const studentUserKey = getStudentUserId();
 
   const parseRoute = (hash) => {

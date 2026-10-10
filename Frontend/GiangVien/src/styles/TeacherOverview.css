@@ -2831,15 +2831,25 @@ button:last-child {
 
 /* Dashboard luôn né đúng header/sidebar, không bị che */
 .page {
-  margin-left: var(--dlu-sidebar-width) !important;
-  padding-top: var(--dlu-header-height) !important;
+  margin-left: var(--dlu-sidebar-width, 56px);
+  padding-top: calc(var(--dlu-header-height, 58px) + 20px);
   transition: margin-left .2s ease;
 }
 
 @media (max-width: 900px) {
   :root { --dlu-sidebar-width: 56px; }
   .dlu-header .dlu-lms-title, .dlu-header .dlu-motto { display: none !important; }
-  .dlu-header .search-box { width: 200px !important; }
+  .dlu-header .search-box { width: clamp(140px, 20vw, 200px) !important; }
+}
+
+@media (max-width: 640px) {
+  :root { --dlu-sidebar-width: 0px; }
+  .page {
+    margin-left: 0;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: calc(var(--dlu-header-height, 58px) + 12px);
+  }
 }
 /* =========================================================
    DLU HEADER - FINAL TYPOGRAPHY OVERRIDE
