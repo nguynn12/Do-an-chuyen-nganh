@@ -191,7 +191,7 @@ export default function StudentCourses({ courses = [], onNavigateToCourse }) {
             <PowerBIEmbed
               title="LMS Analytics - Kế hoạch học tập & Dự báo nỗ lực ôn thi toàn kỳ"
               reportUrl={effortReportUrl}
-              height="580px"
+              height="740px"
             />
           ) : (
             <div
