@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   BookOpen,
   Award,
@@ -7,15 +7,32 @@ import {
   Search,
   GraduationCap,
   Sparkles,
+  TrendingUp,
 } from "lucide-react";
+import PowerBIEmbed from "../components/PowerBIEmbed";
+import { getStudentUsername } from "../services/studentAuth";
+import { buildEffortPredictionUrl } from "../services/powerbiConfig";
+import "../styles/course-detail.css";
 
-export default function StudentCourses({ courses, onNavigateToCourse }) {
+export default function StudentCourses({ courses = [], onNavigateToCourse }) {
   const [searchTerm, setSearchTerm] = useState("");
+  // Tab chuyển đổi: "courses" (Danh sách môn học) | "effort" (Dự báo nỗ lực toàn kỳ)
+  const [activeTab, setActiveTab] = useState("courses");
 
-  const filteredCourses = courses.filter(
+  // Lấy username sinh viên đang đăng nhập (mặc định an toàn là "sv2310002")
+  const currentUser = useMemo(() => {
+    return getStudentUsername();
+  }, []);
+
+  // Cấu hình URL nhúng Power BI mới: Tab Dự báo nỗ lực toàn kỳ (chỉ lọc theo sinh viên)
+  const effortReportUrl = useMemo(() => {
+    return buildEffortPredictionUrl(currentUser);
+  }, [currentUser]);
+
+  const filteredCourses = (courses || []).filter(
     (c) =>
-      c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.shortName.toLowerCase().includes(searchTerm.toLowerCase())
+      c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.shortName?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -50,7 +67,7 @@ export default function StudentCourses({ courses, onNavigateToCourse }) {
         </div>
       </section>
 
-      {/* 2. SEARCH & FILTER BAR */}
+      {/* 2. TAB SWITCHER (DANH SÁCH MÔN HỌC / DỰ BÁO NỖ LỰC TOÀN KỲ) */}
       <div
         style={{
           display: "flex",
@@ -59,89 +76,140 @@ export default function StudentCourses({ courses, onNavigateToCourse }) {
           marginBottom: "18px",
           flexWrap: "wrap",
           gap: "12px",
+          borderBottom: "1px solid #dfe4e1",
+          paddingBottom: "14px",
         }}
       >
-        <div style={{ fontSize: "14px", fontWeight: "700", color: "#17221d" }}>
-          Danh sách khóa học ({filteredCourses.length})
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+          <button
+            type="button"
+            className={activeTab === "courses" ? "btn-dlu-primary" : "btn-dlu-secondary"}
+            onClick={() => setActiveTab("courses")}
+            style={{ cursor: "pointer" }}
+          >
+            <BookOpen size={15} />
+            <span>Danh sách môn học ({(courses || []).length})</span>
+          </button>
+
+          <button
+            type="button"
+            className={activeTab === "effort" ? "btn-dlu-primary" : "btn-dlu-secondary"}
+            onClick={() => setActiveTab("effort")}
+            style={{ cursor: "pointer" }}
+          >
+            <TrendingUp size={15} />
+            <span>Dự báo nỗ lực toàn kỳ</span>
+          </button>
         </div>
 
-        <div className="search-box" style={{ width: "280px", background: "white", border: "1px solid #dfe4e1" }}>
-          <Search size={15} style={{ color: "#68766f" }} />
-          <input
-            type="text"
-            placeholder="Tìm theo tên hoặc mã môn..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{ color: "#17221d" }}
-          />
-        </div>
+        {activeTab === "courses" && (
+          <div className="search-box" style={{ width: "280px", background: "white", border: "1px solid #dfe4e1" }}>
+            <Search size={15} style={{ color: "#68766f" }} />
+            <input
+              type="text"
+              placeholder="Tìm theo tên hoặc mã môn..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{ color: "#17221d" }}
+            />
+          </div>
+        )}
       </div>
 
-      {/* 3. COURSES GRID */}
-      <div className="courses-grid" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))" }}>
-        {filteredCourses.map((c) => {
-          // Tính tiến độ an toàn: ưu tiên trường progress, nếu không có thì mặc định 0%
-          const progressPercent = c.progress !== undefined && c.progress !== null ? c.progress : 0;
+      {/* 3. NỘI DUNG THEO TAB ĐƯỢC CHỌN */}
+      {activeTab === "courses" && (
+        <div className="courses-grid" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))" }}>
+          {filteredCourses.map((c) => {
+            // Tính tiến độ an toàn: ưu tiên trường progress, nếu không có thì mặc định 0%
+            const progressPercent = c.progress !== undefined && c.progress !== null ? c.progress : 0;
 
-          return (
-            <div className="course-card" key={c.id}>
-              <div className="course-cover">
-                <div>
-                  <span>{c.shortName}</span>
-                </div>
-                <span className="course-cover-badge">Đang học</span>
-              </div>
-
-              <div className="course-body">
-                <h3>{c.name}</h3>
-
-                <p>
-                  <Award size={14} />
-                  Điểm TB học phần:{" "}
-                  <strong style={{ color: c.averageGrade ? "#37883e" : "#64748b" }}>
-                    {c.averageGrade ? `${c.averageGrade}/10` : "Chưa có"}
-                  </strong>
-                </p>
-
-                <p>
-                  <ClipboardCheck size={14} />
-                  Tiến độ nộp bài: <strong>{progressPercent}%</strong>
-                </p>
-
-                <p>
-                  <Clock3 size={14} />
-                  Tổng giờ tương tác: <strong>{c.totalEngagementHours || 0} giờ</strong>
-                </p>
-
-                <div style={{ marginTop: "10px", marginBottom: "12px" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", marginBottom: "4px", color: "#66736b" }}>
-                    <span>Tiến độ hoàn thành</span>
-                    <strong>{progressPercent}%</strong>
+            return (
+              <div className="course-card" key={c.id}>
+                <div className="course-cover">
+                  <div>
+                    <span>{c.shortName}</span>
                   </div>
-                  <div className="analytics-track">
-                    <div className="analytics-fill" style={{ width: `${progressPercent}%` }} />
-                  </div>
+                  <span className="course-cover-badge">Đang học</span>
                 </div>
 
-                <div className="course-actions">
-                  <button
-                    type="button"
-                    onClick={() => (window.location.hash = "grades")}
-                  >
-                    Bảng điểm
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onNavigateToCourse(c.id)}
-                  >
-                    Xem phân tích
-                  </button>
+                <div className="course-body">
+                  <h3>{c.name}</h3>
+
+                  <p>
+                    <Award size={14} />
+                    Điểm TB học phần:{" "}
+                    <strong style={{ color: c.averageGrade ? "#37883e" : "#64748b" }}>
+                      {c.averageGrade ? `${c.averageGrade}/10` : "Chưa có"}
+                    </strong>
+                  </p>
+
+                  <p>
+                    <ClipboardCheck size={14} />
+                    Tiến độ nộp bài: <strong>{progressPercent}%</strong>
+                  </p>
+
+                  <p>
+                    <Clock3 size={14} />
+                    Tổng giờ tương tác: <strong>{c.totalEngagementHours || 0} giờ</strong>
+                  </p>
+
+                  <div style={{ marginTop: "10px", marginBottom: "12px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", marginBottom: "4px", color: "#66736b" }}>
+                      <span>Tiến độ hoàn thành</span>
+                      <strong>{progressPercent}%</strong>
+                    </div>
+                    <div className="analytics-track">
+                      <div className="analytics-fill" style={{ width: `${progressPercent}%` }} />
+                    </div>
+                  </div>
+
+                  <div className="course-actions">
+                    <button
+                      type="button"
+                      onClick={() => (window.location.hash = "grades")}
+                    >
+                      Bảng điểm
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onNavigateToCourse(c.id)}
+                    >
+                      Xem phân tích
+                    </button>
+                  </div>
                 </div>
               </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* 4. KHU VỰC THỐNG KÊ & DỰ BÁO NỖ LỰC TOÀN KỲ (POWER BI EMBED) */}
+      {activeTab === "effort" && (
+        <section className="course-detail-pbi-wrapper" style={{ marginTop: "6px" }}>
+          {effortReportUrl ? (
+            <PowerBIEmbed
+              title="LMS Analytics - Kế hoạch học tập & Dự báo nỗ lực ôn thi toàn kỳ"
+              reportUrl={effortReportUrl}
+              height="740px"
+            />
+          ) : (
+            <div
+              style={{
+                padding: "36px 20px",
+                textAlign: "center",
+                background: "#ffffff",
+                borderRadius: "12px",
+                border: "1px solid #e2e8f0",
+                color: "#64748b",
+                fontSize: "13px",
+              }}
+            >
+              Đang chuẩn bị dữ liệu báo cáo dự báo nỗ lực toàn kỳ...
             </div>
-          );
-        })}
-      </div>
+          )}
+        </section>
+      )}
     </main>
   );
 }

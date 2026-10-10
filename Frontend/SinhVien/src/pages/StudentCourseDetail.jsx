@@ -1,13 +1,13 @@
-import React, { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { studentGet } from "../services/apiClient";
+import { getStudentUsername } from "../services/studentAuth";
+import { buildGradePredictionUrl } from "../services/powerbiConfig";
 import PowerBIEmbed from "../components/PowerBIEmbed";
 import "../styles/course-detail.css";
 import {
   ArrowLeft,
   Award,
   BookOpen,
-  Calendar,
-  CheckCircle2,
   Clock3,
   AlertCircle,
   FileText,
@@ -15,26 +15,11 @@ import {
   FlaskConical,
 } from "lucide-react";
 
-// Ánh xạ chính xác 4 mã pageName thật từ Power BI Service
-const POWERBI_PAGE_MAP = {
-  CS301: {
-    compare: "448f23014055298dc25a",   // Trang 1: CSDL - So sánh điểm
-    simulator: "fd3a98cce47b2e1b21cd", // Trang 2: CSDL - Dự báo điểm
-  },
-  WEB302: {
-    compare: "5cf015f0b26bd95b09a1",   // Trang 3: Web - So sánh điểm
-    simulator: "c7c6f6b5d0b2617070c1", // Trang 4: Web - Dự báo điểm
-  },
-};
-
 export default function StudentCourseDetail({ courseId, onBack }) {
   const [courseData, setCourseData] = useState(null);
   const [allSubmissions, setAllSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const BASE_POWERBI_URL =
-    "https://app.powerbi.com/view?r=eyJrIjoiNjRmYTA4ZDgtYmZlNS00MDNjLTliNGUtNjJkMTJmZWE1MDZkIiwidCI6Ijg0NTAzNjliLTExZmEtNDQxMy04ZGM3LTA2MGFiOWYzNGY0MSIsImMiOjEwfQ%3D%3D";
 
   useEffect(() => {
     if (!courseId) return;
@@ -69,19 +54,26 @@ export default function StudentCourseDetail({ courseId, onBack }) {
       .finally(() => setLoading(false));
   }, [courseId]);
 
-  // Link nhúng 1: Trang Dự báo điểm theo từng môn (Trang 2 cho CSDL, Trang 4 cho Web)
-  const simulatorReportUrl = useMemo(() => {
-    const code = (courseData?.code || "CS301").toUpperCase();
-    const pages = POWERBI_PAGE_MAP[code] || POWERBI_PAGE_MAP.CS301;
-    return `${BASE_POWERBI_URL}&pageName=${pages.simulator}`;
-  }, [courseData?.code]);
+  // Lấy username của sinh viên đang đăng nhập (mặc định để test là "sv2310002")
+  const currentUser = useMemo(() => {
+    return getStudentUsername();
+  }, []);
 
-  // Link nhúng 2: Trang So sánh điểm theo từng môn (Trang 1 cho CSDL, Trang 3 cho Web)
-  const compareReportUrl = useMemo(() => {
-    const code = (courseData?.code || "CS301").toUpperCase();
-    const pages = POWERBI_PAGE_MAP[code] || POWERBI_PAGE_MAP.CS301;
-    return `${BASE_POWERBI_URL}&pageName=${pages.compare}`;
-  }, [courseData?.code]);
+  // Xác định tên môn học để lọc chính xác trong Data Warehouse (dim_course/Course_Name)
+  const courseTitle = useMemo(() => {
+    const matchedSub = allSubmissions.find(
+      (s) =>
+        (courseData?.code && s.Course_Code?.trim().toLowerCase() === courseData.code?.trim().toLowerCase()) ||
+        (courseData?.title && s.Course_Name?.trim().toLowerCase() === courseData.title?.trim().toLowerCase()) ||
+        (s.Course_Key && String(s.Course_Key) === String(courseId))
+    );
+    return (matchedSub?.Course_Name || courseData?.courseName || courseData?.name || courseData?.title || "").trim();
+  }, [allSubmissions, courseData, courseId]);
+
+  // Cấu hình URL nhúng Power BI mới: Tab Dự báo điểm môn học kèm bộ lọc sinh viên & tên môn học
+  const gradePredictionReportUrl = useMemo(() => {
+    return buildGradePredictionUrl(currentUser, courseTitle);
+  }, [currentUser, courseTitle]);
 
   // Lọc danh sách bài Lab
   const labTasks = useMemo(() => {
@@ -282,25 +274,34 @@ export default function StudentCourseDetail({ courseId, onBack }) {
         </div>
       </div>
 
-      {/* 3. PHẦN 1 POWER BI: DỰ BÁO KẾT QUẢ & MỤC TIÊU QUA MÔN */}
-      <div className="course-detail-pbi-wrapper" style={{ marginTop: "24px" }}>
-        <PowerBIEmbed
-          title={`LMS Analytics - Dự báo kết quả & Mục tiêu môn học (${courseData.code})`}
-          reportUrl={simulatorReportUrl}
-          height="540px"
-        />
-      </div>
+      {/* 3. BÁO CÁO POWER BI: DỰ BÁO ĐIỂM THEO MÔN HỌC */}
+      {gradePredictionReportUrl ? (
+        <div className="course-detail-pbi-wrapper" style={{ marginTop: "24px" }}>
+          <PowerBIEmbed
+            title={`LMS Analytics - Dự báo điểm học phần (${courseData.code}${courseTitle ? ` - ${courseTitle}` : ""})`}
+            reportUrl={gradePredictionReportUrl}
+            height="720px"
+          />
+        </div>
+      ) : (
+        <div
+          className="course-detail-pbi-wrapper"
+          style={{
+            marginTop: "24px",
+            padding: "36px 20px",
+            textAlign: "center",
+            background: "#ffffff",
+            borderRadius: "12px",
+            border: "1px solid #e2e8f0",
+            color: "#64748b",
+            fontSize: "13px",
+          }}
+        >
+          Đang chuẩn bị dữ liệu báo cáo phân tích học phần...
+        </div>
+      )}
 
-      {/* 4. PHẦN 2 POWER BI: SO SÁNH ĐIỂM VỚI LỚP */}
-      <div className="course-detail-pbi-wrapper" style={{ marginTop: "24px" }}>
-        <PowerBIEmbed
-          title={`Phổ điểm & So sánh bài thực hành với trung bình lớp (${courseData.code})`}
-          reportUrl={compareReportUrl}
-          height="500px"
-        />
-      </div>
-
-      {/* 5. BẢNG CHI TIẾT BÀI LAB */}
+      {/* 4. BẢNG CHI TIẾT BÀI LAB */}
       <div className="student-table-card" style={{ marginTop: "24px" }}>
         <div className="section-title">
           <div className="left">

@@ -14,6 +14,8 @@
   padding: 12px 20px;
   background-color: #f8fafc;
   border-bottom: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .pbi-embed-title-group {
@@ -33,6 +35,12 @@
   color: #0f172a;
 }
 
+.pbi-embed-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .pbi-embed-badge {
   font-size: 12px;
   color: #64748b;
@@ -42,21 +50,51 @@
   border: 1px solid #e2e8f0;
 }
 
-/* Khung bọc cắt bỏ hoàn toàn thanh chân trang bị tràn */
+.pbi-size-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f8fafc;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pbi-size-toggle-btn:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+.pbi-size-toggle-btn.active {
+  background-color: #0284c7;
+  color: #ffffff;
+  border-color: #0284c7;
+}
+
+/* Khung bọc iframe Power BI - hiển thị trọn vẹn, không cắt xén */
 .pbi-embed-frame-wrapper {
   position: relative !important;
   width: 100% !important;
-  overflow: hidden !important;
+  min-height: 680px;
   background-color: #ffffff;
+  overflow: hidden !important;
+  border-radius: 0 0 12px 12px;
+  transition: height 0.25s ease, min-height 0.25s ease;
 }
 
-/* Kéo dài thêm 42px để đẩy thanh điều hướng tụt xuống dưới vùng nhìn thấy */
+/* Iframe lấp đầy 100% khung nhìn, không bị đẩy lệch */
 .pbi-embed-iframe {
   position: absolute !important;
   top: 0 !important;
   left: 0 !important;
   width: 100% !important;
-  height: calc(100% + 42px) !important;
+  height: 100% !important;
   border: none !important;
 }
 
