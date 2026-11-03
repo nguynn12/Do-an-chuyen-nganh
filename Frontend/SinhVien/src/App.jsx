@@ -145,7 +145,7 @@ function StudentShell() {
       ) : error ? (
         <main className="page-full" role="alert">
           <div className="welcome-card dlu-state-card">
-            <div className="dlu-state-title" style={{ color: "#d92d20" }}>
+            <div className="dlu-state-title" style={{ color: "var(--dlu-red, #c53030)" }}>
               Không thể tải dữ liệu học tập
             </div>
             <div className="dlu-state-desc">{error}</div>

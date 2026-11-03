@@ -198,7 +198,7 @@ export default function StudentOverview({
                 <button
                   type="button"
                   className="btn-dlu-secondary"
-                  style={{ height: "24px", fontSize: "10px", padding: "0 8px" }}
+                  style={{ height: "24px", fontSize: "11px", padding: "0 8px" }}
                   onClick={() => onNavigateToTab("grades")}
                 >
                   Chi tiết
@@ -237,7 +237,7 @@ export default function StudentOverview({
                 <button
                   type="button"
                   className="btn-dlu-secondary"
-                  style={{ height: "24px", fontSize: "10px", padding: "0 8px" }}
+                  style={{ height: "24px", fontSize: "11px", padding: "0 8px" }}
                   onClick={() => onNavigateToTab("submissions")}
                 >
                   Lịch sử
