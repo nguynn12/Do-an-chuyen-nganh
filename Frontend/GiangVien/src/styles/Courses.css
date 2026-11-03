@@ -3,9 +3,9 @@
 ========================================================= */
 
 .courses-page {
-  --dlu-green: #6f9638;
-  --dlu-green-dark: #4f752f;
-  --dlu-green-deep: #203522;
+  --dlu-green: var(--dlu-green-brand, #37883e);
+  --dlu-green-dark: var(--dlu-green, #0a543f);
+  --dlu-green-deep: #063e32;
   --dlu-orange: #e7893b;
 
   --text-main: #203026;
@@ -105,7 +105,8 @@
 .courses-content {
   min-height: 100vh;
 
-  margin-left: 45px;
+  margin-left: var(--dlu-sidebar-width, 56px);
+  transition: margin-left 0.2s ease;
 
   padding:
     84px 34px 55px;
@@ -231,7 +232,7 @@
 
   color: #87928a;
 
-  font-size: 9px;
+  font-size: 11px;
 }
 
 
@@ -247,7 +248,7 @@
 
   color: var(--dlu-green);
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 900;
 
   letter-spacing: 0.14em;
@@ -338,7 +339,7 @@
 .courses-semester span {
   color: #8b958d;
 
-  font-size: 9px;
+  font-size: 11px;
 }
 
 
@@ -462,7 +463,7 @@
 
   color: #7f8b82;
 
-  font-size: 9px;
+  font-size: 11px;
 }
 
 
@@ -481,7 +482,7 @@
 
   color: #9da69f;
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 
@@ -537,7 +538,7 @@
 
   color: var(--dlu-green);
 
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 900;
 
   letter-spacing: 0.13em;
@@ -558,7 +559,7 @@
 
   color: #89948d;
 
-  font-size: 9px;
+  font-size: 11px;
 }
 
 
@@ -643,7 +644,7 @@
 
   color: #6f7d73;
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
 
   white-space: nowrap;
@@ -681,7 +682,7 @@
 
   color: inherit;
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 
@@ -766,7 +767,7 @@
 
   color: #27382d;
 
-  font-size: 10px;
+  font-size: 11px;
 }
 
 
@@ -928,7 +929,7 @@
 
   color: #739250;
 
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 800;
 
   letter-spacing: 0.06em;
@@ -960,7 +961,7 @@
 
   border-radius: 999px;
 
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 800;
 
   white-space: nowrap;
@@ -1029,14 +1030,14 @@
 
   color: #96a098;
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 
 .course-row-metric strong {
   color: #334338;
 
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
 }
 
@@ -1066,7 +1067,7 @@
 
   border-radius: 10px;
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
 
   white-space: nowrap;
@@ -1167,7 +1168,7 @@
 .courses-empty p {
   margin: 5px 0 0;
 
-  font-size: 9px;
+  font-size: 11px;
 }
 
 
@@ -1208,7 +1209,7 @@
 
   color: #7d8980;
 
-  font-size: 10px;
+  font-size: 11px;
 }
 
 
@@ -1414,39 +1415,39 @@
 }
 
 .courses-breadcrumb,
-.courses-breadcrumb strong { font-size: 10px; font-weight: 500; letter-spacing: 0; }
+.courses-breadcrumb strong { font-size: 11px; font-weight: 500; letter-spacing: 0; }
 .courses-hero-kicker { margin-bottom: 5px; font-size: 11px; font-weight: 600; letter-spacing: 0; text-transform: none; }
 .courses-hero h1 { font-family: "Segoe UI", Arial, Helvetica, sans-serif; font-size: 28px; font-weight: 700; line-height: 1.22; letter-spacing: 0; }
 .courses-hero p { font-size: 12px; font-weight: 400; line-height: 1.55; letter-spacing: 0; }
 
-.courses-semester span { font-size: 10px; font-weight: 400; }
+.courses-semester span { font-size: 11px; font-weight: 400; }
 .courses-semester strong { font-size: 11px; font-weight: 600; letter-spacing: 0; }
 
 .courses-stat-content span { font-size: 11px; font-weight: 500; letter-spacing: 0; }
 .courses-stat-content strong { font-size: 20px; font-weight: 700; line-height: 1.15; letter-spacing: 0; }
-.courses-stat-content small { font-size: 9px; font-weight: 400; letter-spacing: 0; }
+.courses-stat-content small { font-size: 11px; font-weight: 400; letter-spacing: 0; }
 
-.courses-panel-heading > div:first-child > span { font-size: 10px; font-weight: 600; letter-spacing: 0; text-transform: none; }
+.courses-panel-heading > div:first-child > span { font-size: 11px; font-weight: 600; letter-spacing: 0; text-transform: none; }
 .courses-panel-heading h2 { font-size: 17px; font-weight: 700; letter-spacing: 0; }
-.courses-panel-heading p { font-size: 10px; font-weight: 400; }
+.courses-panel-heading p { font-size: 11px; font-weight: 400; }
 .courses-result-number { font-size: 16px; font-weight: 700; }
 
-.course-tab { font-size: 10px; font-weight: 600; letter-spacing: 0; }
-.course-tab span { font-size: 9px; font-weight: 600; }
+.course-tab { font-size: 11px; font-weight: 600; letter-spacing: 0; }
+.course-tab span { font-size: 11px; font-weight: 600; }
 .courses-search input { font-size: 11px; font-weight: 400; }
 
-.course-code { font-size: 9px; font-weight: 600; letter-spacing: 0; }
+.course-code { font-size: 11px; font-weight: 600; letter-spacing: 0; }
 .course-row-heading h3 { font-size: 15px; font-weight: 700; letter-spacing: 0; }
-.course-status { font-size: 9px; font-weight: 600; }
+.course-status { font-size: 11px; font-weight: 600; }
 
-.course-row-metric span { font-size: 9px; font-weight: 400; letter-spacing: 0; }
+.course-row-metric span { font-size: 11px; font-weight: 400; letter-spacing: 0; }
 .course-row-metric strong { font-size: 11px; font-weight: 600; letter-spacing: 0; }
-.course-row-actions button { font-size: 10px; font-weight: 600; }
+.course-row-actions button { font-size: 11px; font-weight: 600; }
 
 .courses-empty strong { font-size: 12px; font-weight: 600; }
-.courses-empty p { font-size: 10px; }
+.courses-empty p { font-size: 11px; }
 .courses-loading strong { font-size: 13px; font-weight: 600; }
-.courses-loading p { font-size: 10px; }
+.courses-loading p { font-size: 11px; }
 
 /* =========================================================
    COURSE COMPARISON SECTION
@@ -1543,7 +1544,7 @@
 }
 
 .comparison-course-code {
-  font-size: 10.5px;
+  font-size: 11px;
   color: #66736b;
 }
 
@@ -1629,4 +1630,11 @@
   background: #ffffff;
   color: #26352b;
   font-weight: 600;
+}
+
+/* Accessibility: Focus visible */
+.course-tab:focus-visible,
+.course-row-actions button:focus-visible {
+  outline: 2px solid var(--dlu-green, #0a543f);
+  outline-offset: 2px;
 }

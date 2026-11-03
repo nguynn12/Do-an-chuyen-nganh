@@ -36,7 +36,7 @@ export default function AssignmentManagement() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const teacherId = Number(localStorage.getItem("currentTeacherId")) || 1;
+  const teacherId = Number(localStorage.getItem("currentTeacherId")) || null;
 
   // Sync tab with URL
   const handleTabChange = (tabKey) => {
@@ -49,6 +49,11 @@ export default function AssignmentManagement() {
     let cancelled = false;
 
     async function loadInitialData() {
+      if (!teacherId) {
+        setLoading(false);
+        setError("Không tìm thấy phiên đăng nhập giảng viên. Vui lòng đăng nhập lại.");
+        return;
+      }
       try {
         setLoading(true);
         setError("");

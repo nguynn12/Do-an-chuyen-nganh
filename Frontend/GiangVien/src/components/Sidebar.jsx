@@ -32,7 +32,7 @@ function Sidebar() {
   });
 
   useEffect(() => {
-    const width = collapsed ? "56px" : "136px";
+    const width = collapsed ? "56px" : "175px";
     document.documentElement.style.setProperty("--dlu-sidebar-width", width);
     localStorage.setItem("dluSidebarCollapsed", String(collapsed));
 

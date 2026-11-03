@@ -103,13 +103,18 @@ export default function Analytics() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const teacherId = Number(localStorage.getItem("currentTeacherId")) || 1;
+  const teacherId = Number(localStorage.getItem("currentTeacherId")) || null;
 
   // 1. TẢI THÔNG TIN GIẢNG VIÊN VÀ DANH SÁCH MÔN HỌC THẬT TỪ API
   useEffect(() => {
     let cancelled = false;
 
     async function loadInitial() {
+      if (!teacherId) {
+        setLoading(false);
+        setError("Không tìm thấy thông tin giảng viên đang đăng nhập. Vui lòng đăng nhập lại.");
+        return;
+      }
       try {
         setLoading(true);
         setError("");

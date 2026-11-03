@@ -2,9 +2,9 @@
    DLU MODERN - CLASS MANAGEMENT
 ========================================================= */
 .class-page {
-  --dlu-green: #6f9638;
-  --dlu-green-dark: #4f752f;
-  --dlu-green-deep: #203522;
+  --dlu-green: var(--dlu-green-brand, #37883e);
+  --dlu-green-dark: var(--dlu-green, #0a543f);
+  --dlu-green-deep: #063e32;
   --dlu-orange: #e7893b;
   --text-main: #203026;
   --text-muted: #79867d;
@@ -79,9 +79,10 @@
 .class-content {
   width: auto;
   min-height: 100vh;
-  margin-left: 45px;
+  margin-left: var(--dlu-sidebar-width, 56px);
   padding:
     84px 34px 55px;
+  transition: margin-left 0.2s ease;
   position: relative;
   z-index: 2;
 }
@@ -167,14 +168,14 @@
   align-items: center;
   gap: 6px;
   color: #87928a;
-  font-size: 9px;
+  font-size: 11px;
 }
 .class-breadcrumb button {
   padding: 0;
   border: none;
   background: transparent;
   color: var(--dlu-green-dark);
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -188,7 +189,7 @@
   display: block;
   margin-bottom: 4px;
   color: var(--dlu-green);
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.14em;
 }
@@ -225,7 +226,7 @@
   background:
     rgba(255, 255, 255, 0.80);
   color: #587d3b;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   cursor: pointer;
   box-shadow:
@@ -311,7 +312,7 @@
 .class-stat-info span {
   margin-bottom: 3px;
   color: #7f8b82;
-  font-size: 9px;
+  font-size: 11px;
 }
 .class-stat-info strong {
   color: #203224;
@@ -322,7 +323,7 @@
 .class-stat-info small {
   margin-top: 5px;
   color: #9da69f;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 /* =========================================================
@@ -368,12 +369,12 @@
 .class-alert strong {
   display: block;
   color: #8e552c;
-  font-size: 10px;
+  font-size: 11px;
 }
 .class-alert p {
   margin: 4px 0 0;
   color: #a27557;
-  font-size: 9px;
+  font-size: 11px;
 }
 .class-alert button {
   height: 34px;
@@ -384,7 +385,7 @@
   border-radius: 9px;
   background: white;
   color: #c76e2a;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -424,7 +425,7 @@
 > span {
   display: block;
   color: var(--dlu-green);
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.13em;
 }
@@ -436,7 +437,7 @@
 .student-panel-heading p {
   margin: 5px 0 0;
   color: #89948d;
-  font-size: 9px;
+  font-size: 11px;
 }
 .student-count-box {
   width: 46px;
@@ -487,7 +488,7 @@
   border-radius: 9px;
   background: transparent;
   color: #6f7d73;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   white-space: nowrap;
   cursor: pointer;
@@ -511,7 +512,7 @@
   background:
     rgba(76, 99, 79, 0.08);
   color: inherit;
-  font-size: 8px;
+  font-size: 11px;
 }
 .student-tab.active {
   background: #ffffff;
@@ -581,7 +582,7 @@
   outline: none;
   background: transparent;
   color: #27382d;
-  font-size: 10px;
+  font-size: 11px;
 }
 .student-search input::placeholder {
   color: #a0aaa3;
@@ -638,7 +639,7 @@
     rgba(74, 97, 76, 0.08);
   color: #8d978f;
   text-align: left;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -651,7 +652,7 @@
     1px solid
     rgba(74, 97, 76, 0.07);
   color: #435148;
-  font-size: 9px;
+  font-size: 11px;
   vertical-align: middle;
 }
 .student-table tbody tr {
@@ -676,7 +677,7 @@ tr:last-child td {
 ========================================================= */
 .student-code {
   color: #65736a;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -704,7 +705,7 @@ tr:last-child td {
       #e1ecdc
     );
   color: #5b833a;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
 }
 .student-profile > div:last-child {
@@ -716,13 +717,13 @@ tr:last-child td {
 }
 .student-profile strong {
   color: #213426;
-  font-size: 10px;
+  font-size: 11px;
   white-space: nowrap;
 }
 .student-profile span {
   margin-top: 3px;
   color: #9aa39d;
-  font-size: 8px;
+  font-size: 11px;
   white-space: nowrap;
 }
 
@@ -737,7 +738,7 @@ tr:last-child td {
 }
 .progress-header strong {
   color: #46554b;
-  font-size: 9px;
+  font-size: 11px;
 }
 .progress-track {
   width: 100%;
@@ -776,7 +777,7 @@ tr:last-child td {
   padding:
     5px 9px;
   border-radius: 999px;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 800;
   white-space: nowrap;
 }
@@ -844,7 +845,7 @@ tr:last-child td {
 }
 .students-empty p {
   margin: 5px 0 0;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 /* =========================================================
@@ -872,7 +873,7 @@ tr:last-child td {
 .class-loading p {
   margin: 0;
   color: #7d8980;
-  font-size: 10px;
+  font-size: 11px;
 }
 .class-loading button {
   margin-top: 8px;
@@ -986,36 +987,36 @@ tr:last-child td {
 .class-hero-code { font-size: 12px; font-weight: 700; letter-spacing: 0; }
 .class-breadcrumb,
 .class-breadcrumb button,
-.class-breadcrumb strong { font-size: 10px; font-weight: 500; letter-spacing: 0; }
+.class-breadcrumb strong { font-size: 11px; font-weight: 500; letter-spacing: 0; }
 .class-hero-kicker { margin-bottom: 5px; font-size: 11px; font-weight: 600; letter-spacing: 0; text-transform: none; }
 .class-hero h1 { font-family: "Segoe UI", Arial, Helvetica, sans-serif; font-size: 28px; font-weight: 700; line-height: 1.22; letter-spacing: 0; }
 .class-hero p { font-size: 12px; font-weight: 400; line-height: 1.55; letter-spacing: 0; }
-.class-export-button { font-size: 10px; font-weight: 600; }
+.class-export-button { font-size: 11px; font-weight: 600; }
 .class-stat-info span { font-size: 11px; font-weight: 500; letter-spacing: 0; }
 .class-stat-info strong { font-size: 20px; font-weight: 700; line-height: 1.15; letter-spacing: 0; }
-.class-stat-info small { font-size: 9px; font-weight: 400; letter-spacing: 0; }
+.class-stat-info small { font-size: 11px; font-weight: 400; letter-spacing: 0; }
 .class-alert strong { font-size: 11px; font-weight: 600; }
 .class-alert p,
-.class-alert button { font-size: 10px; }
-.student-panel-heading > div:first-child > span { font-size: 10px; font-weight: 600; letter-spacing: 0; text-transform: none; }
+.class-alert button { font-size: 11px; }
+.student-panel-heading > div:first-child > span { font-size: 11px; font-weight: 600; letter-spacing: 0; text-transform: none; }
 .student-panel-heading h2 { font-size: 17px; font-weight: 700; letter-spacing: 0; }
-.student-panel-heading p { font-size: 10px; font-weight: 400; }
+.student-panel-heading p { font-size: 11px; font-weight: 400; }
 .student-count-box { font-size: 16px; font-weight: 700; }
-.student-tab { font-size: 10px; font-weight: 600; letter-spacing: 0; }
-.student-tab span { font-size: 9px; font-weight: 600; }
+.student-tab { font-size: 11px; font-weight: 600; letter-spacing: 0; }
+.student-tab span { font-size: 11px; font-weight: 600; }
 .student-search input { font-size: 11px; font-weight: 400; }
-.student-table th { font-size: 9px; font-weight: 600; letter-spacing: 0; text-transform: none; }
+.student-table th { font-size: 11px; font-weight: 600; letter-spacing: 0; text-transform: none; }
 .student-table td,
-.student-code { font-size: 10px; }
+.student-code { font-size: 11px; }
 .student-profile strong { font-size: 11px; font-weight: 600; letter-spacing: 0; }
-.student-profile span { font-size: 9px; font-weight: 400; }
-.progress-header strong { font-size: 10px; font-weight: 600; }
+.student-profile span { font-size: 11px; font-weight: 400; }
+.progress-header strong { font-size: 11px; font-weight: 600; }
 .student-score { font-size: 12px; font-weight: 700; }
-.student-status { font-size: 9px; font-weight: 600; letter-spacing: 0; }
+.student-status { font-size: 11px; font-weight: 600; letter-spacing: 0; }
 .students-empty strong { font-size: 12px; font-weight: 600; }
-.students-empty p { font-size: 10px; }
+.students-empty p { font-size: 11px; }
 .class-loading strong { font-size: 13px; font-weight: 600; }
-.class-loading p { font-size: 10px; }
+.class-loading p { font-size: 11px; }
 
 /* =========================================================
    STUDENT ANALYTICS PANEL (SIDE OVERLAY)
@@ -1085,8 +1086,7 @@ tr:last-child td {
   display: block;
   color:
     #6f9638;
-  font-size:
-    10px;
+  font-size: 11px;
   font-weight:
     600;
   letter-spacing:
@@ -1188,16 +1188,14 @@ tr:last-child td {
     4px;
   color:
     #68776d;
-  font-size:
-    10px;
+  font-size: 11px;
 }
 .student-analysis-profile p {
   margin:
     2px 0 0;
   color:
     #9aa39c;
-  font-size:
-    9px;
+  font-size: 11px;
 }
 
 /* STATUS */
@@ -1251,8 +1249,7 @@ tr:last-child td {
     block;
 }
 .student-analysis-status span {
-  font-size:
-    9px;
+  font-size: 11px;
   font-weight:
     400;
   opacity:
@@ -1335,8 +1332,7 @@ tr:last-child td {
 .student-analysis-metric span {
   color:
     #89948d;
-  font-size:
-    9px;
+  font-size: 11px;
   font-weight:
     400;
 }
@@ -1387,8 +1383,7 @@ tr:last-child td {
 .student-analysis-info-row span {
   color:
     #8a958d;
-  font-size:
-    9px;
+  font-size: 11px;
   font-weight:
     400;
 }
@@ -1397,8 +1392,7 @@ tr:last-child td {
     3px;
   color:
     #344239;
-  font-size:
-    10px;
+  font-size: 11px;
   font-weight:
     600;
   line-height:
@@ -1449,8 +1443,7 @@ tr:last-child td {
     0;
   color:
     #647168;
-  font-size:
-    10px;
+  font-size: 11px;
   font-weight:
     400;
   line-height:
@@ -1500,7 +1493,7 @@ tr:last-child td {
   display: block;
   margin-bottom: 4px;
   color: var(--dlu-green);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0;
 }
@@ -1514,7 +1507,7 @@ tr:last-child td {
 .class-analytics-heading p {
   margin: 6px 0 0;
   color: #89948d;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 400;
   line-height: 1.55;
 }
@@ -1533,7 +1526,7 @@ tr:last-child td {
   background:
     rgba(255, 255, 255, 0.82);
   color: #587d3b;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   cursor: pointer;
   box-shadow:
@@ -1602,7 +1595,7 @@ tr:last-child td {
 }
 .class-analytics-card span {
   color: #7f8b82;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
 }
 .class-analytics-card strong {
@@ -1615,7 +1608,7 @@ tr:last-child td {
 .class-analytics-card small {
   margin-top: 4px;
   color: #9aa49c;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 400;
   line-height: 1.4;
 }
@@ -1649,7 +1642,7 @@ tr:last-child td {
   display: block;
   margin-bottom: 4px;
   color: #8c988f;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0;
 }
@@ -1665,7 +1658,7 @@ tr:last-child td {
   border-radius: 999px;
   background: #edf4e8;
   color: #5e833d;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -1689,7 +1682,7 @@ tr:last-child td {
 }
 .score-distribution-label {
   color: #69766c;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -1754,7 +1747,7 @@ tr:last-child td {
 .status-summary-item p {
   margin: 0;
   color: #59665c;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
 }
 .status-summary-item
@@ -1802,7 +1795,7 @@ tr:last-child td {
 }
 .analytics-class-summary span {
   color: #89948d;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 400;
 }
 .analytics-class-summary strong {
@@ -1931,7 +1924,7 @@ tr:last-child td {
 }
 .risk-student-code {
   display: block;
-  font-size: 10.5px;
+  font-size: 11px;
   color: #6b7280;
 }
 .risk-flags-wrap {
@@ -1945,7 +1938,7 @@ tr:last-child td {
   gap: 4px;
   padding: 3px 8px;
   border-radius: 6px;
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 500;
 }
 .risk-flag-red {
@@ -2245,7 +2238,7 @@ tr:last-child td {
 
 .cohort-selector-label {
   color: #7c897f;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.04em;
 }
@@ -2272,7 +2265,7 @@ tr:last-child td {
     );
   color: #36552d;
   font-family: inherit;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   cursor: pointer;
   box-shadow:
@@ -2311,7 +2304,7 @@ tr:last-child td {
   border-radius: 999px;
   background: #eaf3e3;
   color: #5a8138;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.03em;
 }
@@ -2322,7 +2315,7 @@ tr:last-child td {
   align-items: center;
   gap: 4px;
   color: #87928a;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .class-hero-cohort-note strong {
@@ -2381,7 +2374,7 @@ tr:last-child td {
   margin-bottom: 4px;
 
   color: var(--dlu-green);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0;
 }
@@ -2399,7 +2392,7 @@ tr:last-child td {
   margin: 6px 0 0;
 
   color: #89948d;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 400;
   line-height: 1.55;
 }
@@ -2422,7 +2415,7 @@ tr:last-child td {
   background: #edf4e8;
   color: #5e833d;
 
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -2511,7 +2504,7 @@ tr:last-child td {
   background: rgba(255, 255, 255, 0.88);
   color: #587d3b;
   font-family: inherit;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 6px 18px rgba(49, 72, 52, 0.05);
@@ -2554,7 +2547,7 @@ tr:last-child td {
 .powerbi-compare-panel-header p {
   margin: 4px 0 0;
   color: #89948d;
-  font-size: 9px;
+  font-size: 11px;
   line-height: 1.5;
 }
 
@@ -2595,7 +2588,7 @@ tr:last-child td {
   background: #ffffff;
   color: #526158;
   font-family: inherit;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   text-align: left;
   cursor: pointer;
@@ -2637,7 +2630,7 @@ tr:last-child td {
 .powerbi-compare-option-info strong {
   overflow: hidden;
   color: inherit;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -2646,7 +2639,7 @@ tr:last-child td {
 .powerbi-compare-option-info span {
   margin-top: 2px;
   color: #929d95;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 400;
 }
 
@@ -2663,7 +2656,7 @@ tr:last-child td {
   padding: 0 13px;
   border-radius: 10px;
   font-family: inherit;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -2727,7 +2720,7 @@ tr:last-child td {
 
 .powerbi-compare-card-header span {
   color: #8b968e;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .powerbi-compare-card-header strong {
@@ -2755,7 +2748,7 @@ tr:last-child td {
   gap: 6px;
   padding: 20px;
   color: #87928a;
-  font-size: 10px;
+  font-size: 11px;
   text-align: center;
 }
 
@@ -2856,7 +2849,7 @@ tr:last-child td {
 
   color: #6f9638;
 
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
 }
 
@@ -2875,7 +2868,7 @@ tr:last-child td {
 
   color: #89948d;
 
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 400;
   line-height: 1.55;
 }
@@ -2953,7 +2946,7 @@ tr:last-child td {
 .powerbi-compare-field label {
   color: #66736a;
 
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
 }
 
@@ -3043,7 +3036,7 @@ tr:last-child td {
 
   color: #929c95;
 
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 600;
 }
 
@@ -3077,7 +3070,7 @@ tr:last-child td {
   background: #edf4e8;
   color: #5e833d;
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -3088,7 +3081,7 @@ tr:last-child td {
 
   color: #8b968e;
 
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -3117,7 +3110,7 @@ tr:last-child td {
   border-radius: 10px;
 
   font-family: inherit;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
 
   cursor: pointer;
@@ -3242,7 +3235,7 @@ tr:last-child td {
 
   color: #8d9890;
 
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 600;
 }
 
@@ -3277,7 +3270,7 @@ tr:last-child td {
   background: #eaf3e3;
   color: #5a8138;
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -3428,7 +3421,7 @@ tr:last-child td {
 
   color: #719642;
 
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -3525,7 +3518,7 @@ tr:last-child td {
 
   color: #68776d;
 
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
 }
 
@@ -3534,7 +3527,7 @@ tr:last-child td {
 
   color: #96a099;
 
-  font-size: 9px;
+  font-size: 11px;
 }
 
 
@@ -3602,7 +3595,7 @@ tr:last-child td {
 }
 
 .student-analysis-status span {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 500;
 }
 
@@ -3689,7 +3682,7 @@ tr:last-child td {
 .student-analysis-metric span {
   color: #859188;
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 500;
 }
 
@@ -3738,7 +3731,7 @@ tr:last-child td {
 .student-analysis-info-row span {
   color: #8a958d;
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 500;
 }
 
@@ -3747,7 +3740,7 @@ tr:last-child td {
 
   color: #304137;
 
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
 }
 
@@ -3821,7 +3814,7 @@ tr:last-child td {
 
   color: #445349;
 
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
   line-height: 1.5;
 }
@@ -3900,4 +3893,13 @@ tr:last-child td {
   box-sizing: border-box !important;
   margin: 0 auto;
   position: relative;
+}
+
+/* Accessibility: Focus visible */
+.student-tab:focus-visible,
+.class-export-button:focus-visible,
+.student-filter-icon:focus-visible,
+.class-alert button:focus-visible {
+  outline: 2px solid var(--dlu-green, #0a543f);
+  outline-offset: 2px;
 }

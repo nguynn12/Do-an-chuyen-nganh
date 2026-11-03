@@ -145,54 +145,31 @@ function Login() {
               giảng viên và sinh viên.
             </p>
 
-            <div className="analytics-decoration">
-
-              <div className="mini-chart line-card">
-
-                <div className="mini-card-title">
-                  <TrendingUp size={15} />
-
-                  <span>
-                    Learning Progress
-                  </span>
+            <div className="login-feature-list" aria-label="Tính năng chính">
+              <div className="login-feature-item">
+                <TrendingUp size={18} className="feature-icon" aria-hidden="true" />
+                <div className="feature-text">
+                  <strong>Theo dõi lớp học</strong>
+                  <span>Điểm số, chuyên cần và tỷ lệ nộp bài trực quan</span>
                 </div>
+              </div>
 
-                <div className="fake-line-chart">
-
-                  <span className="line-point p1"></span>
-                  <span className="line-point p2"></span>
-                  <span className="line-point p3"></span>
-                  <span className="line-point p4"></span>
-                  <span className="line-point p5"></span>
-
-                  <div className="fake-line"></div>
-
+              <div className="login-feature-item">
+                <PieChart size={18} className="feature-icon" aria-hidden="true" />
+                <div className="feature-text">
+                  <strong>Cảnh báo sớm rủi ro</strong>
+                  <span>Phát hiện sinh viên cần hỗ trợ kịp thời</span>
                 </div>
-
               </div>
 
-              <div className="mini-chart donut-card">
-
-                <PieChart size={42} />
-
-                <span>
-                  Performance
-                </span>
-
+              <div className="login-feature-item">
+                <BarChart3 size={18} className="feature-icon" aria-hidden="true" />
+                <div className="feature-text">
+                  <strong>Quản lý & Chấm điểm</strong>
+                  <span>Điều phối bài tập và phân tích chuyên sâu</span>
+                </div>
               </div>
-
-              <div className="mini-chart bar-card">
-
-                <BarChart3 size={50} />
-
-                <span>
-                  Analytics
-                </span>
-
-              </div>
-
             </div>
-
           </div>
 
           <div className="login-wave wave-one"></div>
@@ -225,15 +202,16 @@ function Login() {
 
               <div className="form-group">
 
-                <label>
+                <label htmlFor="teacher-username">
                   Tên đăng nhập
                 </label>
 
                 <div className="input-wrapper">
 
-                  <UserRound size={17} />
+                  <UserRound size={17} aria-hidden="true" />
 
                   <input
+                    id="teacher-username"
                     type="text"
                     placeholder="Nhập tài khoản"
                     value={username}
@@ -257,15 +235,16 @@ function Login() {
 
               <div className="form-group">
 
-                <label>
+                <label htmlFor="teacher-password">
                   Mật khẩu
                 </label>
 
                 <div className="input-wrapper">
 
-                  <LockKeyhole size={17} />
+                  <LockKeyhole size={17} aria-hidden="true" />
 
                   <input
+                    id="teacher-password"
                     type={
                       showPassword
                         ? "text"
@@ -353,7 +332,7 @@ function Login() {
               {/* ERROR */}
 
               {error && (
-                <div className="login-error">
+                <div className="login-error" role="alert" aria-live="assertive">
                   <div>{error}</div>
                   {error.includes("Cổng Sinh viên") && (
                     <div style={{ marginTop: "8px" }}>

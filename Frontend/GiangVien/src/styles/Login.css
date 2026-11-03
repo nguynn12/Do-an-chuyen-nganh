@@ -151,158 +151,52 @@
   line-height: 1.7;
 }
 
-/* =========================
-   FAKE ANALYTICS
-========================= */
-
-.analytics-decoration {
-  position: relative;
-
-  height: 220px;
-
-  margin-top: 35px;
-}
-
-.mini-chart {
-  position: absolute;
-
-  border: 1px solid rgba(93, 194, 126, 0.25);
-
-  background:
-    rgba(0, 28, 27, 0.35);
-
-  backdrop-filter: blur(5px);
-
-  border-radius: 10px;
-
-  box-shadow:
-    inset 0 0 20px rgba(73, 168, 100, 0.04);
-}
-
-.line-card {
-  width: 210px;
-  height: 105px;
-
-  left: 0;
-  top: 0;
-
-  padding: 12px;
-}
-
-.mini-card-title {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-
-  color: #77c77d;
-
-  font-size: 9px;
-}
-
-.fake-line-chart {
-  height: 60px;
-
-  position: relative;
-
-  margin-top: 8px;
-
-  border-bottom:
-    1px solid rgba(255, 255, 255, 0.08);
-}
-
-.fake-line {
-  position: absolute;
-
-  width: 155px;
-  height: 2px;
-
-  left: 13px;
-  top: 31px;
-
-  background: #73c87b;
-
-  transform: rotate(-12deg);
-
-  box-shadow:
-    0 0 7px rgba(115, 200, 123, 0.5);
-}
-
-.line-point {
-  position: absolute;
-
-  width: 6px;
-  height: 6px;
-
-  border-radius: 50%;
-
-  background: #83d786;
-
-  z-index: 2;
-}
-
-.p1 {
-  left: 13px;
-  top: 44px;
-}
-
-.p2 {
-  left: 52px;
-  top: 35px;
-}
-
-.p3 {
-  left: 92px;
-  top: 38px;
-}
-
-.p4 {
-  left: 130px;
-  top: 24px;
-}
-
-.p5 {
-  left: 167px;
-  top: 15px;
-}
-
-.donut-card {
-  width: 105px;
-  height: 105px;
-
-  right: 55px;
-  top: 20px;
-
+/* Danh sách tính năng nền tảng */
+.login-feature-list {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-
-  gap: 8px;
-
-  color: #69bf75;
+  gap: 12px;
+  margin-top: 24px;
+  z-index: 2;
+  position: relative;
 }
 
-.donut-card span,
-.bar-card span {
-  font-size: 9px;
-
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.bar-card {
-  width: 140px;
-  height: 100px;
-
-  left: 90px;
-  top: 120px;
-
+.login-feature-item {
   display: flex;
   align-items: center;
-  justify-content: center;
-
   gap: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: #ffffff;
+  transition: background 0.2s ease;
+}
 
-  color: #6cc378;
+.login-feature-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.login-feature-item .feature-icon {
+  color: var(--dlu-gold-seal, #e6a23c);
+  flex-shrink: 0;
+}
+
+.login-feature-item .feature-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.login-feature-item .feature-text strong {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.login-feature-item .feature-text span {
+  font-size: 11px;
+  color: #c4e4d0;
 }
 
 /* =========================
@@ -616,7 +510,7 @@
 
   color: #919a94;
 
-  font-size: 9px;
+  font-size: 11px;
 }
 /* =========================
    LOGIN ERROR
@@ -632,7 +526,7 @@
   border: 1px solid #f5cece;
   border-radius: 7px;
 
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.5;
 }
 

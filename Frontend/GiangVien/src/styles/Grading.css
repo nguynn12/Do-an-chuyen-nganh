@@ -3,9 +3,9 @@
 ======================================== */
 
 .grading-page {
-  --dlu-green: #6f9638;
-  --dlu-green-dark: #466b2a;
-  --dlu-green-deep: #203522;
+  --dlu-green: var(--dlu-green-brand, #37883e);
+  --dlu-green-dark: var(--dlu-green, #0a543f);
+  --dlu-green-deep: #063e32;
   --dlu-green-soft: #edf4e7;
 
   --dlu-orange: #e7893b;
@@ -264,7 +264,7 @@
   color:
     #88938b;
 
-  font-size: 9px;
+  font-size: 11px;
 }
 
 
@@ -431,7 +431,7 @@
   color:
     var(--dlu-green-dark);
 
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 900;
 
   letter-spacing:
@@ -522,7 +522,7 @@
   color:
     #7d897f;
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -737,7 +737,7 @@ span:nth-child(3) {
   color:
     #7d887f;
 
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
 }
 
@@ -816,7 +816,7 @@ span:nth-child(3) {
   color:
     var(--dlu-green);
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 900;
 
   letter-spacing:
@@ -1008,7 +1008,7 @@ span:nth-child(3) {
   color:
     #435148;
 
-  font-size: 10px;
+  font-size: 11px;
 
   cursor: pointer;
 }
@@ -1063,7 +1063,7 @@ span:nth-child(3) {
   color:
     #8b978e;
 
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 800;
 
   letter-spacing:
@@ -1208,7 +1208,7 @@ span:nth-child(3) {
   color:
     #58685e;
 
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .grading-student small {
@@ -1217,7 +1217,7 @@ span:nth-child(3) {
   color:
     #99a299;
 
-  font-size: 9px;
+  font-size: 11px;
 }
 
 
@@ -1245,7 +1245,7 @@ span:nth-child(3) {
   color:
     #7d8980;
 
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .grading-assignment i {
@@ -1281,7 +1281,7 @@ span:nth-child(3) {
   color:
     #98a199;
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 
@@ -1303,7 +1303,7 @@ span:nth-child(3) {
   border-radius:
     999px;
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
 }
 
@@ -1368,7 +1368,7 @@ span:nth-child(3) {
   color:
     #527d35;
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
 
   transition:
@@ -1448,7 +1448,7 @@ span:nth-child(3) {
   margin:
     6px 0 0;
 
-  font-size: 10px;
+  font-size: 11px;
 }
 
 
@@ -1488,7 +1488,7 @@ span:nth-child(3) {
 .grading-note p {
   margin: 0;
 
-  font-size: 9px;
+  font-size: 11px;
 
   line-height: 1.6;
 }
@@ -1529,7 +1529,7 @@ span:nth-child(3) {
   color:
     #7d8a81;
 
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .grading-loading button {
@@ -1757,43 +1757,51 @@ span:nth-child(3) {
 
 .grading-back { font-size: 11px; font-weight: 600; letter-spacing: 0; }
 .grading-brand-mini strong { font-size: 11px; font-weight: 600; }
-.grading-brand-mini span { font-size: 9px; }
+.grading-brand-mini span { font-size: 11px; }
 
 .grading-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0; text-transform: none; }
 .grading-hero h1 { font-family: "Segoe UI", Arial, Helvetica, sans-serif; font-size: 28px; font-weight: 700; line-height: 1.22; letter-spacing: 0; }
 .grading-hero p { font-size: 12px; font-weight: 400; line-height: 1.55; }
 
-.grading-hero-summary span { font-size: 10px; font-weight: 500; }
+.grading-hero-summary span { font-size: 11px; font-weight: 500; }
 .grading-hero-summary strong { font-size: 21px; font-weight: 700; }
 
 .grading-overview-item span { font-size: 11px; font-weight: 500; }
 .grading-overview-item strong { font-size: 20px; font-weight: 700; }
 
-.grading-panel-kicker { font-size: 10px; font-weight: 600; letter-spacing: 0; text-transform: none; }
+.grading-panel-kicker { font-size: 11px; font-weight: 600; letter-spacing: 0; text-transform: none; }
 .grading-panel-heading h2 { font-size: 17px; font-weight: 700; letter-spacing: 0; }
-.grading-panel-heading p { font-size: 10px; font-weight: 400; }
+.grading-panel-heading p { font-size: 11px; font-weight: 400; }
 .grading-panel-count { font-size: 16px; font-weight: 700; }
 
 .grading-search input,
 .grading-select-wrap select { font-size: 11px; font-weight: 400; }
 
-.grading-table-head span { font-size: 9px; font-weight: 600; letter-spacing: 0; text-transform: none; }
+.grading-table-head span { font-size: 11px; font-weight: 600; letter-spacing: 0; text-transform: none; }
 
 .grading-student strong { font-size: 11px; font-weight: 600; }
-.grading-student span { font-size: 10px; font-weight: 400; }
-.grading-student small { font-size: 9px; }
+.grading-student span { font-size: 11px; font-weight: 400; }
+.grading-student small { font-size: 11px; }
 
 .grading-assignment strong { font-size: 11px; font-weight: 600; }
-.grading-assignment span { font-size: 9px; font-weight: 400; }
+.grading-assignment span { font-size: 11px; font-weight: 400; }
 
 .grading-grade strong { font-size: 14px; font-weight: 700; }
-.grading-grade span { font-size: 9px; }
+.grading-grade span { font-size: 11px; }
 
 .grading-status,
-.grading-lms-button { font-size: 9px; font-weight: 600; letter-spacing: 0; }
+.grading-lms-button { font-size: 11px; font-weight: 600; letter-spacing: 0; }
 
 .grading-empty strong { font-size: 12px; font-weight: 600; }
 .grading-empty p,
-.grading-note p { font-size: 10px; }
+.grading-note p { font-size: 11px; }
 .grading-loading strong { font-size: 13px; font-weight: 600; }
-.grading-loading p { font-size: 10px; }
+.grading-loading p { font-size: 11px; }
+
+/* Accessibility: Focus visible */
+.grading-lms-button:focus-visible,
+.grading-back:focus-visible,
+.grading-filter-select:focus-visible {
+  outline: 2px solid var(--dlu-green, #0a543f);
+  outline-offset: 2px;
+}

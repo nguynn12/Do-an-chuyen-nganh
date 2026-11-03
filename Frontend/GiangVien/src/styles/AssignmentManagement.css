@@ -2,8 +2,10 @@
    ASSIGNMENT MANAGEMENT & GRADING STYLES (DLU THEME)
    ============================================================ */
 
-:root {
-  --dlu-green: #006837;
+.assignment-management-layout,
+.assign-page-loading,
+.assign-page-error {
+  --dlu-green: var(--dlu-green-brand, #37883e);
   --dlu-green-hover: #00542c;
   --dlu-green-accent: #008848;
   --dlu-green-tint: #f0fdf4;
@@ -220,7 +222,7 @@
 .tab-pill-accent {
   background: #f59e0b;
   color: #ffffff;
-  font-size: 10px;
+  font-size: 11px;
   padding: 2px 6px;
   border-radius: 10px;
   font-weight: 700;
@@ -1699,4 +1701,12 @@
   color: #334155;
   text-align: center;
   padding: 24px;
+}
+
+/* Accessibility: Focus visible */
+.assign-btn:focus-visible,
+.assign-tab-btn:focus-visible,
+.assign-course-select:focus-visible {
+  outline: 2px solid var(--dlu-green, #37883e);
+  outline-offset: 2px;
 }
