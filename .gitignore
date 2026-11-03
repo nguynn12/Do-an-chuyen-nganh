@@ -13,6 +13,7 @@ lerna-debug.log*
 # NODE MODULES
 # =========================
 node_modules/
+backend/node_modules/
 Backend/node_modules/
 Frontend/*/node_modules/
 
@@ -22,6 +23,8 @@ Frontend/*/node_modules/
 dist/
 dist-ssr/
 build/
+Frontend/*/dist/
+Frontend/**/dist/
 
 # =========================
 # ENV / PASSWORD
@@ -30,7 +33,9 @@ build/
 .env.*
 !.env.example
 !Backend/.env.example
+!backend/.env.example
 Backend/.env
+backend/.env
 
 # =========================
 # POWER BI

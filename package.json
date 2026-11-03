@@ -7,9 +7,13 @@
     "dev": "npm --prefix Frontend/GiangVien run dev",
     "dev:gv": "npm --prefix Frontend/GiangVien run dev",
     "dev:sv": "npm --prefix Frontend/SinhVien run dev",
-    "dev:backend": "npm --prefix Backend run dev",
+    "dev:backend": "npm --prefix backend run dev",
+    "install:all": "npm --prefix Frontend/GiangVien install && npm --prefix Frontend/SinhVien install && npm --prefix backend install",
     "build:gv": "npm --prefix Frontend/GiangVien run build",
-    "build:sv": "npm --prefix Frontend/SinhVien run build"
+    "build:sv": "npm --prefix Frontend/SinhVien run build",
+    "build:all": "npm run build:gv && npm run build:sv",
+    "start": "npm --prefix backend start",
+    "app": "npm run build:all && npm run start"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
