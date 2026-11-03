@@ -7,7 +7,7 @@ import "../../shared/dlu-theme.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename="/sinhvien">
       <App />
     </BrowserRouter>
   </React.StrictMode>

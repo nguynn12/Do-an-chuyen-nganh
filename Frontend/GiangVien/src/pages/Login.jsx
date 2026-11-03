@@ -9,18 +9,20 @@ import {
   TrendingUp,
 } from "lucide-react";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { clearStudentSession } from "../services/teacherAuth.js";
 
 import "../styles/Login.css";
 
 function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(location.state?.error || "");
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (event) => {
@@ -40,7 +42,7 @@ function Login() {
       setError("");
 
       const response = await fetch(
-        "http://localhost:3000/api/auth/login",
+        "/api/auth/login",
         {
           method: "POST",
 
@@ -66,79 +68,33 @@ function Login() {
 
       const user = result.user;
 
-      // ========================================
-      // LƯU PHIÊN ĐĂNG NHẬP
-      // ========================================
+      if (user.role !== "teacher") {
+        setError(
+          user.role === "student"
+            ? "Tài khoản này là Sinh viên, vui lòng đăng nhập tại Cổng Sinh viên"
+            : "Tài khoản không có quyền giảng viên."
+        );
+        return;
+      }
 
-      localStorage.setItem(
-        "isLoggedIn",
-        "true"
-      );
+      // Xóa các khóa phiên Sinh viên cũ (nếu có) trước khi lưu phiên Giảng viên
+      clearStudentSession();
 
-      localStorage.setItem(
-        "currentTeacherId",
-        String(user.moodleUserId)
-      );
-
-      localStorage.setItem(
-        "currentUserKey",
-        String(user.userKey)
-      );
-
-      localStorage.setItem(
-        "currentUsername",
-        user.username
-      );
-
-      localStorage.setItem(
-        "currentUserName",
-        user.fullName || ""
-      );
-
-      localStorage.setItem(
-        "currentUserEmail",
-        user.email || ""
-      );
-
-      localStorage.setItem(
-        "userRole",
-        user.role
-      );
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("currentTeacherId", String(user.moodleUserId));
+      localStorage.setItem("currentUserKey", String(user.userKey));
+      localStorage.setItem("currentUsername", user.username);
+      localStorage.setItem("currentUserName", user.fullName || "");
+      localStorage.setItem("currentUserEmail", user.email || "");
+      localStorage.setItem("userRole", user.role);
 
       if (rememberMe) {
-        localStorage.setItem(
-          "rememberLogin",
-          "true"
-        );
+        localStorage.setItem("rememberLogin", "true");
       } else {
-        localStorage.removeItem(
-          "rememberLogin"
-        );
+        localStorage.removeItem("rememberLogin");
       }
 
-      // ========================================
-      // ĐIỀU HƯỚNG THEO ROLE
-      // ========================================
-
-      if (user.role === "teacher") {
-        navigate("/", {
-          replace: true,
-        });
-
-        return;
-      }
-
-      if (user.role === "student") {
-        navigate("/sinh-vien", {
-          replace: true,
-        });
-
-        return;
-      }
-
-      setError(
-        "Tài khoản chưa được phân quyền."
-      );
+      navigate("/", { replace: true });
     } catch (err) {
       setError(
         err.message ||
@@ -398,7 +354,22 @@ function Login() {
 
               {error && (
                 <div className="login-error">
-                  {error}
+                  <div>{error}</div>
+                  {error.includes("Cổng Sinh viên") && (
+                    <div style={{ marginTop: "8px" }}>
+                      <a
+                        href="/sinhvien/dang-nhap"
+                        style={{
+                          color: "#18734f",
+                          fontWeight: 600,
+                          fontSize: "13px",
+                          textDecoration: "underline",
+                        }}
+                      >
+                        Chuyển sang Cổng Sinh viên &rarr;
+                      </a>
+                    </div>
+                  )}
                 </div>
               )}
 

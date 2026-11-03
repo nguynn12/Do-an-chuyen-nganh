@@ -6,7 +6,7 @@ import "./ClassComparison.css";
 // CONFIG
 // ============================================================
 
-const API_BASE_URL = "http://localhost:3000";
+const API_BASE_URL = "";
 
 const POWER_BI_BASE_URL =
   "https://app.powerbi.com/view?r=eyJrIjoiN2NkMjk3MzUtMWU4MS00ODIwLWE5Y2YtYWYzNTA1N2EzMWI3IiwidCI6Ijg0NTAzNjliLTExZmEtNDQxMy04ZGM3LTA2MGFiOWYzNGY0MSIsImMiOjEwfQ%3D%3D";

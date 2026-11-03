@@ -119,9 +119,9 @@ export function getMsalRedirectUri() {
     return powerBiEnv.redirectUri;
   }
   if (typeof window !== "undefined") {
-    return `${window.location.origin}/auth.html`;
+    return `${window.location.origin}/giangvien/auth.html`;
   }
-  return "http://localhost:5173/auth.html";
+  return "http://localhost:3000/giangvien/auth.html";
 }
 
 /**

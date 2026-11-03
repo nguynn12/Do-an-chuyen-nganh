@@ -7,6 +7,7 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url))
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/giangvien/',
   plugins: [react()],
   server: {
     port: 5173,

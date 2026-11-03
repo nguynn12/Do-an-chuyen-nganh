@@ -30,7 +30,7 @@ if (isMsalPopupCallback) {
 } else {
   createRoot(document.getElementById("root")).render(
     <StrictMode>
-      <BrowserRouter>
+      <BrowserRouter basename="/giangvien">
         <App />
       </BrowserRouter>
     </StrictMode>

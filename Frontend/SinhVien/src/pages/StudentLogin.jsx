@@ -8,11 +8,13 @@ import {
   PieChart,
   TrendingUp,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { clearTeacherSession } from "../services/studentAuth";
 import "../styles/Login.css";
 
 function StudentLogin() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   // =========================================================================
   // KHAI BÁO STATE QUẢN LÝ FORM VÀ TRẠNG THÁI
@@ -21,7 +23,7 @@ function StudentLogin() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(location.state?.error || "");
   const [loading, setLoading] = useState(false);
 
   // =========================================================================
@@ -41,7 +43,7 @@ function StudentLogin() {
       setLoading(true);
       setError("");
 
-      const response = await fetch("http://localhost:3000/api/auth/login", {
+      const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -75,6 +77,9 @@ function StudentLogin() {
       // =====================================================================
       // LƯU PHIÊN ĐĂNG NHẬP SINH VIÊN VÀO LOCALSTORAGE
       // =====================================================================
+      // Xóa phiên Giảng viên cũ (nếu có) trước khi ghi phiên Sinh viên
+      clearTeacherSession();
+
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("studentUserKey", String(user.userKey));
       localStorage.setItem("studentMoodleId", String(user.moodleUserId));
@@ -232,7 +237,26 @@ function StudentLogin() {
               </div>
 
               {/* THÔNG BÁO LỖI */}
-              {error && <div className="login-error">{error}</div>}
+              {error && (
+                <div className="login-error">
+                  <div>{error}</div>
+                  {error.includes("Cổng Giảng viên") && (
+                    <div style={{ marginTop: "8px" }}>
+                      <a
+                        href="/giangvien/dang-nhap"
+                        style={{
+                          color: "#18734f",
+                          fontWeight: 600,
+                          fontSize: "13px",
+                          textDecoration: "underline",
+                        }}
+                      >
+                        Chuyển sang Cổng Giảng viên &rarr;
+                      </a>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* NÚT ĐĂNG NHẬP CHÍNH */}
               <button
