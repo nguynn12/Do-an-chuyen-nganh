@@ -362,7 +362,7 @@ export default function Analytics() {
           </section>
 
           {/* 2. THANH ĐIỀU HƯỚNG 7 PHÂN HỆ PHÂN TÍCH (TƯƠNG ỨNG 7 TRANG PBIX) */}
-          <nav className="analytics-tabs-bar">
+          <nav className="analytics-tabs-bar" role="tablist" aria-label="Các phân hệ phân tích Power BI">
             {ANALYTICS_TABS.map((tab) => {
               const Icon = tab.icon;
               const isActive = tab.key === activeTabKey;
@@ -370,6 +370,8 @@ export default function Analytics() {
                 <button
                   key={tab.key}
                   type="button"
+                  role="tab"
+                  aria-selected={isActive}
                   className={`analytics-tab-btn ${isActive ? "active" : ""}`}
                   onClick={() => handleTabChange(tab.key)}
                   title={tab.page.description}

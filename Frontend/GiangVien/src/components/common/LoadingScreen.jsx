@@ -1,8 +1,8 @@
-function LoadingScreen() {
+function LoadingScreen({ message = "Đang tải dữ liệu giảng viên..." }) {
   return (
-    <div className="dashboard-state">
-      <div className="loader"></div>
-      <p>Đang tải dữ liệu giảng viên...</p>
+    <div className="dashboard-state" role="status" aria-live="polite">
+      <div className="loader" aria-hidden="true"></div>
+      <p>{message}</p>
     </div>
   );
 }

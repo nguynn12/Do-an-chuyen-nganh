@@ -212,9 +212,11 @@ export default function AssignmentManagement() {
           </section>
 
           {/* 2. UNIFIED TABS BAR (5 TABS) */}
-          <nav className="assign-tabs-nav">
+          <nav className="assign-tabs-nav" role="tablist" aria-label="Phân hệ Quản lý bài tập">
             <button
               type="button"
+              role="tab"
+              aria-selected={activeTab === "bank"}
               className={`assign-tab-btn ${activeTab === "bank" ? "active" : ""}`}
               onClick={() => handleTabChange("bank")}
             >
@@ -224,6 +226,8 @@ export default function AssignmentManagement() {
 
             <button
               type="button"
+              role="tab"
+              aria-selected={activeTab === "campaign"}
               className={`assign-tab-btn ${activeTab === "campaign" ? "active" : ""}`}
               onClick={() => handleTabChange("campaign")}
             >
@@ -233,6 +237,8 @@ export default function AssignmentManagement() {
 
             <button
               type="button"
+              role="tab"
+              aria-selected={activeTab === "history"}
               className={`assign-tab-btn ${activeTab === "history" ? "active" : ""}`}
               onClick={() => handleTabChange("history")}
             >
@@ -242,6 +248,8 @@ export default function AssignmentManagement() {
 
             <button
               type="button"
+              role="tab"
+              aria-selected={activeTab === "grading"}
               className={`assign-tab-btn tab-highlight ${activeTab === "grading" ? "active" : ""}`}
               onClick={() => handleTabChange("grading")}
             >
@@ -252,6 +260,8 @@ export default function AssignmentManagement() {
 
             <button
               type="button"
+              role="tab"
+              aria-selected={activeTab === "analytics"}
               className={`assign-tab-btn ${activeTab === "analytics" ? "active" : ""}`}
               onClick={() => handleTabChange("analytics")}
             >

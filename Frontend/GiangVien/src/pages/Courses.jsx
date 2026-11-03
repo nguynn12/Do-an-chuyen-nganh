@@ -1708,18 +1708,18 @@ function Courses() {
             {/* TABS */}
             {/* ======================================= */}
 
-            <div className="courses-tabs">
+            <div className="courses-tabs" role="tablist" aria-label="Bộ lọc khóa học">
 
 
               {/* TẤT CẢ */}
 
               <button
+                type="button"
+                role="tab"
+                aria-selected={filter === "all"}
                 className={
-                  filter ===
-                  "all"
-
+                  filter === "all"
                     ? "course-tab active"
-
                     : "course-tab"
                 }
 
@@ -1744,12 +1744,12 @@ function Courses() {
               {/* ĐANG DẠY */}
 
               <button
+                type="button"
+                role="tab"
+                aria-selected={filter === "active"}
                 className={
-                  filter ===
-                  "active"
-
+                  filter === "active"
                     ? "course-tab active"
-
                     : "course-tab"
                 }
 
@@ -1772,12 +1772,12 @@ function Courses() {
               {/* ĐÃ KẾT THÚC */}
 
               <button
+                type="button"
+                role="tab"
+                aria-selected={filter === "ended"}
                 className={
-                  filter ===
-                  "ended"
-
+                  filter === "ended"
                     ? "course-tab active"
-
                     : "course-tab"
                 }
 
