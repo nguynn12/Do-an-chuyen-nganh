@@ -38,6 +38,19 @@
   --dlu-border-soft: rgba(11, 85, 63, 0.12);
   --dlu-shadow-card: 0 2px 10px rgba(16, 76, 54, 0.05);
 
+  /* Semantic alert & status tokens */
+  --dlu-red: #c53030;
+  --dlu-red-tint: #fff5f5;
+  --dlu-red-border: #fed7d7;
+  --dlu-amber: #d9782b;
+  --dlu-amber-tint: #fff8f0;
+  --dlu-amber-border: #feebc8;
+  --dlu-green-tint: #e9f4ec;
+  --dlu-green-border: #b8e0c3;
+  --dlu-blue: #1e70bf;
+  --dlu-blue-tint: #f0f7ff;
+  --dlu-blue-border: #bee3f8;
+
   /* Radius tokens */
   --dlu-radius-card: 14px;
   --dlu-radius-btn: 8px;
@@ -140,7 +153,7 @@ button {
 
 .dlu-header .school-name-en {
   color: var(--dlu-orange);
-  font-size: clamp(10px, 1vw, 11.5px);
+  font-size: clamp(11px, 1vw, 11.5px);
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: 0.3px;
@@ -452,7 +465,7 @@ button {
 .dlu-sidebar-art strong {
   display: block;
   font-family: Georgia, serif;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.5px;
   color: rgba(255, 255, 255, 0.88);
@@ -461,7 +474,7 @@ button {
 .dlu-sidebar-art small {
   display: block;
   font-family: Georgia, serif;
-  font-size: 10px;
+  font-size: 11px;
   color: rgba(224, 211, 153, 0.85);
   font-style: italic;
   margin-top: 2px;

@@ -75,7 +75,7 @@
 
 .dlu-uh-school-en {
   color: #e87524;
-  font-size: clamp(10px, 0.95vw, 11px);
+  font-size: clamp(11px, 0.95vw, 11px);
   font-weight: 700;
   letter-spacing: 0.3px;
   margin-top: 1px;
@@ -408,6 +408,6 @@
   }
 
   .dlu-uh-school-en {
-    font-size: 10px;
+    font-size: 11px;
   }
 }
