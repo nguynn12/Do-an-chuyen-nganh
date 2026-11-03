@@ -42,7 +42,6 @@ import {
   getCourseEngagementTrend,
 } from "../services/teacherApi";
 
-import "../styles/TeacherOverview.css";
 import "../styles/ClassManagement.css";
 
 
@@ -1916,13 +1915,15 @@ const averageAttendance =
                 TABS
             ========================================== */}
 
-            <div className="student-tabs">
+            <div className="student-tabs" role="tablist" aria-label="Bộ lọc danh sách sinh viên">
 
 
               {/* ALL */}
 
               <button
                 type="button"
+                role="tab"
+                aria-selected={filter === "all"}
                 className={
                   filter === "all"
                     ? "student-tab active"
@@ -1954,6 +1955,8 @@ const averageAttendance =
 
               <button
                 type="button"
+                role="tab"
+                aria-selected={filter === "good"}
                 className={
                   filter === "good"
                     ? "student-tab active"
@@ -1985,6 +1988,8 @@ const averageAttendance =
 
               <button
                 type="button"
+                role="tab"
+                aria-selected={filter === "warning"}
                 className={
                   filter === "warning"
                     ? "student-tab active warning"
@@ -2012,6 +2017,8 @@ const averageAttendance =
 
               <button
                 type="button"
+                role="tab"
+                aria-selected={filter === "risk"}
                 className={
                   filter === "risk"
                     ? "student-tab active risk"

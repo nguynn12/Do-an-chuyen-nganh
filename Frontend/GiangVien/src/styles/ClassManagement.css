@@ -612,6 +612,8 @@
    TABLE WRAPPER
 ========================================================= */
 .student-table-wrapper {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
   width: 100%;
   overflow-x: auto;
   border-top:
@@ -632,6 +634,10 @@
   background: #f7f9f6;
 }
 .student-table th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #f7f9f6;
   padding:
     12px 17px;
   border-bottom:
@@ -667,6 +673,19 @@
       transparent
     );
 }
+/* Sticky first column (MSSV) for horizontal scroll on smaller laptops */
+.student-table th:first-child,
+.student-table td:first-child {
+  position: sticky;
+  left: 0;
+  background: #ffffff;
+  z-index: 1;
+}
+.student-table thead th:first-child {
+  background: #f7f9f6;
+  z-index: 3;
+}
+
 .student-table tbody
 tr:last-child td {
   border-bottom: none;
@@ -3900,6 +3919,14 @@ tr:last-child td {
 .class-export-button:focus-visible,
 .student-filter-icon:focus-visible,
 .class-alert button:focus-visible {
+  outline: 2px solid var(--dlu-green, #0a543f);
+  outline-offset: 2px;
+}
+
+/* Accessibility: Focus visible for StudentTable buttons */
+.student-more-button:focus-visible,
+.student-detail-button:focus-visible,
+.student-search input:focus-visible {
   outline: 2px solid var(--dlu-green, #0a543f);
   outline-offset: 2px;
 }

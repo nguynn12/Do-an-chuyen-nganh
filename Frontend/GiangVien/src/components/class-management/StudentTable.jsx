@@ -440,6 +440,7 @@ function StudentTable({
                         type="button"
                         className="student-more-button"
                         title="Tùy chọn"
+                        aria-label={`Tùy chọn cho sinh viên ${student.fullName || ''}`}
                       >
                         <MoreHorizontal
                           size={17}
@@ -456,6 +457,7 @@ function StudentTable({
                           )
                         }
                         title="Xem hồ sơ phân tích"
+                        aria-label={`Xem hồ sơ phân tích của sinh viên ${student.fullName || ''}`}
                       >
                         <ChevronRight
                           size={17}
