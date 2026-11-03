@@ -311,7 +311,7 @@
 }
 .class-stat-info span {
   margin-bottom: 3px;
-  color: #7f8b82;
+  color: #4a5750;
   font-size: 11px;
 }
 .class-stat-info strong {
@@ -322,7 +322,7 @@
 }
 .class-stat-info small {
   margin-top: 5px;
-  color: #9da69f;
+  color: #4a5750;
   font-size: 11px;
 }
 
@@ -643,7 +643,8 @@
   border-bottom:
     1px solid
     rgba(74, 97, 76, 0.08);
-  color: #8d978f;
+  color: #4a5750;
+  font-weight: 700;
   text-align: left;
   font-size: 11px;
   font-weight: 800;
@@ -741,7 +742,7 @@ tr:last-child td {
 }
 .student-profile span {
   margin-top: 3px;
-  color: #9aa39d;
+  color: #4a5750;
   font-size: 11px;
   white-space: nowrap;
 }
@@ -855,11 +856,13 @@ tr:last-child td {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #99a49d;
+  color: #4a5750;
 }
 .students-empty strong {
   margin-top: 11px;
-  color: #536057;
+  color: #17221d;
+  font-size: 13px;
+  font-weight: 700;
   font-size: 11px;
 }
 .students-empty p {

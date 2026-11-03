@@ -1477,7 +1477,7 @@ const averageAttendance =
           <div className="histogram-header">
             <div className="histogram-title-wrap">
               <div className="histogram-title-icon">
-                <BarChart3 size={18} />
+                <BarChart3 size={18} aria-hidden="true" />
               </div>
               <div>
                 <strong>Phân bố điểm số sinh viên (Histogram)</strong>
@@ -1512,19 +1512,19 @@ const averageAttendance =
                     key: "Under_5",
                     label: "0 - 4.9 điểm (Yếu / Chưa đạt)",
                     count: Number(currentDistribution.Under_5 || 0),
-                    color: "#dc2626",
+                    color: "var(--dlu-red, #c53030)",
                   },
                   {
                     key: "Range_5_To_7",
                     label: "5.0 - 6.9 điểm (Trung bình)",
                     count: Number(currentDistribution.Range_5_To_7 || 0),
-                    color: "#e66d1e",
+                    color: "var(--dlu-amber, #d9782b)",
                   },
                   {
                     key: "Range_7_To_85",
                     label: "7.0 - 8.4 điểm (Khá)",
                     count: Number(currentDistribution.Range_7_To_85 || 0),
-                    color: "#65c777",
+                    color: "#2e8856",
                   },
                   {
                     key: "Range_85_To_10",
@@ -1592,7 +1592,7 @@ const averageAttendance =
 
                 <div className="histogram-stat-card">
                   <span>Điểm cao nhất</span>
-                  <strong style={{ color: "#2563eb" }}>
+                  <strong style={{ color: "var(--dlu-blue, #1e70bf)" }}>
                     {currentDistribution.Max_Grade !== null &&
                     currentDistribution.Max_Grade !== undefined
                       ? `${Number(currentDistribution.Max_Grade).toFixed(1)}/10`
@@ -1624,7 +1624,7 @@ const averageAttendance =
               style={{
                 padding: "24px",
                 textAlign: "center",
-                color: "#66736b",
+                color: "#4a5750",
                 fontSize: "12px",
               }}
             >
@@ -1641,7 +1641,7 @@ const averageAttendance =
           <div className="trend-header">
             <div className="trend-title-wrap">
               <div className="trend-title-icon">
-                <TrendingUp size={18} />
+                <TrendingUp size={18} aria-hidden="true" />
               </div>
               <div>
                 <strong>Xu hướng tương tác học tập của lớp theo tuần</strong>
@@ -1712,7 +1712,7 @@ const averageAttendance =
                             y={g.y + 4}
                             textAnchor="end"
                             fontSize="11"
-                            fill="#79867d"
+                            fill="#4a5750"
                             fontWeight="500"
                           >
                             {g.val}h
@@ -1817,7 +1817,7 @@ const averageAttendance =
                     <span>Thời lượng học trung bình mỗi sinh viên (Giờ / SV)</span>
                   </div>
                   <div className="trend-legend-item">
-                    <span style={{ color: "#79867d", fontSize: "11px" }}>
+                    <span style={{ color: "#4a5750", fontSize: "11px" }}>
                       * Dữ liệu ghi nhận tự động từ nhật ký tương tác học tập hàng ngày
                     </span>
                   </div>
@@ -2075,6 +2075,7 @@ const averageAttendance =
                     )
                   }
                   placeholder="Tìm MSSV hoặc tên sinh viên..."
+                  aria-label="Tìm kiếm sinh viên theo tên hoặc mã số"
                 />
 
               </div>
