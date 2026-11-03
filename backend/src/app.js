@@ -38,6 +38,12 @@ import assignmentRoutes from "./GiangVien/routes/assignmentRoutes.js";
 
 import studentRoutes from "./SinhVien/routes/studentRoutes.js";
 
+// ============================================================
+// PHỤC VỤ FRONTEND
+// ============================================================
+
+import setupFrontendServing from "./serveFrontend.js";
+
 
 const app = express();
 
@@ -46,11 +52,20 @@ const app = express();
 // CORS
 // ============================================================
 
+const extraOrigins = process.env.EXTRA_ALLOWED_ORIGINS
+  ? process.env.EXTRA_ALLOWED_ORIGINS.split(",")
+      .map((origin) => origin.trim())
+      .filter(Boolean)
+  : [];
+
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "http://127.0.0.1:5173",
   "http://127.0.0.1:5174",
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  ...extraOrigins,
 ];
 
 app.use(
@@ -81,18 +96,6 @@ app.use(
     extended: true,
   })
 );
-
-
-// ============================================================
-// ROOT API
-// ============================================================
-
-app.get("/", (req, res) => {
-  res.json({
-    success: true,
-    message: "LMS Backend API đang hoạt động!",
-  });
-});
 
 
 // ============================================================
@@ -188,6 +191,21 @@ app.use(
   "/api/student",
   studentRoutes
 );
+
+
+// ============================================================
+// 4. PHỤC VỤ FILE TĨNH & CỔNG CHỌN VAI TRÒ FRONTEND
+// ============================================================
+
+setupFrontendServing(app);
+
+// Fallback cho "/" nếu không bật SERVE_FRONTEND hoặc chưa có portal
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "LMS Backend API đang hoạt động!",
+  });
+});
 
 
 // ============================================================

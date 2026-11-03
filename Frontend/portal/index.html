@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hệ Thống LMS - Đại Học Đà Lạt | Chọn Cổng Truy Cập</title>
+    <style>
+      :root {
+        --dlu-green: #37883e;
+        --dlu-green-dark: #0a543f;
+        --dlu-green-deep: #063e32;
+        --dlu-green-light: #e9f4ec;
+        --dlu-orange: #e87524;
+        --dlu-bg: #f5f7f5;
+        --dlu-card-bg: #ffffff;
+        --dlu-text-dark: #14251e;
+        --dlu-text-muted: #5e7468;
+        --dlu-border: rgba(11, 85, 63, 0.12);
+        --dlu-shadow: 0 10px 25px -5px rgba(10, 84, 63, 0.08), 0 8px 10px -6px rgba(10, 84, 63, 0.04);
+        --dlu-shadow-hover: 0 20px 30px -10px rgba(10, 84, 63, 0.16), 0 10px 15px -5px rgba(10, 84, 63, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+        background: linear-gradient(145deg, #f0f6f1 0%, #f7faf7 50%, #edf5ef 100%);
+        color: var(--dlu-text-dark);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 920px;
+        text-align: center;
+      }
+
+      .header-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 14px;
+        border-radius: 999px;
+        background: var(--dlu-green-light);
+        color: var(--dlu-green);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        margin-bottom: 16px;
+      }
+
+      .header-badge span.dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--dlu-green);
+      }
+
+      h1 {
+        font-size: 32px;
+        font-weight: 800;
+        color: var(--dlu-green-deep);
+        margin-bottom: 12px;
+        letter-spacing: -0.5px;
+      }
+
+      p.subtitle {
+        font-size: 16px;
+        color: var(--dlu-text-muted);
+        max-width: 620px;
+        margin: 0 auto 40px auto;
+        line-height: 1.5;
+      }
+
+      .roles-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+        margin-bottom: 40px;
+      }
+
+      @media (max-width: 640px) {
+        .roles-grid {
+          grid-template-columns: 1fr;
+        }
+        h1 {
+          font-size: 26px;
+        }
+      }
+
+      .role-card {
+        background: var(--dlu-card-bg);
+        border: 2px solid var(--dlu-border);
+        border-radius: 18px;
+        padding: 36px 28px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        color: inherit;
+        box-shadow: var(--dlu-shadow);
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .role-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: var(--dlu-green);
+        opacity: 0;
+        transition: opacity 0.25s ease;
+      }
+
+      .role-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--dlu-green);
+        box-shadow: var(--dlu-shadow-hover);
+      }
+
+      .role-card:hover::before {
+        opacity: 1;
+      }
+
+      .icon-wrapper {
+        width: 76px;
+        height: 76px;
+        border-radius: 20px;
+        background: var(--dlu-green-light);
+        color: var(--dlu-green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 22px;
+        transition: transform 0.25s ease, background 0.25s ease;
+      }
+
+      .role-card:hover .icon-wrapper {
+        transform: scale(1.08);
+        background: var(--dlu-green);
+        color: #ffffff;
+      }
+
+      .role-card svg {
+        width: 40px;
+        height: 40px;
+      }
+
+      .role-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--dlu-green-deep);
+        margin-bottom: 10px;
+      }
+
+      .role-desc {
+        font-size: 14px;
+        color: var(--dlu-text-muted);
+        line-height: 1.5;
+        margin-bottom: 24px;
+        flex-grow: 1;
+      }
+
+      .role-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 12px 20px;
+        border-radius: 10px;
+        background: var(--dlu-green);
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 600;
+        transition: background 0.2s ease;
+      }
+
+      .role-card:hover .role-btn {
+        background: var(--dlu-green-dark);
+      }
+
+      .role-btn svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      footer {
+        font-size: 13px;
+        color: var(--dlu-text-muted);
+        opacity: 0.85;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <div class="header-badge">
+        <span class="dot"></span>
+        Trường Đại học Đà Lạt • LMS Platform
+      </div>
+
+      <h1>Hệ Thống Quản Lý &amp; Phân Tích Học Tập</h1>
+      <p class="subtitle">
+        Cổng thông tin tích hợp hỗ trợ đào tạo, quản lý khóa học và phân tích dữ liệu học tập thông minh. Vui lòng chọn phân hệ làm việc của bạn:
+      </p>
+
+      <div class="roles-grid">
+        <!-- Sinh viên -->
+        <a class="role-card" href="/sinhvien/dang-nhap" id="btn-sinhvien">
+          <div class="icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+              <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+            </svg>
+          </div>
+          <h2 class="role-title">Cổng Sinh Viên</h2>
+          <p class="role-desc">
+            Theo dõi tiến độ học tập, nộp bài tập, tra cứu điểm số, phân tích năng lực cá nhân và báo cáo trực quan.
+          </p>
+          <div class="role-btn">
+            Đăng nhập Sinh viên
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </div>
+        </a>
+
+        <!-- Giảng viên -->
+        <a class="role-card" href="/giangvien/dang-nhap" id="btn-giangvien">
+          <div class="icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+              <circle cx="12" cy="8" r="2"/>
+              <path d="M8 14c0-2 2-3 4-3s4 1 4 3"/>
+            </svg>
+          </div>
+          <h2 class="role-title">Cổng Giảng Viên</h2>
+          <p class="role-desc">
+            Quản lý khóa học, ngân hàng bài tập, chấm điểm sinh viên, so sánh lớp học và tích hợp Power BI Analytics chuyên sâu.
+          </p>
+          <div class="role-btn">
+            Đăng nhập Giảng viên
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </div>
+        </a>
+      </div>
+
+      <footer>
+        &copy; 2026 Đại học Đà Lạt • Thụ Nhân - Khai Phóng - Bản Sắc
+      </footer>
+    </main>
+  </body>
+</html>
+
