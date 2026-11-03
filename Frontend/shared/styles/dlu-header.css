@@ -84,7 +84,7 @@
 
 .dlu-uh-school-motto {
   color: #708078;
-  font-size: 8.5px;
+  font-size: 11px;
   font-weight: 500;
   margin-top: 2px;
   white-space: nowrap;
@@ -121,7 +121,7 @@
 .dlu-uh-lms-tagline {
   color: #2f6654;
   font-family: Georgia, serif;
-  font-size: 9px;
+  font-size: 11px;
   font-style: italic;
   margin-top: 2px;
   white-space: nowrap;
@@ -196,6 +196,11 @@
   background: rgba(13, 92, 67, 0.06);
 }
 
+.dlu-uh-profile:focus-visible {
+  outline: 2px solid var(--dlu-green-brand, #37883e);
+  outline-offset: 2px;
+}
+
 .dlu-uh-avatar {
   width: 34px;
   height: 34px;
@@ -245,7 +250,7 @@
 
 .dlu-uh-user-sub {
   color: #65746d;
-  font-size: 8.5px;
+  font-size: 11px;
   margin-top: 1px;
   white-space: nowrap;
   overflow: hidden;
@@ -306,6 +311,11 @@
 .dlu-uh-dropdown-item:hover {
   background: rgba(13, 92, 67, 0.08);
   color: #08754b;
+}
+
+.dlu-uh-dropdown-item:focus-visible {
+  outline: 2px solid var(--dlu-green-brand, #37883e);
+  outline-offset: -2px;
 }
 
 .dlu-uh-dropdown-item.is-logout {
@@ -398,6 +408,6 @@
   }
 
   .dlu-uh-school-en {
-    font-size: 8px;
+    font-size: 10px;
   }
 }

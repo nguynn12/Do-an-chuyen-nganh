@@ -16,6 +16,7 @@
 
   /* Bảng màu xanh thông rừng DLU */
   --dlu-green: #0a543f;
+  --dlu-green-brand: #37883e;
   --dlu-green-950: #063e32;
   --dlu-green-900: #084b3c;
   --dlu-green-800: #0c5a47;
@@ -67,6 +68,11 @@ textarea {
 
 button {
   cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--dlu-green-brand, #37883e);
+  outline-offset: 2px;
 }
 
 /* =========================================================
@@ -144,7 +150,7 @@ button {
 
 .dlu-header .school-sub {
   color: #708078;
-  font-size: 8.5px;
+  font-size: 11px;
   font-weight: 400;
   margin-top: 2px;
   white-space: nowrap;
@@ -179,7 +185,7 @@ button {
 .dlu-header .dlu-lms-title span {
   color: #2f6654;
   font-family: Georgia, serif;
-  font-size: 9px;
+  font-size: 11px;
   font-style: italic;
   margin-top: 2px;
   white-space: nowrap;
@@ -284,7 +290,7 @@ button {
 }
 
 .dlu-header .teacher-mini span {
-  font-size: 8.5px;
+  font-size: 11px;
   color: #65746d;
   margin-top: 1px;
   white-space: nowrap;
@@ -346,7 +352,7 @@ button {
   border: 0;
   border-radius: var(--dlu-radius-btn);
   color: rgba(255, 255, 255, 0.76);
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 600;
   transition: all 0.2s ease;
 }
@@ -455,7 +461,7 @@ button {
 .dlu-sidebar-art small {
   display: block;
   font-family: Georgia, serif;
-  font-size: 8px;
+  font-size: 10px;
   color: rgba(224, 211, 153, 0.85);
   font-style: italic;
   margin-top: 2px;

@@ -118,6 +118,7 @@ export default function DluHeader({
           onClick={() => setMenuOpen((prev) => !prev)}
           role="button"
           tabIndex={0}
+          aria-label="Menu tài khoản người dùng"
           aria-expanded={menuOpen}
           aria-haspopup="true"
           onKeyDown={(e) => {
@@ -160,6 +161,7 @@ export default function DluHeader({
                   type="button"
                   className="dlu-uh-dropdown-item"
                   role="menuitem"
+                  aria-label="Xem hồ sơ cá nhân"
                   onClick={handleProfileClick}
                 >
                   <UserIcon size={14} />
@@ -172,6 +174,7 @@ export default function DluHeader({
                   type="button"
                   className="dlu-uh-dropdown-item is-logout"
                   role="menuitem"
+                  aria-label="Đăng xuất khỏi hệ thống"
                   onClick={handleLogoutClick}
                 >
                   <LogOut size={14} />
