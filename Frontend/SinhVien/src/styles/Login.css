@@ -80,7 +80,7 @@
   .login-label {
     font-size: 11px;
     font-weight: 700;
-    color: #52c41a;
+    color: var(--dlu-gold-seal, #e6a23c);
     letter-spacing: 1px;
     text-transform: uppercase;
   }
@@ -100,94 +100,54 @@
     max-width: 330px;
   }
   
-  /* Biểu đồ trang trí */
-  .analytics-decoration {
-    position: relative;
-    height: 160px;
-    margin-top: 30px;
-  }
-  
-  .mini-chart {
-    position: absolute;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    backdrop-filter: blur(10px);
-    border-radius: 14px;
-    color: #ffffff;
-  }
-  
-  .line-card {
-    top: 0;
-    left: 0;
-    width: 180px;
-    padding: 12px;
-  }
-  
-  .mini-card-title {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    color: #a3e635;
-    margin-bottom: 12px;
-  }
-  
-  .fake-line-chart {
-    position: relative;
-    height: 36px;
-  }
-  
-  .fake-line {
-    position: absolute;
-    top: 18px;
-    left: 6px;
-    right: 6px;
-    height: 2px;
-    background: #a3e635;
-    transform: rotate(-5deg);
-  }
-  
-  .line-point {
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #ffffff;
-    z-index: 2;
-  }
-  
-  .p1 { left: 10%; top: 22px; }
-  .p2 { left: 30%; top: 18px; }
-  .p3 { left: 50%; top: 12px; }
-  .p4 { left: 70%; top: 15px; }
-  .p5 { left: 90%; top: 6px; }
-  
-  .donut-card {
-    top: 12px;
-    right: 12px;
-    width: 95px;
-    height: 95px;
+  /* Danh sách tính năng nền tảng */
+  .login-feature-list {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    font-size: 10px;
-    color: #8fc2a1;
+    gap: 12px;
+    margin-top: 24px;
+    z-index: 2;
+    position: relative;
   }
-  
-  .bar-card {
-    bottom: 0;
-    right: 60px;
-    width: 110px;
-    padding: 10px;
+
+  .login-feature-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 11px;
-    color: #8fc2a1;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: #ffffff;
+    transition: background 0.2s ease;
   }
-  
+
+  .login-feature-item:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .login-feature-item .feature-icon {
+    color: var(--dlu-gold-seal, #e6a23c);
+    flex-shrink: 0;
+  }
+
+  .login-feature-item .feature-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .login-feature-item .feature-text strong {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #ffffff;
+  }
+
+  .login-feature-item .feature-text span {
+    font-size: 11px;
+    color: #c4e4d0;
+  }
+
   /* ================= RIGHT PANEL ================= */
   .login-right {
     flex: 1;
@@ -254,8 +214,8 @@
   }
   
   .input-wrapper input:focus {
-    border-color: #2d864e;
-    box-shadow: 0 0 0 3px rgba(45, 134, 78, 0.15);
+    border-color: var(--dlu-green-brand, #37883e);
+    box-shadow: 0 0 0 3px rgba(55, 136, 62, 0.15);
   }
   
   .show-password {
@@ -307,7 +267,7 @@
   .login-main-button {
     width: 100%;
     height: 42px;
-    background-color: #2d864e;
+    background-color: var(--dlu-green-brand, #37883e);
     color: #ffffff;
     border: none;
     border-radius: 8px;
@@ -318,7 +278,7 @@
   }
   
   .login-main-button:hover {
-    background-color: #246f40;
+    background-color: var(--dlu-green-700, #18734f);
   }
   
   .login-main-button:disabled {
@@ -394,4 +354,22 @@
     border-radius: 6px;
     color: #0b3b24;
     cursor: pointer;
+  }
+
+  /* Responsive Mobile */
+  @media (max-width: 768px) {
+    .login-page {
+      padding: 12px;
+    }
+    .login-container {
+      flex-direction: column;
+      min-height: auto;
+      border-radius: 16px;
+    }
+    .login-left {
+      padding: 24px;
+    }
+    .login-right {
+      padding: 24px;
+    }
   }

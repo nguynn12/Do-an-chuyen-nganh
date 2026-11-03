@@ -47,6 +47,7 @@ function StudentShell() {
   );
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(!isDemo);
+  const [error, setError] = useState(null);
   const studentUserKey = getStudentUserId();
 
   const parseRoute = (hash) => {
@@ -92,6 +93,7 @@ function StudentShell() {
     const fetchData = async () => {
       try {
         setLoading(true);
+        setError(null);
         const [sumData, crsData] = await Promise.all([
           studentGet("/dashboard-summary"),
           studentGet("/courses"),
@@ -104,6 +106,7 @@ function StudentShell() {
         setCourses(Array.isArray(crsData) ? crsData : []);
       } catch (err) {
         console.error("Lỗi nạp dữ liệu dashboard sinh viên:", err);
+        setError(err.message || "Không thể nạp dữ liệu học tập từ hệ thống.");
       } finally {
         setLoading(false);
       }
@@ -130,27 +133,29 @@ function StudentShell() {
       />
 
       {loading ? (
-        <main className="page-full">
-          <div
-            className="welcome-card"
-            style={{
-              padding: "60px",
-              textAlign: "center",
-              color: "#66736b",
-              marginTop: "20px",
-            }}
-          >
-            <div
-              style={{
-                fontSize: "16px",
-                fontWeight: "700",
-                marginBottom: "8px",
-                color: "#17221d",
-              }}
-            >
+        <main className="page-full" role="status" aria-live="polite">
+          <div className="welcome-card dlu-state-card">
+            <div className="dlu-state-spinner" aria-hidden="true" />
+            <div className="dlu-state-title">
               Đang đồng bộ dữ liệu từ Data Warehouse...
             </div>
-            <div style={{ fontSize: "12px" }}>Vui lòng đợi trong giây lát.</div>
+            <div className="dlu-state-desc">Vui lòng đợi trong giây lát.</div>
+          </div>
+        </main>
+      ) : error ? (
+        <main className="page-full" role="alert">
+          <div className="welcome-card dlu-state-card">
+            <div className="dlu-state-title" style={{ color: "#d92d20" }}>
+              Không thể tải dữ liệu học tập
+            </div>
+            <div className="dlu-state-desc">{error}</div>
+            <button
+              type="button"
+              className="dlu-retry-btn"
+              onClick={() => window.location.reload()}
+            >
+              Tải lại trang
+            </button>
           </div>
         </main>
       ) : (

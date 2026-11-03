@@ -604,7 +604,7 @@ button {
 .summary-item small {
   margin-top: 2px;
   color: #738078;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .summary-arrow {
@@ -961,7 +961,7 @@ button {
 
 .calendar-week span {
   color: #69746d;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 600;
 }
 
@@ -1038,7 +1038,7 @@ button {
 
 .notification-info span {
   display: block;
-  font-size: 9px;
+  font-size: 11px;
   color: #7d8881;
   margin-top: 2px;
 }
@@ -1123,7 +1123,7 @@ button {
 }
 
 .courses-hero-kicker {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 1px;
   color: #65c777;
@@ -1751,4 +1751,61 @@ button {
   text-align: right;
   font-weight: 700;
   color: #17221d;
+}
+
+
+/* =========================================================
+   TRẠNG THÁI TẢI & LỖI HỌC TẬP (CỔNG SINH VIÊN)
+   ========================================================= */
+.dlu-state-card {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--dlu-text-muted, #667970);
+  margin-top: 20px;
+}
+
+.dlu-state-spinner {
+  width: 36px;
+  height: 36px;
+  margin: 0 auto 16px;
+  border: 3px solid rgba(11, 85, 63, 0.15);
+  border-top-color: var(--dlu-green-brand, #37883e);
+  border-radius: 50%;
+  animation: dluSpin 0.8s linear infinite;
+}
+
+@keyframes dluSpin {
+  to { transform: rotate(360deg); }
+}
+
+.dlu-state-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--dlu-text-dark, #14251e);
+}
+
+.dlu-state-desc {
+  font-size: 12.5px;
+  color: var(--dlu-text-muted, #667970);
+  margin-bottom: 16px;
+}
+
+.dlu-retry-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 20px;
+  background-color: var(--dlu-green-brand, #37883e);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--dlu-radius-btn, 8px);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.dlu-retry-btn:hover {
+  background-color: var(--dlu-green-700, #18734f);
 }

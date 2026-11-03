@@ -124,31 +124,30 @@ function StudentLogin() {
               viên.
             </p>
 
-            {/* Các biểu đồ trang trí */}
-            <div className="analytics-decoration">
-              <div className="mini-chart line-card">
-                <div className="mini-card-title">
-                  <TrendingUp size={15} />
-                  <span>Learning Progress</span>
-                </div>
-                <div className="fake-line-chart">
-                  <span className="line-point p1"></span>
-                  <span className="line-point p2"></span>
-                  <span className="line-point p3"></span>
-                  <span className="line-point p4"></span>
-                  <span className="line-point p5"></span>
-                  <div className="fake-line"></div>
+            {/* Giới thiệu tính năng nền tảng */}
+            <div className="login-feature-list" aria-label="Tính năng chính">
+              <div className="login-feature-item">
+                <TrendingUp size={18} className="feature-icon" aria-hidden="true" />
+                <div className="feature-text">
+                  <strong>Theo dõi tiến độ</strong>
+                  <span>Điểm số, chuyên cần và tỷ lệ nộp bài LMS</span>
                 </div>
               </div>
 
-              <div className="mini-chart donut-card">
-                <PieChart size={42} />
-                <span>Performance</span>
+              <div className="login-feature-item">
+                <PieChart size={18} className="feature-icon" aria-hidden="true" />
+                <div className="feature-text">
+                  <strong>Cảnh báo học tập sớm</strong>
+                  <span>Nhận diện nguy cơ để kịp thời cải thiện</span>
+                </div>
               </div>
 
-              <div className="mini-chart bar-card">
-                <BarChart3 size={50} />
-                <span>Analytics</span>
+              <div className="login-feature-item">
+                <BarChart3 size={18} className="feature-icon" aria-hidden="true" />
+                <div className="feature-text">
+                  <strong>Phân tích năng lực</strong>
+                  <span>Đánh giá hành vi và kết quả học tập đa chiều</span>
+                </div>
               </div>
             </div>
           </div>
@@ -168,10 +167,11 @@ function StudentLogin() {
             <form onSubmit={handleLogin}>
               {/* TÊN ĐĂNG NHẬP / MÃ SINH VIÊN */}
               <div className="form-group">
-                <label>Mã sinh viên</label>
+                <label htmlFor="student-username">Mã sinh viên</label>
                 <div className="input-wrapper">
-                  <UserRound size={17} />
+                  <UserRound size={17} aria-hidden="true" />
                   <input
+                    id="student-username"
                     type="text"
                     placeholder="Nhập mã sinh viên (ví dụ: sv2310001)"
                     value={username}
@@ -187,10 +187,11 @@ function StudentLogin() {
 
               {/* MẬT KHẨU */}
               <div className="form-group">
-                <label>Mật khẩu</label>
+                <label htmlFor="student-password">Mật khẩu</label>
                 <div className="input-wrapper">
-                  <LockKeyhole size={17} />
+                  <LockKeyhole size={17} aria-hidden="true" />
                   <input
+                    id="student-password"
                     type={showPassword ? "text" : "password"}
                     placeholder="Nhập mật khẩu"
                     value={password}
@@ -238,7 +239,7 @@ function StudentLogin() {
 
               {/* THÔNG BÁO LỖI */}
               {error && (
-                <div className="login-error">
+                <div className="login-error" role="alert" aria-live="assertive">
                   <div>{error}</div>
                   {error.includes("Cổng Giảng viên") && (
                     <div style={{ marginTop: "8px" }}>
