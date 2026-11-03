@@ -1,13 +1,18 @@
 import { Navigate } from "react-router-dom";
+import { clearAuthStorage } from "../services/studentAuth";
 
 /**
  * Route Guard cho phân hệ Sinh viên:
  * Kiểm tra trạng thái đăng nhập và quyền 'student'.
- * Nếu không hợp lệ, xóa sạch phiên và chuyển hướng về /dang-nhap.
+ * Nếu không hợp lệ, xóa sạch phiên Sinh viên và chuyển hướng về /dang-nhap.
  */
 function StudentProtectedRoute({ children }) {
+  const isDemoAllowed =
+    import.meta.env.DEV === true ||
+    import.meta.env.VITE_ALLOW_DEMO === "true";
+
   const searchParams = new URLSearchParams(window.location.search);
-  if (searchParams.get("demo") === "1") {
+  if (isDemoAllowed && searchParams.get("demo") === "1") {
     localStorage.setItem("isLoggedIn", "true");
     localStorage.setItem("userRole", "student");
     localStorage.setItem("studentUserKey", "2");
@@ -20,11 +25,24 @@ function StudentProtectedRoute({ children }) {
   const userRole = localStorage.getItem("userRole");
 
   if (!isLoggedIn || userRole !== "student") {
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("studentUserKey");
-    localStorage.removeItem("studentMoodleId");
-    localStorage.removeItem("userRole");
-    return <Navigate to="/dang-nhap" replace />;
+    const isTeacher = userRole === "teacher";
+    clearAuthStorage();
+
+    return (
+      <Navigate
+        to="/dang-nhap"
+        replace
+        state={
+          isTeacher
+            ? {
+                error:
+                  "Tài khoản này là Giảng viên, vui lòng đăng nhập tại Cổng Giảng viên",
+                targetPortal: "/giangvien/dang-nhap",
+              }
+            : undefined
+        }
+      />
+    );
   }
 
   return children;

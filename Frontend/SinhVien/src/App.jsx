@@ -22,7 +22,7 @@ import { getStudentUserId } from "./services/studentAuth";
 function StudentShell() {
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedCourseId, setSelectedCourseId] = useState(null);
-  const isDemo = new URLSearchParams(window.location.search).get("demo") === "1";
+  const isDemo = (import.meta.env.DEV === true || import.meta.env.VITE_ALLOW_DEMO === "true") && new URLSearchParams(window.location.search).get("demo") === "1";
   const [summary, setSummary] = useState(
     isDemo
       ? {

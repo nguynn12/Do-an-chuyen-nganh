@@ -1,10 +1,23 @@
-const STUDENT_KEYS = [
+export const STUDENT_KEYS = [
   "isLoggedIn",
   "userRole",
   "studentUserKey",
   "studentMoodleId",
   "studentName",
   "studentUsername",
+  "studentEmail",
+  "rememberStudentLogin",
+];
+
+export const TEACHER_KEYS = [
+  "currentTeacherId",
+  "currentUserKey",
+  "currentUsername",
+  "currentUserName",
+  "currentUserEmail",
+  "teacherUser",
+  "teacherToken",
+  "rememberLogin",
 ];
 
 export function getStudentUserId() {
@@ -57,15 +70,26 @@ export function isStudentAuthenticated() {
 }
 
 export function saveStudentSession(user) {
+  clearTeacherSession();
   localStorage.setItem("isLoggedIn", "true");
   localStorage.setItem("userRole", user.role);
   localStorage.setItem("studentUserKey", String(user.userKey));
   localStorage.setItem("studentMoodleId", String(user.moodleUserId));
   localStorage.setItem("studentName", user.fullName || "");
   localStorage.setItem("studentUsername", user.username || "");
+  localStorage.setItem("studentEmail", user.email || "");
 }
 
+/**
+ * Xóa sạch phiên Sinh viên mà KHÔNG làm ảnh hưởng cài đặt giao diện (dluSidebarCollapsed, v.v.)
+ */
 export function clearAuthStorage() {
   STUDENT_KEYS.forEach((key) => localStorage.removeItem(key));
-  localStorage.clear();
+}
+
+/**
+ * Xóa phiên Giảng viên để tránh xung đột origin
+ */
+export function clearTeacherSession() {
+  TEACHER_KEYS.forEach((key) => localStorage.removeItem(key));
 }

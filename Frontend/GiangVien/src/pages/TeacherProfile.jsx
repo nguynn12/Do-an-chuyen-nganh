@@ -24,6 +24,7 @@ import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import LoadingScreen from "../components/common/LoadingScreen";
 import ErrorScreen from "../components/common/ErrorScreen";
+import { clearTeacherSession } from "../services/teacherAuth.js";
 
 import {
   getTeacher,
@@ -374,13 +375,7 @@ function TeacherProfile() {
   // ====================================================
 
   const logout = () => {
-    localStorage.removeItem(
-      "isLoggedIn"
-    );
-
-    localStorage.removeItem(
-      "currentTeacherId"
-    );
+    clearTeacherSession();
 
     navigate(
       "/dang-nhap",
