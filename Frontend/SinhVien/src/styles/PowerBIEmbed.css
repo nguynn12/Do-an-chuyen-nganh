@@ -72,9 +72,9 @@
 }
 
 .pbi-size-toggle-btn.active {
-  background-color: #0284c7;
+  background-color: var(--dlu-green-brand, #37883e);
   color: #ffffff;
-  border-color: #0284c7;
+  border-color: var(--dlu-green-brand, #37883e);
 }
 
 /* Khung bọc iframe Power BI - hiển thị trọn vẹn, không cắt xén */
@@ -111,4 +111,9 @@
   font-size: 14px;
   color: #475569;
   z-index: 10;
+}
+/* Accessibility Focus Visible */
+.pbi-size-toggle-btn:focus-visible {
+  outline: 2px solid var(--dlu-green-brand, #37883e);
+  outline-offset: 2px;
 }

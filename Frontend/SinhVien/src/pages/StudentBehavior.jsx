@@ -18,27 +18,27 @@ import "../styles/StudentDashboard.css";
 // Màu sắc phân khúc
 const SEGMENT_THEMES = {
   "Chăm & giỏi": {
-    color: "#37883e",
-    bg: "#dcfce7",
-    border: "#86efac",
+    color: "var(--dlu-green-brand, #37883e)",
+    bg: "#e9f4ec",
+    border: "#b8e0c3",
     desc: "Bạn có mức độ tham gia cao và kết quả điểm số rất tốt. Hãy tiếp tục duy trì phong độ xuất sắc này!",
   },
   "Chăm nhưng điểm thấp": {
-    color: "#e0a030",
-    bg: "#fef3c7",
-    border: "#fcd34d",
+    color: "#d9782b",
+    bg: "#fff8f0",
+    border: "#feebc8",
     desc: "Bạn rất chăm chỉ tương tác và nộp bài. Hãy tập trung củng cố phương pháp ôn tập các nội dung cốt lõi để nâng cao điểm số.",
   },
   "Ít tham gia nhưng điểm cao": {
-    color: "#4a90b8",
-    bg: "#e0f2fe",
-    border: "#7dd3fc",
+    color: "#1e70bf",
+    bg: "#f0f7ff",
+    border: "#bee3f8",
     desc: "Bạn có nền tảng học lực tốt. Hãy tăng cường tương tác bài giảng và thảo luận để tối ưu hóa tiềm năng của mình.",
   },
   "Nguy cơ cao": {
-    color: "#c0504d",
-    bg: "#fee2e2",
-    border: "#fca5a5",
+    color: "#c53030",
+    bg: "#fff5f5",
+    border: "#fed7d7",
     desc: "Mức độ tương tác và kết quả gần đây đang thấp hơn kỳ vọng của môn. Hãy dành thêm thời gian học và nộp bài đúng hạn.",
   },
 };
@@ -89,11 +89,19 @@ export default function StudentBehavior() {
   if (error && !data) {
     return (
       <main className="page-full">
-        <div className="card" style={{ padding: "30px", background: "#fef2f2", color: "#991b1b" }}>
+        <div className="card" style={{ padding: "30px", background: "#fff5f5", color: "#c53030", border: "1px solid #fed7d7", borderRadius: "14px" }} role="alert">
           <div style={{ display: "flex", alignItems: "center", gap: "8px", fontWeight: "700" }}>
             <AlertCircle size={20} /> Không thể hiển thị hồ sơ hành vi
           </div>
           <div style={{ fontSize: "13px", marginTop: "6px" }}>{error}</div>
+          <button
+            type="button"
+            className="btn-dlu-secondary"
+            style={{ marginTop: "14px", height: "32px", fontSize: "12px", display: "inline-flex", alignItems: "center", gap: "6px" }}
+            onClick={() => fetchData(selectedCourseId)}
+          >
+            Thử lại
+          </button>
         </div>
       </main>
     );
@@ -194,7 +202,7 @@ export default function StudentBehavior() {
           </div>
 
           <div style={{ position: "relative", width: "100%", overflowX: "auto" }}>
-            <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`} style={{ width: "100%", height: "auto", display: "block", overflow: "visible" }}>
+            <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`} style={{ width: "100%", height: "auto", display: "block", overflow: "visible" }} role="img" aria-label="Biểu đồ phân tán so sánh hành vi học tập và điểm số với lớp">
               {/* 4 Quadrant Backgrounds */}
               <rect x={padding.left} y={padding.top} width={lineX - padding.left} height={lineY - padding.top} fill="rgba(74, 144, 184, 0.05)" />
               <rect x={lineX} y={padding.top} width={padding.left + plotWidth - lineX} height={lineY - padding.top} fill="rgba(55, 136, 62, 0.06)" />
@@ -202,23 +210,23 @@ export default function StudentBehavior() {
               <rect x={lineX} y={lineY} width={padding.left + plotWidth - lineX} height={padding.top + plotHeight - lineY} fill="rgba(224, 160, 48, 0.05)" />
 
               {/* Quadrant Labels */}
-              <text x={padding.left + 10} y={padding.top + 16} fill="#4a90b8" fontSize="10" fontWeight="700">ÍT THAM GIA, ĐIỂM CAO</text>
-              <text x={padding.left + plotWidth - 10} y={padding.top + 16} fill="#37883e" fontSize="10" fontWeight="700" textAnchor="end">CHĂM & GIỎI</text>
-              <text x={padding.left + 10} y={padding.top + plotHeight - 10} fill="#c0504d" fontSize="10" fontWeight="700">CẦN CỐ GẮNG</text>
-              <text x={padding.left + plotWidth - 10} y={padding.top + plotHeight - 10} fill="#e0a030" fontSize="10" fontWeight="700" textAnchor="end">CHĂM, ĐIỂM CHƯA CAO</text>
+              <text x={padding.left + 10} y={padding.top + 16} fill="#1e70bf" fontSize="11" fontWeight="700">ÍT THAM GIA, ĐIỂM CAO</text>
+              <text x={padding.left + plotWidth - 10} y={padding.top + 16} fill="#37883e" fontSize="11" fontWeight="700" textAnchor="end">CHĂM & GIỎI</text>
+              <text x={padding.left + 10} y={padding.top + plotHeight - 10} fill="#c53030" fontSize="11" fontWeight="700">CẦN CỐ GẮNG</text>
+              <text x={padding.left + plotWidth - 10} y={padding.top + plotHeight - 10} fill="#d9782b" fontSize="11" fontWeight="700" textAnchor="end">CHĂM, ĐIỂM CHƯA CAO</text>
 
               {/* Grid & Axis */}
               {[0, 25, 50, 75, 100].map((val) => (
                 <g key={`gx-${val}`}>
                   <line x1={getX(val)} y1={padding.top} x2={getX(val)} y2={padding.top + plotHeight} stroke="#f0f3f1" />
-                  <text x={getX(val)} y={padding.top + plotHeight + 16} textAnchor="middle" fontSize="10" fill="#79867d">{val}</text>
+                  <text x={getX(val)} y={padding.top + plotHeight + 16} textAnchor="middle" fontSize="11" fill="#79867d">{val}</text>
                 </g>
               ))}
 
               {[0, 25, 50, 75, 100].map((val) => (
                 <g key={`gy-${val}`}>
                   <line x1={padding.left} y1={getY(val)} x2={padding.left + plotWidth} y2={getY(val)} stroke="#f0f3f1" />
-                  <text x={padding.left - 8} y={getY(val) + 3} textAnchor="end" fontSize="10" fill="#79867d">{val}%</text>
+                  <text x={padding.left - 8} y={getY(val) + 3} textAnchor="end" fontSize="11" fill="#79867d">{val}%</text>
                 </g>
               ))}
 
@@ -274,7 +282,7 @@ export default function StudentBehavior() {
                     y={getY(myCoords.y) - 18}
                     textAnchor="middle"
                     fill="#ffffff"
-                    fontSize="9.5"
+                    fontSize="11"
                     fontWeight="700"
                   >
                     VỊ TRÍ CỦA BẠN

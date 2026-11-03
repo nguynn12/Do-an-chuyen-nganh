@@ -141,6 +141,8 @@ export default function StudentCompetencyRadar({ summary, onNavigateToAnalytics 
             <svg
               viewBox="0 0 440 300"
               className="competency-radar-svg"
+              role="img"
+              aria-label="Biểu đồ radar đánh giá 5 khía cạnh năng lực học tập sinh viên"
             >
               {/* Lưới đa giác nền */}
               {gridPolygons.map((poly, i) => (

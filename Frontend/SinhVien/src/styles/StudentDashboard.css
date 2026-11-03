@@ -116,7 +116,7 @@ button {
 
 .dlu-header .school-sub {
   color: #708078;
-  font-size: 8.5px;
+  font-size: 11px;
   font-weight: 400;
   margin-top: 2px;
 }
@@ -146,7 +146,7 @@ button {
 .dlu-header .dlu-lms-title span {
   color: #2f6654;
   font-family: Georgia, serif;
-  font-size: 9px;
+  font-size: 11px;
   font-style: italic;
   margin-top: 2px;
 }
@@ -258,7 +258,7 @@ button {
 }
 
 .dlu-header .teacher-mini span {
-  font-size: 8.5px;
+  font-size: 11px;
   color: #65746d;
   margin-top: 1px;
 }
@@ -299,7 +299,7 @@ button {
   border: 0;
   border-radius: 8px;
   color: rgba(255, 255, 255, 0.76);
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 600;
   transition: all 0.2s ease;
 }
@@ -391,7 +391,7 @@ button {
 }
 
 .tower-clock {
-  font-size: 7.5px;
+  font-size: 11px;
   font-weight: 800;
   color: #e5d496;
 }
@@ -399,7 +399,7 @@ button {
 .dlu-sidebar-art strong {
   display: block;
   font-family: Georgia, serif;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.5px;
   color: rgba(255, 255, 255, 0.88);
@@ -408,7 +408,7 @@ button {
 .dlu-sidebar-art small {
   display: block;
   font-family: Georgia, serif;
-  font-size: 8px;
+  font-size: 11px;
   color: rgba(224, 211, 153, 0.85);
   font-style: italic;
   margin-top: 2px;
@@ -589,7 +589,7 @@ button {
 
 .summary-item span {
   color: #66726b;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .summary-item strong {
@@ -713,7 +713,7 @@ button {
 }
 
 .course-cover-badge {
-  font-size: 9px;
+  font-size: 11px;
   background: rgba(255, 255, 255, 0.2);
   padding: 2px 8px;
   border-radius: 4px;
@@ -907,7 +907,7 @@ button {
 .right-heading .badge {
   background: #e8f2e7;
   color: #37883e;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   padding: 2px 7px;
   border-radius: 9999px;
@@ -977,7 +977,7 @@ button {
   place-items: center;
   border-radius: 4px;
   color: #1f2923;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .calendar-day.marked {
@@ -1155,7 +1155,7 @@ button {
 
 .courses-semester span {
   display: block;
-  font-size: 10px;
+  font-size: 11px;
   color: #a0b6a6;
 }
 
@@ -1207,7 +1207,7 @@ button {
   gap: 4px;
   padding: 3px 8px;
   border-radius: 9999px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -1485,7 +1485,7 @@ button {
   display: grid;
   grid-template-rows: repeat(7, 18px);
   gap: 4px;
-  font-size: 10px;
+  font-size: 11px;
   color: #66736b;
   font-weight: 600;
   text-align: right;
@@ -1506,7 +1506,7 @@ button {
 }
 
 .heatmap-month-label {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   color: #66736b;
   height: 14px;
@@ -1666,7 +1666,7 @@ button {
 }
 
 .benchmark-metric-box span {
-  font-size: 10.5px;
+  font-size: 11px;
   color: #66736b;
 }
 
