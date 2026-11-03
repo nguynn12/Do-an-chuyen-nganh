@@ -78,7 +78,7 @@ export default function StudentBehavior() {
           <div style={{ fontSize: "16px", fontWeight: "700", color: "#37883e" }}>
             Đang tổng hợp Hồ sơ Hành vi Học tập...
           </div>
-          <div style={{ fontSize: "13px", color: "#66736b", marginTop: "6px" }}>
+          <div style={{ fontSize: "13px", color: "#4a5750", marginTop: "6px" }}>
             Đang so sánh ẩn danh mức độ tham gia và tiến độ nộp bài của bạn với lớp
           </div>
         </div>
@@ -145,10 +145,10 @@ export default function StudentBehavior() {
                 justifyContent: "center",
               }}
             >
-              <Compass size={26} />
+              <Compass size={26} aria-hidden="true" />
             </div>
             <div>
-              <div style={{ fontSize: "12px", color: "#66736b", fontWeight: "600", textTransform: "uppercase" }}>
+              <div style={{ fontSize: "12px", color: "#4a5750", fontWeight: "600", textTransform: "uppercase" }}>
                 GÓC NHÌN BẢN THÂN & ĐỒNG BỘ ẨN DANH
               </div>
               <h1 style={{ margin: "2px 0 0", fontSize: "22px", fontWeight: "800", color: "#17221d" }}>
@@ -161,10 +161,11 @@ export default function StudentBehavior() {
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <div style={{ fontSize: "12px", color: "#66736b", fontWeight: "600" }}>Chọn môn:</div>
+            <div style={{ fontSize: "12px", color: "#4a5750", fontWeight: "600" }}>Chọn môn:</div>
             <select
               value={selectedCourseId}
               onChange={(e) => setSelectedCourseId(e.target.value)}
+              aria-label="Chọn môn học để xem hồ sơ hành vi"
               style={{
                 padding: "8px 16px",
                 borderRadius: "12px",
@@ -193,12 +194,12 @@ export default function StudentBehavior() {
         <section className="card" style={{ padding: "22px", background: "#ffffff", borderRadius: "18px", border: "1px solid rgba(67, 91, 70, 0.12)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <Sparkles size={18} color="#37883e" />
+              <Sparkles size={18} color="var(--dlu-green-brand, #37883e)" aria-hidden="true" />
               <h2 style={{ fontSize: "16px", fontWeight: "700", margin: 0, color: "#17221d" }}>
                 Tôi đang ở góc nào trong lớp?
               </h2>
             </div>
-            <span style={{ fontSize: "11px", color: "#79867d" }}>* Ẩn danh toàn bộ bạn học</span>
+            <span style={{ fontSize: "11px", color: "#4a5750" }}>* Ẩn danh toàn bộ bạn học</span>
           </div>
 
           <div style={{ position: "relative", width: "100%", overflowX: "auto" }}>
@@ -219,14 +220,14 @@ export default function StudentBehavior() {
               {[0, 25, 50, 75, 100].map((val) => (
                 <g key={`gx-${val}`}>
                   <line x1={getX(val)} y1={padding.top} x2={getX(val)} y2={padding.top + plotHeight} stroke="#f0f3f1" />
-                  <text x={getX(val)} y={padding.top + plotHeight + 16} textAnchor="middle" fontSize="11" fill="#79867d">{val}</text>
+                  <text x={getX(val)} y={padding.top + plotHeight + 16} textAnchor="middle" fontSize="11" fill="#4a5750">{val}</text>
                 </g>
               ))}
 
               {[0, 25, 50, 75, 100].map((val) => (
                 <g key={`gy-${val}`}>
                   <line x1={padding.left} y1={getY(val)} x2={padding.left + plotWidth} y2={getY(val)} stroke="#f0f3f1" />
-                  <text x={padding.left - 8} y={getY(val) + 3} textAnchor="end" fontSize="11" fill="#79867d">{val}%</text>
+                  <text x={padding.left - 8} y={getY(val) + 3} textAnchor="end" fontSize="11" fill="#4a5750">{val}%</text>
                 </g>
               ))}
 
@@ -327,7 +328,7 @@ export default function StudentBehavior() {
         {/* Khối 2: "Điều cần chú ý" */}
         <section className="card" style={{ padding: "22px", background: "#ffffff", borderRadius: "18px", border: "1px solid rgba(67, 91, 70, 0.12)", display: "flex", flexDirection: "column" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
-            <AlertCircle size={18} color="#e0a030" />
+            <AlertCircle size={18} color="var(--dlu-amber, #d9782b)" aria-hidden="true" />
             <h2 style={{ fontSize: "16px", fontWeight: "700", margin: 0, color: "#17221d" }}>
               Tín hiệu Cần Chú ý & Khuyến nghị
             </h2>
@@ -348,12 +349,12 @@ export default function StudentBehavior() {
                 }}
               >
                 {item.includes("đúng hướng") ? (
-                  <CheckCircle2 size={20} color="#16a34a" style={{ flexShrink: 0, marginTop: "2px" }} />
+                  <CheckCircle2 size={20} color="var(--dlu-green-brand, #37883e)" style={{ flexShrink: 0, marginTop: "2px" }} aria-hidden="true" />
                 ) : (
-                  <Clock size={20} color="#d97706" style={{ flexShrink: 0, marginTop: "2px" }} />
+                  <Clock size={20} color="var(--dlu-amber, #d9782b)" style={{ flexShrink: 0, marginTop: "2px" }} aria-hidden="true" />
                 )}
                 <div>
-                  <div style={{ fontSize: "13px", fontWeight: "700", color: item.includes("đúng hướng") ? "#166534" : "#92400e" }}>
+                  <div style={{ fontSize: "13px", fontWeight: "700", color: item.includes("đúng hướng") ? "#0a543f" : "#8c4a16" }}>
                     {item.includes("đúng hướng") ? "Phong độ Tốt" : "Gợi ý Cải thiện"}
                   </div>
                   <div style={{ fontSize: "12px", color: "#4b5563", marginTop: "2px", lineHeight: "1.4" }}>
@@ -367,21 +368,21 @@ export default function StudentBehavior() {
           {/* Quick Metrics of Mine */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px", marginTop: "16px", paddingTop: "14px", borderTop: "1px solid #f3f4f6" }}>
             <div style={{ textAlign: "center", padding: "10px", background: "#fafbf9", borderRadius: "10px" }}>
-              <div style={{ fontSize: "11px", color: "#79867d" }}>Tỷ lệ Đúng hạn</div>
+              <div style={{ fontSize: "11px", color: "#4a5750" }}>Tỷ lệ Đúng hạn</div>
               <div style={{ fontSize: "16px", fontWeight: "800", color: "#37883e", marginTop: "2px" }}>
                 {myScores?.onTimeRate !== null ? `${myScores.onTimeRate}%` : "—"}
               </div>
             </div>
 
             <div style={{ textAlign: "center", padding: "10px", background: "#fafbf9", borderRadius: "10px" }}>
-              <div style={{ fontSize: "11px", color: "#79867d" }}>Nộp trước hạn TB</div>
-              <div style={{ fontSize: "16px", fontWeight: "800", color: "#2563eb", marginTop: "2px" }}>
+              <div style={{ fontSize: "11px", color: "#4a5750" }}>Nộp trước hạn TB</div>
+              <div style={{ fontSize: "16px", fontWeight: "800", color: "var(--dlu-blue, #1e70bf)", marginTop: "2px" }}>
                 {myScores?.avgLeadDays !== null ? `${myScores.avgLeadDays > 0 ? `+${myScores.avgLeadDays}` : myScores.avgLeadDays}d` : "—"}
               </div>
             </div>
 
             <div style={{ textAlign: "center", padding: "10px", background: "#fafbf9", borderRadius: "10px" }}>
-              <div style={{ fontSize: "11px", color: "#79867d" }}>Giờ học tương tác</div>
+              <div style={{ fontSize: "11px", color: "#4a5750" }}>Giờ học tương tác</div>
               <div style={{ fontSize: "16px", fontWeight: "800", color: "#17221d", marginTop: "2px" }}>
                 {myScores?.engagementHours}h
               </div>
@@ -396,7 +397,7 @@ export default function StudentBehavior() {
         <section className="card" style={{ padding: "22px", background: "#ffffff", borderRadius: "18px", border: "1px solid rgba(67, 91, 70, 0.12)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <BarChart2 size={18} color="#37883e" />
+              <BarChart2 size={18} color="var(--dlu-green-brand, #37883e)" aria-hidden="true" />
               <h2 style={{ fontSize: "16px", fontWeight: "700", margin: 0, color: "#17221d" }}>
                 Hồ sơ Nộp bài của Tôi vs Cả lớp
               </h2>
@@ -415,7 +416,7 @@ export default function StudentBehavior() {
             </span>
           </div>
 
-          <div style={{ fontSize: "12px", color: "#66736b", marginBottom: "16px" }}>
+          <div style={{ fontSize: "12px", color: "#4a5750", marginBottom: "16px" }}>
             So sánh tỷ lệ phân bố bài nộp của bạn theo các khoảng thời gian so với mức bình quân của lớp học:
           </div>
 
@@ -425,7 +426,7 @@ export default function StudentBehavior() {
               <div key={b.bucket}>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", marginBottom: "4px" }}>
                   <span style={{ fontWeight: "700", color: "#203026" }}>{b.bucket}</span>
-                  <span style={{ fontSize: "11px", color: "#6b7280" }}>
+                  <span style={{ fontSize: "11px", color: "#4a5750" }}>
                     Tôi: <strong>{b.myCount} bài ({b.myPct}%)</strong> • Lớp: <strong>{b.classPct}%</strong>
                   </span>
                 </div>
@@ -471,7 +472,7 @@ export default function StudentBehavior() {
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
               <span style={{ width: "10px", height: "10px", borderRadius: "2px", background: "#9ca3af" }} />
-              <span style={{ color: "#6b7280" }}>Bình quân cả lớp</span>
+              <span style={{ color: "#4a5750" }}>Bình quân cả lớp</span>
             </div>
           </div>
         </section>
@@ -479,13 +480,13 @@ export default function StudentBehavior() {
         {/* Khối 4: Yếu tố liên quan nhiều nhất tới điểm */}
         <section className="card" style={{ padding: "22px", background: "#ffffff", borderRadius: "18px", border: "1px solid rgba(67, 91, 70, 0.12)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
-            <TrendingUp size={18} color="#2563eb" />
+            <TrendingUp size={18} color="var(--dlu-blue, #1e70bf)" aria-hidden="true" />
             <h2 style={{ fontSize: "16px", fontWeight: "700", margin: 0, color: "#17221d" }}>
               Yếu tố Liên quan Nhiều nhất tới Điểm ở Lớp này
             </h2>
           </div>
 
-          <div style={{ fontSize: "12px", color: "#66736b", marginBottom: "16px" }}>
+          <div style={{ fontSize: "12px", color: "#4a5750", marginBottom: "16px" }}>
             Hệ số tương quan thống kê Pearson (|R|) giữa các yếu tố hành vi và điểm tổng kết cuối khóa của lớp:
           </div>
 
@@ -497,7 +498,7 @@ export default function StudentBehavior() {
                 <div key={idx}>
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", marginBottom: "4px" }}>
                     <span style={{ fontWeight: "700", color: "#1f2937" }}>{f.factor}</span>
-                    <span style={{ fontWeight: "700", color: "#2563eb" }}>
+                    <span style={{ fontWeight: "700", color: "var(--dlu-blue, #1e70bf)" }}>
                       R = {Number(f.r).toFixed(2)} ({rPct >= 60 ? "Tương quan mạnh" : "Tương quan vừa"})
                     </span>
                   </div>
@@ -506,7 +507,7 @@ export default function StudentBehavior() {
                       style={{
                         width: `${rPct}%`,
                         height: "100%",
-                        background: "linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)",
+                        background: "linear-gradient(90deg, #3182ce 0%, #1e70bf 100%)",
                         borderRadius: "5px",
                       }}
                     />
@@ -525,7 +526,7 @@ export default function StudentBehavior() {
               background: "#f9fafb",
               border: "1px solid #e5e7eb",
               fontSize: "11px",
-              color: "#6b7280",
+              color: "#4a5750",
               lineHeight: "1.4",
             }}
           >

@@ -86,7 +86,7 @@ export default function StudentCompetencyRadar({ summary, onNavigateToAnalytics 
     <section className="section competency-section">
       <div className="section-title">
         <div>
-          <TrendingUp size={18} style={{ color: "#37883e" }} />
+          <TrendingUp size={18} style={{ color: "var(--dlu-green-brand, #37883e)" }} aria-hidden="true" />
           <strong>Đánh giá Năng lực Toàn diện &amp; Cảnh báo Sớm</strong>
         </div>
         <button
@@ -95,7 +95,7 @@ export default function StudentCompetencyRadar({ summary, onNavigateToAnalytics 
           style={{ height: "28px", fontSize: "11px", padding: "0 10px" }}
           onClick={onNavigateToAnalytics}
         >
-          <BarChart3 size={13} /> Mở Power BI chi tiết
+          <BarChart3 size={13} aria-hidden="true" /> Mở Power BI chi tiết
         </button>
       </div>
 
@@ -121,7 +121,7 @@ export default function StudentCompetencyRadar({ summary, onNavigateToAnalytics 
             </div>
 
             <div className="competency-status-row">
-              <ShieldCheck size={16} /> Hồ sơ học tập an toàn
+              <ShieldCheck size={16} aria-hidden="true" /> Hồ sơ học tập an toàn
             </div>
 
             <p className="competency-hero-desc">
@@ -244,7 +244,7 @@ export default function StudentCompetencyRadar({ summary, onNavigateToAnalytics 
 
         {/* Khối khuyến nghị từ Learning Analytics */}
         <div className="competency-recommendation">
-          <Sparkles size={18} className="competency-recommendation-icon" />
+          <Sparkles size={18} className="competency-recommendation-icon" aria-hidden="true" />
           <p className="competency-recommendation-text">
             <strong>Khuyến nghị từ Learning Analytics:</strong> Bạn đang duy trì phong độ thực hành bài Lab rất tốt ({metrics[1].raw}). Hãy tiếp tục nộp đúng hạn các bài tập tiếp theo và phân bổ thời gian xem tài liệu đều đặn để tối ưu hóa điểm tổng kết cuối kỳ.
           </p>
