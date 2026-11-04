@@ -7,7 +7,6 @@ import {
   useLocation,
   useNavigate,
   useOutletContext,
-  useParams,
 } from "react-router-dom";
 import "./styles/StudentDashboard.css";
 
@@ -205,19 +204,6 @@ function StudentCoursesWrapper() {
   );
 }
 
-// Wrapper component cho trang Chi tiết môn học
-function StudentCourseDetailWrapper() {
-  const { courseId } = useParams();
-  const navigate = useNavigate();
-
-  return (
-    <StudentCourseDetail
-      courseId={courseId}
-      onBack={() => navigate("/khoa-hoc")}
-    />
-  );
-}
-
 export default function App() {
   return (
     <Routes>
@@ -234,7 +220,7 @@ export default function App() {
       >
         <Route index element={<StudentOverviewWrapper />} />
         <Route path="khoa-hoc" element={<StudentCoursesWrapper />} />
-        <Route path="khoa-hoc/:courseId" element={<StudentCourseDetailWrapper />} />
+        <Route path="khoa-hoc/:courseId" element={<StudentCourseDetail />} />
         <Route path="ho-so-hanh-vi" element={<StudentBehavior />} />
         <Route path="bai-nop" element={<StudentSubmissions />} />
         <Route path="bang-diem" element={<StudentGrades />} />

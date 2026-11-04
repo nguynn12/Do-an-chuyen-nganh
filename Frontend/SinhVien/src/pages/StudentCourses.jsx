@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   BookOpen,
   Award,
@@ -15,6 +16,7 @@ import { buildEffortPredictionUrl } from "../services/powerbiConfig";
 import "../styles/course-detail.css";
 
 export default function StudentCourses({ courses = [], onNavigateToCourse }) {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   // Tab chuyển đổi: "courses" (Danh sách môn học) | "effort" (Dự báo nỗ lực toàn kỳ)
   const [activeTab, setActiveTab] = useState("courses");
@@ -185,13 +187,17 @@ export default function StudentCourses({ courses = [], onNavigateToCourse }) {
                   <div className="course-actions">
                     <button
                       type="button"
-                      onClick={() => (window.location.hash = "grades")}
+                      onClick={() => navigate("/bang-diem")}
                     >
                       Bảng điểm
                     </button>
                     <button
                       type="button"
-                      onClick={() => onNavigateToCourse(c.id)}
+                      onClick={() =>
+                        onNavigateToCourse
+                          ? onNavigateToCourse(c.id)
+                          : navigate(`/khoa-hoc/${c.id}`)
+                      }
                     >
                       Xem phân tích
                     </button>

@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { studentGet } from "../services/apiClient";
 import { getStudentUsername } from "../services/studentAuth";
 import { buildGradePredictionUrl } from "../services/powerbiConfig";
@@ -15,11 +16,23 @@ import {
   FlaskConical,
 } from "lucide-react";
 
-export default function StudentCourseDetail({ courseId, onBack }) {
+export default function StudentCourseDetail({ courseId: propCourseId, onBack }) {
+  const params = useParams();
+  const navigate = useNavigate();
+  const courseId = propCourseId || params.courseId;
+
   const [courseData, setCourseData] = useState(null);
   const [allSubmissions, setAllSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const handleBack = () => {
+    if (typeof onBack === "function") {
+      onBack();
+    } else {
+      navigate("/khoa-hoc");
+    }
+  };
 
   useEffect(() => {
     if (!courseId) return;
@@ -172,7 +185,7 @@ export default function StudentCourseDetail({ courseId, onBack }) {
           <div className="welcome-card__error-title">
             {error || "Lỗi tải môn học"}
           </div>
-          <button className="btn-dlu-secondary" onClick={onBack}>
+          <button className="btn-dlu-secondary" onClick={handleBack}>
             <ArrowLeft size={16} aria-hidden="true" /> Quay lại danh sách môn học
           </button>
         </div>
@@ -187,7 +200,7 @@ export default function StudentCourseDetail({ courseId, onBack }) {
         <button
           type="button"
           className="btn-dlu-secondary course-detail-back-btn"
-          onClick={onBack}
+          onClick={handleBack}
         >
           <ArrowLeft size={15} aria-hidden="true" /> Quay lại danh sách môn
         </button>
