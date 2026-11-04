@@ -174,11 +174,11 @@ export default function StudentGrades() {
       <section className="courses-hero">
         <div className="courses-hero-main">
           <div className="courses-hero-icon">
-            <Award size={26} />
+            <Award size={26} aria-hidden="true" />
           </div>
           <div>
             <div className="courses-breadcrumb">
-              <BookOpen size={14} />
+              <BookOpen size={14} aria-hidden="true" />
               <span>Phân tích học tập</span>
               <span>/</span>
               <strong>Bảng điểm</strong>
@@ -192,7 +192,7 @@ export default function StudentGrades() {
         </div>
 
         <div className="courses-semester">
-          <Sparkles size={18} style={{ color: "#65c777" }} />
+          <Sparkles size={18} style={{ color: "#65c777" }} aria-hidden="true" />
           <div>
             <span>Điểm trung bình chung</span>
             <strong>{avgGrade}/10</strong>
@@ -204,7 +204,7 @@ export default function StudentGrades() {
       <div className="summary-grid" style={{ marginBottom: "20px" }}>
         <div className="summary-item summary-green">
           <div className="summary-icon">
-            <Award size={22} />
+            <Award size={22} aria-hidden="true" />
           </div>
           <div className="summary-content">
             <span>Điểm TB tích lũy</span>
@@ -215,7 +215,7 @@ export default function StudentGrades() {
 
         <div className="summary-item summary-blue">
           <div className="summary-icon">
-            <CheckCircle2 size={22} />
+            <CheckCircle2 size={22} aria-hidden="true" />
           </div>
           <div className="summary-content">
             <span>Tỷ lệ đạt chuẩn (Pass)</span>
@@ -228,7 +228,7 @@ export default function StudentGrades() {
 
         <div className="summary-item summary-orange">
           <div className="summary-icon">
-            <TrendingUp size={22} />
+            <TrendingUp size={22} aria-hidden="true" />
           </div>
           <div className="summary-content">
             <span>Điểm cao nhất</span>
@@ -239,7 +239,7 @@ export default function StudentGrades() {
 
         <div className="summary-item summary-light">
           <div className="summary-icon">
-            <GraduationCap size={22} />
+            <GraduationCap size={22} aria-hidden="true" />
           </div>
           <div className="summary-content">
             <span>Tổng số bài đánh giá</span>
@@ -253,12 +253,12 @@ export default function StudentGrades() {
       <section className="chart-card">
         <div className="chart-header">
           <div className="chart-title-wrap">
-            <TrendingUp size={18} style={{ color: "#37883e" }} />
+            <TrendingUp size={18} style={{ color: "#37883e" }} aria-hidden="true" />
             <strong>Xu hướng kết quả điểm số theo thời gian</strong>
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <Filter size={15} style={{ color: "#66736b" }} />
+            <Filter size={15} style={{ color: "#4a5750" }} aria-hidden="true" />
             <select
               className="chart-filter-select"
               value={selectedCourse}
@@ -331,12 +331,12 @@ export default function StudentGrades() {
 
         {/* SVG Chart Container */}
         {loading ? (
-          <div style={{ padding: "40px", textAlign: "center", color: "#66736b" }}>
+          <div role="status" aria-live="polite" style={{ padding: "40px", textAlign: "center", color: "#4a5750" }}>
             Đang tải dữ liệu biểu đồ...
           </div>
         ) : sortedGrades.length === 0 ? (
-          <div style={{ padding: "40px", textAlign: "center", color: "#66736b" }}>
-            Không có dữ liệu điểm nào để hiển thị biểu đồ xu hướng.
+          <div role="status" style={{ padding: "40px", textAlign: "center", color: "#4a5750" }}>
+            Chưa có dữ liệu điểm để hiển thị biểu đồ xu hướng.
           </div>
         ) : (
           <div className="svg-chart-container">
@@ -380,8 +380,8 @@ export default function StudentGrades() {
                       x={padding.left - 8}
                       y={yPos + 4}
                       textAnchor="end"
-                      fontSize="10"
-                      fill={isBenchmark ? "#d97706" : "#66736b"}
+                      fontSize="11"
+                      fill={isBenchmark ? "#d97706" : "#4a5750"}
                       fontWeight={isBenchmark ? "600" : "400"}
                     >
                       {val}%
@@ -395,7 +395,7 @@ export default function StudentGrades() {
                 x={padding.left + plotWidth}
                 y={getY(50) - 5}
                 textAnchor="end"
-                fontSize="9"
+                fontSize="11"
                 fill="#d97706"
                 fontWeight="600"
               >
@@ -446,8 +446,8 @@ export default function StudentGrades() {
                       x={xPos}
                       y={padding.top + plotHeight + 16}
                       textAnchor="middle"
-                      fontSize="9.5"
-                      fill="#475569"
+                      fontSize="11"
+                      fill="#4a5750"
                     >
                       {dateStr}
                     </text>
@@ -534,14 +534,14 @@ export default function StudentGrades() {
                             ? `${item.Course_Name.slice(0, 24)}...`
                             : item.Course_Name}
                         </text>
-                        <text x="10" y="34" fill="#a7f3d0" fontSize="10">
+                        <text x="10" y="34" fill="#a7f3d0" fontSize="11">
                           {item.Activity_Name || item.Grade_Item_Name}
                         </text>
                         <text
                           x="10"
                           y="50"
                           fill="#ffffff"
-                          fontSize="10"
+                          fontSize="11"
                           fontWeight="600"
                         >
                           Điểm: {score}/10 ({Math.round(hoveredPoint.pct)}%) •{" "}
@@ -549,7 +549,7 @@ export default function StudentGrades() {
                             {isPassed ? "Đạt" : "Chưa đạt"}
                           </tspan>
                         </text>
-                        <text x="10" y="64" fill="#94a3b8" fontSize="9">
+                        <text x="10" y="64" fill="#94a3b8" fontSize="11">
                           Ngày ghi nhận: {item.Grade_Date || "—"}
                         </text>
                       </g>
@@ -566,7 +566,7 @@ export default function StudentGrades() {
       <section className="benchmark-card">
         <div className="benchmark-header">
           <div className="benchmark-title-wrap">
-            <Users size={20} style={{ color: "#37883e" }} />
+            <Users size={20} style={{ color: "#37883e" }} aria-hidden="true" />
             <div>
               <strong>So sánh kết quả học tập với trung bình lớp (Ẩn danh)</strong>
               <p>
@@ -578,17 +578,17 @@ export default function StudentGrades() {
             className="dlu-badge dlu-badge--green"
             style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}
           >
-            <Info size={13} />
+            <Info size={13} aria-hidden="true" />
             Dữ liệu ẩn danh 100%
           </span>
         </div>
 
         {loading ? (
-          <div style={{ padding: "30px", textAlign: "center", color: "#66736b" }}>
+          <div role="status" aria-live="polite" style={{ padding: "30px", textAlign: "center", color: "#4a5750" }}>
             Đang phân tích dữ liệu đối sánh lớp học...
           </div>
         ) : benchmarks.length === 0 ? (
-          <div style={{ padding: "24px", textAlign: "center", color: "#66736b" }}>
+          <div role="status" style={{ padding: "24px", textAlign: "center", color: "#4a5750" }}>
             Chưa có đủ dữ liệu lớp học để tạo biểu đồ đối sánh.
           </div>
         ) : (
@@ -641,7 +641,7 @@ export default function StudentGrades() {
                       </strong>
                       <span
                         style={{
-                          fontSize: "10px",
+                          fontSize: "11px",
                           color: isGradeHigher ? "#37883e" : "#dc2626",
                         }}
                       >
@@ -663,8 +663,8 @@ export default function StudentGrades() {
                       </strong>
                       <span
                         style={{
-                          fontSize: "10px",
-                          color: isHoursHigher ? "#2563eb" : "#6b7280",
+                          fontSize: "11px",
+                          color: isHoursHigher ? "#2563eb" : "#4a5750",
                         }}
                       >
                         TB lớp: {b.classStats.avgHours}h (Top{" "}
@@ -761,13 +761,13 @@ export default function StudentGrades() {
       <div className="student-table-card">
         <div className="section-title">
           <div className="left">
-            <Award size={18} style={{ color: "#37883e" }} />
+            <Award size={18} style={{ color: "#37883e" }} aria-hidden="true" />
             <strong>Chi tiết kết quả đánh giá học tập</strong>
           </div>
         </div>
 
         {loading ? (
-          <div style={{ padding: "30px", textAlign: "center", color: "#66736b" }}>
+          <div role="status" aria-live="polite" style={{ padding: "30px", textAlign: "center", color: "#4a5750" }}>
             Đang tải dữ liệu bảng điểm từ Data Warehouse...
           </div>
         ) : (
@@ -791,7 +791,7 @@ export default function StudentGrades() {
                     colSpan="8"
                     style={{
                       textAlign: "center",
-                      color: "#66736b",
+                      color: "#4a5750",
                       padding: "24px",
                     }}
                   >
@@ -814,7 +814,7 @@ export default function StudentGrades() {
                         <div style={{ fontWeight: "700", color: "#17221d" }}>
                           {item.Course_Code}
                         </div>
-                        <div style={{ fontSize: "11px", color: "#66736b" }}>
+                        <div style={{ fontSize: "11px", color: "#4a5750" }}>
                           {item.Course_Name}
                         </div>
                       </td>
@@ -860,7 +860,7 @@ export default function StudentGrades() {
                         </span>
                       </td>
                       <td>
-                        <span style={{ color: "#66736b", fontSize: "11px" }}>
+                        <span style={{ color: "#4a5750", fontSize: "11px" }}>
                           {item.Grade_Date || "—"}
                         </span>
                       </td>

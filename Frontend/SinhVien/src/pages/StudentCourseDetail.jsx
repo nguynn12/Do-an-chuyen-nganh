@@ -157,7 +157,7 @@ export default function StudentCourseDetail({ courseId, onBack }) {
   if (loading) {
     return (
       <main className="page-full">
-        <div className="welcome-card welcome-card--center">
+        <div className="welcome-card welcome-card--center" role="status" aria-live="polite">
           Đang tải dữ liệu phân tích chi tiết môn học từ Data Warehouse...
         </div>
       </main>
@@ -167,13 +167,13 @@ export default function StudentCourseDetail({ courseId, onBack }) {
   if (error || !courseData) {
     return (
       <main className="page-full">
-        <div className="welcome-card welcome-card--error">
-          <AlertCircle size={36} className="welcome-card__error-icon" />
+        <div className="welcome-card welcome-card--error" role="alert">
+          <AlertCircle size={36} className="welcome-card__error-icon" aria-hidden="true" />
           <div className="welcome-card__error-title">
             {error || "Lỗi tải môn học"}
           </div>
           <button className="btn-dlu-secondary" onClick={onBack}>
-            <ArrowLeft size={16} /> Quay lại danh sách môn học
+            <ArrowLeft size={16} aria-hidden="true" /> Quay lại danh sách môn học
           </button>
         </div>
       </main>
@@ -189,17 +189,17 @@ export default function StudentCourseDetail({ courseId, onBack }) {
           className="btn-dlu-secondary course-detail-back-btn"
           onClick={onBack}
         >
-          <ArrowLeft size={15} /> Quay lại danh sách môn
+          <ArrowLeft size={15} aria-hidden="true" /> Quay lại danh sách môn
         </button>
 
         <section className="courses-hero">
           <div className="courses-hero-main">
             <div className="courses-hero-icon">
-              <GraduationCap size={26} />
+              <GraduationCap size={26} aria-hidden="true" />
             </div>
             <div>
               <div className="courses-breadcrumb">
-                <BookOpen size={14} />
+                <BookOpen size={14} aria-hidden="true" />
                 <span>Khóa học</span>
                 <span>/</span>
                 <strong>{courseData.code}</strong>
@@ -225,7 +225,7 @@ export default function StudentCourseDetail({ courseId, onBack }) {
       <div className="summary-grid course-detail-metrics">
         <div className="summary-item summary-green">
           <div className="summary-icon">
-            <Award size={22} />
+            <Award size={22} aria-hidden="true" />
           </div>
           <div className="summary-content">
             <span>Điểm TB Lab (Thực tế)</span>
@@ -236,7 +236,7 @@ export default function StudentCourseDetail({ courseId, onBack }) {
 
         <div className="summary-item summary-orange">
           <div className="summary-icon">
-            <FlaskConical size={22} />
+            <FlaskConical size={22} aria-hidden="true" />
           </div>
           <div className="summary-content">
             <span>Tiến độ bài Lab</span>
@@ -253,7 +253,7 @@ export default function StudentCourseDetail({ courseId, onBack }) {
 
         <div className="summary-item summary-blue">
           <div className="summary-icon">
-            <Clock3 size={22} />
+            <Clock3 size={22} aria-hidden="true" />
           </div>
           <div className="summary-content">
             <span>Tình trạng nộp</span>
@@ -264,7 +264,7 @@ export default function StudentCourseDetail({ courseId, onBack }) {
 
         <div className="summary-item summary-light">
           <div className="summary-icon">
-            <FileText size={22} />
+            <FileText size={22} aria-hidden="true" />
           </div>
           <div className="summary-content">
             <span>Tài liệu môn học</span>
@@ -293,7 +293,7 @@ export default function StudentCourseDetail({ courseId, onBack }) {
             background: "#ffffff",
             borderRadius: "12px",
             border: "1px solid #e2e8f0",
-            color: "#64748b",
+            color: "#4a5750",
             fontSize: "13px",
           }}
         >
@@ -305,7 +305,7 @@ export default function StudentCourseDetail({ courseId, onBack }) {
       <div className="student-table-card" style={{ marginTop: "24px" }}>
         <div className="section-title">
           <div className="left">
-            <FlaskConical size={18} className="grade-high" />
+            <FlaskConical size={18} className="grade-high" aria-hidden="true" />
             <strong>Danh sách bài thực hành Lab theo học phần</strong>
           </div>
         </div>
@@ -325,7 +325,7 @@ export default function StudentCourseDetail({ courseId, onBack }) {
             {totalLabs === 0 ? (
               <tr>
                 <td colSpan="6" className="table-empty-cell">
-                  <AlertCircle size={28} className="table-empty-icon" />
+                  <AlertCircle size={28} className="table-empty-icon" aria-hidden="true" />
                   <div>Môn học này hiện không có bài thực hành (Lab) hoặc chưa phân bổ trên hệ thống LMS.</div>
                 </td>
               </tr>

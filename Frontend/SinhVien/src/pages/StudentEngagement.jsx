@@ -184,11 +184,11 @@ export default function StudentEngagement() {
       <section className="courses-hero">
         <div className="courses-hero-main">
           <div className="courses-hero-icon">
-            <Clock3 size={26} />
+            <Clock3 size={26} aria-hidden="true" />
           </div>
           <div>
             <div className="courses-breadcrumb">
-              <BookOpen size={14} />
+              <BookOpen size={14} aria-hidden="true" />
               <span>Phân tích học tập</span>
               <span>/</span>
               <strong>Thời gian học</strong>
@@ -202,7 +202,7 @@ export default function StudentEngagement() {
         </div>
 
         <div className="courses-semester">
-          <Sparkles size={18} style={{ color: "#65c777" }} />
+          <Sparkles size={18} style={{ color: "#65c777" }} aria-hidden="true" />
           <div>
             <span>Tổng giờ học</span>
             <strong>{totalHours} giờ</strong>
@@ -214,7 +214,7 @@ export default function StudentEngagement() {
       <div className="summary-grid" style={{ marginBottom: "20px" }}>
         <div className="summary-item summary-green">
           <div className="summary-icon">
-            <Clock3 size={22} />
+            <Clock3 size={22} aria-hidden="true" />
           </div>
           <div className="summary-content">
             <span>Tổng thời gian học</span>
@@ -225,7 +225,7 @@ export default function StudentEngagement() {
 
         <div className="summary-item summary-blue">
           <div className="summary-icon">
-            <TrendingUp size={22} />
+            <TrendingUp size={22} aria-hidden="true" />
           </div>
           <div className="summary-content">
             <span>Trung bình / ngày học</span>
@@ -236,7 +236,7 @@ export default function StudentEngagement() {
 
         <div className="summary-item summary-orange">
           <div className="summary-icon">
-            <BookOpen size={22} />
+            <BookOpen size={22} aria-hidden="true" />
           </div>
           <div className="summary-content">
             <span>Môn học nhiều nhất</span>
@@ -247,7 +247,7 @@ export default function StudentEngagement() {
 
         <div className="summary-item summary-light">
           <div className="summary-icon">
-            <Flame size={22} />
+            <Flame size={22} aria-hidden="true" />
           </div>
           <div className="summary-content">
             <span>Số ngày hoạt động</span>
@@ -263,7 +263,7 @@ export default function StudentEngagement() {
       <section className="chart-card">
         <div className="chart-header">
           <div className="chart-title-wrap">
-            <Grid size={18} style={{ color: "#37883e" }} />
+            <Grid size={18} style={{ color: "#37883e" }} aria-hidden="true" />
             <strong>Ma trận thời gian học theo ngày trong tuần (Activity Heatmap)</strong>
           </div>
 
@@ -284,7 +284,7 @@ export default function StudentEngagement() {
         </div>
 
         {loading ? (
-          <div style={{ padding: "30px", textAlign: "center", color: "#66736b" }}>
+          <div role="status" aria-live="polite" style={{ padding: "30px", textAlign: "center", color: "#4a5750" }}>
             Đang tải dữ liệu ma trận thời gian học...
           </div>
         ) : (
@@ -393,13 +393,18 @@ export default function StudentEngagement() {
         <div className="analytics-card">
           <div className="analytics-card__header">
             <div className="analytics-card__title">
-              <BookOpen size={16} />
+              <BookOpen size={16} aria-hidden="true" />
               <span>Thời gian học tập theo môn học</span>
             </div>
           </div>
 
           <div>
-            {engagementData.courseEngagement.map((c) => {
+            {engagementData.courseEngagement.length === 0 ? (
+              <div role="status" style={{ padding: "24px", textAlign: "center", color: "#4a5750", fontSize: "13px" }}>
+                Chưa có dữ liệu thời gian học theo môn học.
+              </div>
+            ) : (
+              engagementData.courseEngagement.map((c) => {
               const hours = Number(c.totalHours || 0);
               const percent =
                 totalHours > 0 ? Math.round((hours / totalHours) * 100) : 0;
@@ -421,7 +426,7 @@ export default function StudentEngagement() {
                   </div>
                 </div>
               );
-            })}
+            }))}
           </div>
         </div>
 
@@ -429,13 +434,18 @@ export default function StudentEngagement() {
         <div className="analytics-card">
           <div className="analytics-card__header">
             <div className="analytics-card__title">
-              <TrendingUp size={16} />
+              <TrendingUp size={16} aria-hidden="true" />
               <span>Nhật ký tương tác gần đây</span>
             </div>
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            {engagementData.dailyTrend.slice(-6).reverse().map((d, idx) => {
+            {engagementData.dailyTrend.length === 0 ? (
+              <div role="status" style={{ padding: "24px", textAlign: "center", color: "#4a5750", fontSize: "13px" }}>
+                Chưa có nhật ký tương tác gần đây.
+              </div>
+            ) : (
+              engagementData.dailyTrend.slice(-6).reverse().map((d, idx) => {
               const dateVal = d.date || d.Date || "—";
               const hrs = Number(
                 d.totalHours !== undefined ? d.totalHours : d.Hours || 0
@@ -464,7 +474,7 @@ export default function StudentEngagement() {
                     >
                       Ngày: {dateVal}
                     </div>
-                    <div style={{ fontSize: "10px", color: "#66736b" }}>
+                    <div style={{ fontSize: "11px", color: "#4a5750" }}>
                       {hrs > 0
                         ? `${hrs} giờ (${Math.round(hrs * 60)} phút)`
                         : "Không có hoạt động"}
@@ -481,7 +491,7 @@ export default function StudentEngagement() {
                   </div>
                 </div>
               );
-            })}
+            }))}
           </div>
         </div>
       </div>
