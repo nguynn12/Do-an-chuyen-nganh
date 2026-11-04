@@ -3994,10 +3994,10 @@ body {
 
 .support-hero p {
   margin-top: 6px !important;
-  font-size: 10px !important;
+  font-size: 12px !important;
   font-weight: 400 !important;
   line-height: 1.55 !important;
-  color: #6b7770 !important;
+  color: #4a5750 !important;
 }
 
 
@@ -4028,10 +4028,10 @@ body {
 }
 
 .support-info-row strong {
-  font-size: 10px !important;
+  font-size: 12px !important;
   font-weight: 600 !important;
   line-height: 1.35 !important;
-  color: #35423a !important;
+  color: #17221d !important;
 }
 
 

@@ -265,9 +265,7 @@ function Grading() {
         key: "ontime",
         label: "Đúng hạn",
         icon: (
-          <CheckCircle2
-            size={14}
-          />
+          <CheckCircle2 size={14} aria-hidden="true" />
         ),
       };
     }
@@ -276,9 +274,7 @@ function Grading() {
       key: "late",
       label: "Nộp trễ",
       icon: (
-        <AlertTriangle
-          size={14}
-        />
+        <AlertTriangle size={14} aria-hidden="true" />
       ),
     };
   }
@@ -334,7 +330,7 @@ function Grading() {
 
   if (loading) {
     return (
-      <div className="grading-loading">
+      <div className="grading-loading" role="status" aria-live="polite">
         <div className="grading-spinner" />
 
         <strong>
@@ -355,7 +351,7 @@ function Grading() {
 
   if (error) {
     return (
-      <div className="grading-loading">
+      <div className="grading-loading" role="alert">
         <h2>
           Không thể tải bài chờ chấm
         </h2>
@@ -402,7 +398,7 @@ function Grading() {
             navigate("/")
           }
         >
-          <ArrowLeft size={17} />
+          <ArrowLeft size={17} aria-hidden="true" />
 
           Quay lại Tổng quan
         </button>
@@ -438,9 +434,7 @@ function Grading() {
           <div className="grading-hero-content">
 
             <div className="grading-hero-icon">
-              <ClipboardCheck
-                size={28}
-              />
+              <ClipboardCheck size={28} aria-hidden="true" />
             </div>
 
 
@@ -522,9 +516,7 @@ function Grading() {
           <div className="grading-overview-item">
 
             <div className="grading-overview-icon green">
-              <ClipboardCheck
-                size={18}
-              />
+              <ClipboardCheck size={18} aria-hidden="true" />
             </div>
 
             <div>
@@ -543,9 +535,7 @@ function Grading() {
           <div className="grading-overview-item">
 
             <div className="grading-overview-icon olive">
-              <CheckCircle2
-                size={18}
-              />
+              <CheckCircle2 size={18} aria-hidden="true" />
             </div>
 
             <div>
@@ -564,9 +554,7 @@ function Grading() {
           <div className="grading-overview-item">
 
             <div className="grading-overview-icon blue">
-              <Layers3
-                size={18}
-              />
+              <Layers3 size={18} aria-hidden="true" />
             </div>
 
             <div>
@@ -585,9 +573,7 @@ function Grading() {
           <div className="grading-overview-item">
 
             <div className="grading-overview-icon orange">
-              <Clock3
-                size={18}
-              />
+              <Clock3 size={18} aria-hidden="true" />
             </div>
 
             <div>
@@ -653,7 +639,7 @@ function Grading() {
 
             <div className="grading-search">
 
-              <Search size={17} />
+              <Search size={17} aria-hidden="true" />
 
               <input
                 value={
@@ -677,9 +663,7 @@ function Grading() {
 
               <div className="grading-select-wrap">
 
-                <BookOpen
-                  size={16}
-                />
+                <BookOpen size={16} aria-hidden="true" />
 
                 <select
                   value={
@@ -728,9 +712,7 @@ function Grading() {
 
               <div className="grading-select-wrap">
 
-                <Filter
-                  size={16}
-                />
+                <Filter size={16} aria-hidden="true" />
 
                 <select
                   value={
@@ -928,9 +910,7 @@ function Grading() {
                         >
                           Mở LMS
 
-                          <ExternalLink
-                            size={15}
-                          />
+                          <ExternalLink size={15} aria-hidden="true" />
                         </button>
 
                       </div>
@@ -940,12 +920,10 @@ function Grading() {
                 }
               )
             ) : (
-              <div className="grading-empty">
+              <div className="grading-empty" role="status">
 
                 <div className="grading-empty-icon">
-                  <ClipboardCheck
-                    size={30}
-                  />
+                  <ClipboardCheck size={30} aria-hidden="true" />
                 </div>
 
                 <strong>

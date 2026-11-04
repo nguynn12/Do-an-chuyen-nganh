@@ -167,11 +167,11 @@ export default function Messages() {
           <section className="messages-hero">
             <div className="messages-hero-main">
               <div className="messages-hero-icon">
-                <BellRing size={28} />
+                <BellRing size={28} aria-hidden="true" />
               </div>
               <div>
                 <div className="messages-breadcrumb">
-                  <BookOpen size={13} />
+                  <BookOpen size={13} aria-hidden="true" />
                   <span>Quản trị giảng dạy</span>
                   <span>/</span>
                   <strong>Cảnh báo học tập</strong>
@@ -192,7 +192,7 @@ export default function Messages() {
                 className="btn-compose"
                 onClick={() => setShowComposeModal(true)}
               >
-                <Plus size={16} /> Gửi thông báo lớp
+                <Plus size={16} aria-hidden="true" /> Gửi thông báo lớp
               </button>
             </div>
           </section>
@@ -201,7 +201,7 @@ export default function Messages() {
           <section className="messages-stats-grid">
             <div className="messages-stat-card">
               <div className="stat-icon-wrapper stat-icon-red">
-                <AlertTriangle size={22} />
+                <AlertTriangle size={22} aria-hidden="true" />
               </div>
               <div className="stat-info">
                 <span className="stat-label">Cảnh báo rủi ro học tập</span>
@@ -212,7 +212,7 @@ export default function Messages() {
 
             <div className="messages-stat-card">
               <div className="stat-icon-wrapper stat-icon-orange">
-                <Clock size={22} />
+                <Clock size={22} aria-hidden="true" />
               </div>
               <div className="stat-info">
                 <span className="stat-label">Hạn chót &amp; Chờ chấm</span>
@@ -223,7 +223,7 @@ export default function Messages() {
 
             <div className="messages-stat-card">
               <div className="stat-icon-wrapper stat-icon-blue">
-                <HelpCircle size={22} />
+                <HelpCircle size={22} aria-hidden="true" />
               </div>
               <div className="stat-info">
                 <span className="stat-label">Yêu cầu &amp; Thắc mắc</span>
@@ -234,7 +234,7 @@ export default function Messages() {
 
             <div className="messages-stat-card">
               <div className="stat-icon-wrapper stat-icon-green">
-                <CheckCircle2 size={22} />
+                <CheckCircle2 size={22} aria-hidden="true" />
               </div>
               <div className="stat-info">
                 <span className="stat-label">Chưa đọc</span>
@@ -260,7 +260,7 @@ export default function Messages() {
                 className={`tab-btn ${activeTab === "risk" ? "active" : ""}`}
                 onClick={() => setActiveTab("risk")}
               >
-                <AlertTriangle size={14} color="#d32f2f" /> Cảnh báo rủi ro{" "}
+                <AlertTriangle size={14} color="#d32f2f" aria-hidden="true" /> Cảnh báo rủi ro{" "}
                 <span className="tab-count">{stats.risk}</span>
               </button>
 
@@ -269,7 +269,7 @@ export default function Messages() {
                 className={`tab-btn ${activeTab === "deadline" ? "active" : ""}`}
                 onClick={() => setActiveTab("deadline")}
               >
-                <Clock size={14} color="#e65100" /> Hạn nộp bài{" "}
+                <Clock size={14} color="#e65100" aria-hidden="true" /> Hạn nộp bài{" "}
                 <span className="tab-count">{stats.deadline}</span>
               </button>
 
@@ -278,7 +278,7 @@ export default function Messages() {
                 className={`tab-btn ${activeTab === "support" ? "active" : ""}`}
                 onClick={() => setActiveTab("support")}
               >
-                <HelpCircle size={14} color="#1565c0" /> Thắc mắc sinh viên{" "}
+                <HelpCircle size={14} color="#1565c0" aria-hidden="true" /> Thắc mắc sinh viên{" "}
                 <span className="tab-count">{stats.support}</span>
               </button>
 
@@ -287,13 +287,13 @@ export default function Messages() {
                 className={`tab-btn ${activeTab === "system" ? "active" : ""}`}
                 onClick={() => setActiveTab("system")}
               >
-                <Info size={14} /> Hệ thống LMS
+                <Info size={14} aria-hidden="true" /> Hệ thống LMS
               </button>
             </div>
 
             <div className="messages-actions-right">
               <div className="search-box">
-                <Search size={15} className="search-icon" />
+                <Search size={15} className="search-icon" aria-hidden="true" />
                 <input
                   type="text"
                   placeholder="Tìm thông báo, mã môn..."
@@ -312,7 +312,7 @@ export default function Messages() {
                   color: onlyUnread ? "#2e7d32" : "#445048",
                 }}
               >
-                <Filter size={13} /> {onlyUnread ? "Đang lọc: Chưa đọc" : "Chưa đọc"}
+                <Filter size={13} aria-hidden="true" /> {onlyUnread ? "Đang lọc: Chưa đọc" : "Chưa đọc"}
               </button>
 
               {stats.unread > 0 && (
@@ -322,7 +322,7 @@ export default function Messages() {
                   onClick={markAllAsRead}
                   title="Đánh dấu tất cả đã đọc"
                 >
-                  <CheckCheck size={14} /> Đọc tất cả
+                  <CheckCheck size={14} aria-hidden="true" /> Đọc tất cả
                 </button>
               )}
             </div>
@@ -331,15 +331,15 @@ export default function Messages() {
           {/* 4. NOTIFICATIONS LIST CONTAINER */}
           <section className="messages-container">
             {alertsLoading ? (
-              <div className="messages-empty" style={{ padding: "48px 20px" }}>
+              <div className="messages-empty" style={{ padding: "48px 20px" }} role="status" aria-live="polite">
                 <div className="loading-spinner" style={{ margin: "0 auto 16px" }} />
                 <h3>Đang trích xuất cảnh báo học tập...</h3>
                 <p>Hệ thống đang phân tích dữ liệu bài nộp và bảng điểm thực tế từ Data Warehouse.</p>
               </div>
             ) : filteredList.length === 0 ? (
-              <div className="messages-empty">
+              <div className="messages-empty" role="status">
                 <div className="messages-empty-icon">
-                  <CheckCircle2 size={30} />
+                  <CheckCircle2 size={30} aria-hidden="true" />
                 </div>
                 <h3>Không có thông báo nào phù hợp</h3>
                 <p>Mọi cảnh báo học tập và thông báo hệ thống đều đã được xử lý.</p>
@@ -376,13 +376,13 @@ export default function Messages() {
                       }}
                     >
                       {isRisk ? (
-                        <AlertTriangle size={20} />
+                        <AlertTriangle size={20} aria-hidden="true" />
                       ) : isDeadline ? (
-                        <Clock size={20} />
+                        <Clock size={20} aria-hidden="true" />
                       ) : isSupport ? (
-                        <HelpCircle size={20} />
+                        <HelpCircle size={20} aria-hidden="true" />
                       ) : (
-                        <Info size={20} />
+                        <Info size={20} aria-hidden="true" />
                       )}
                     </div>
 
@@ -418,7 +418,7 @@ export default function Messages() {
 
                       <div className="notification-footer">
                         <div className="notification-course-tag">
-                          <BookOpen size={12} />
+                          <BookOpen size={12} aria-hidden="true" />
                           <span>{item.courseName}</span>
                         </div>
 
@@ -430,7 +430,7 @@ export default function Messages() {
                               onClick={() => navigate(item.actionPath)}
                             >
                               <span>{item.actionLabel}</span>
-                              <ArrowRight size={13} />
+                              <ArrowRight size={13} aria-hidden="true" />
                             </button>
                           )}
 
@@ -450,7 +450,7 @@ export default function Messages() {
                             title="Xóa thông báo"
                             style={{ color: "#d32f2f" }}
                           >
-                            <Trash2 size={13} />
+                            <Trash2 size={13} aria-hidden="true" />
                           </button>
                         </div>
                       </div>
@@ -472,7 +472,7 @@ export default function Messages() {
           >
             <div className="modal-header">
               <div className="modal-title-group">
-                <Sparkles size={18} color="#37883e" />
+                <Sparkles size={18} color="#37883e" aria-hidden="true" />
                 <h2>Soạn thông báo gửi lớp học</h2>
               </div>
               <button
@@ -480,7 +480,7 @@ export default function Messages() {
                 className="btn-modal-close"
                 onClick={() => setShowComposeModal(false)}
               >
-                <X size={18} />
+                <X size={18} aria-hidden="true" />
               </button>
             </div>
 
@@ -549,7 +549,7 @@ export default function Messages() {
                   Hủy bỏ
                 </button>
                 <button type="submit" className="btn-compose">
-                  <Send size={14} /> Phát thông báo ngay
+                  <Send size={14} aria-hidden="true" /> Phát thông báo ngay
                 </button>
               </div>
             </form>

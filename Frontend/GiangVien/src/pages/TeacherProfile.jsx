@@ -435,7 +435,7 @@ function TeacherProfile() {
             className="profile-edit"
             type="button"
           >
-            <Pencil size={16} />
+            <Pencil size={16} aria-hidden="true" />
 
             Chỉnh sửa thông tin
           </button>
@@ -470,7 +470,7 @@ function TeacherProfile() {
 
               {/* Mã GV */}
               <div>
-                <GraduationCap />
+                <GraduationCap aria-hidden="true" />
 
                 <span>
                   Mã giảng viên
@@ -484,7 +484,7 @@ function TeacherProfile() {
 
               {/* Đơn vị */}
               <div>
-                <Building2 />
+                <Building2 aria-hidden="true" />
 
                 <span>
                   Đơn vị
@@ -498,7 +498,7 @@ function TeacherProfile() {
 
               {/* Email */}
               <div>
-                <Mail />
+                <Mail aria-hidden="true" />
 
                 <span>
                   Email
@@ -512,7 +512,7 @@ function TeacherProfile() {
 
               {/* Điện thoại */}
               <div>
-                <Phone />
+                <Phone aria-hidden="true" />
 
                 <span>
                   Số điện thoại
@@ -554,7 +554,7 @@ function TeacherProfile() {
           {/* KHÓA HỌC */}
           <div className="profile-stat green">
 
-            <BookOpen />
+            <BookOpen aria-hidden="true" />
 
             <div>
               <strong>
@@ -576,7 +576,7 @@ function TeacherProfile() {
           {/* SINH VIÊN */}
           <div className="profile-stat orange student-stat">
 
-            <UsersRound />
+            <UsersRound aria-hidden="true" />
 
             <div className="student-stat-content">
 
@@ -618,7 +618,7 @@ function TeacherProfile() {
           {/* BÀI CHỜ CHẤM */}
           <div className="profile-stat amber">
 
-            <BarChart3 />
+            <BarChart3 aria-hidden="true" />
 
             <div>
               <strong>
@@ -640,7 +640,7 @@ function TeacherProfile() {
           {/* TỶ LỆ NỘP */}
           <div className="profile-stat green">
 
-            <ShieldCheck />
+            <ShieldCheck aria-hidden="true" />
 
             <div>
 
@@ -683,7 +683,7 @@ function TeacherProfile() {
             <div className="profile-card-title">
 
               <div>
-                <BookOpen size={20} />
+                <BookOpen size={20} aria-hidden="true" />
 
                 <strong>
                   Khóa học đang giảng dạy
@@ -695,7 +695,7 @@ function TeacherProfile() {
                 className="add-course"
                 type="button"
               >
-                <Plus size={17} />
+                <Plus size={17} aria-hidden="true" />
 
                 Thêm khóa học
               </button>
@@ -706,7 +706,7 @@ function TeacherProfile() {
             {/* Không có môn */}
             {courseRows.length === 0 ? (
 
-              <div className="profile-empty">
+              <div className="profile-empty" role="status">
                 Chưa có khóa học trong hệ thống.
               </div>
 
@@ -784,9 +784,7 @@ function TeacherProfile() {
 
               Xem tất cả khóa học
 
-              <ChevronRight
-                size={15}
-              />
+              <ChevronRight size={15} aria-hidden="true" />
 
             </button>
 
@@ -802,7 +800,7 @@ function TeacherProfile() {
             <div className="profile-card-title">
 
               <div>
-                <UserRound size={20} />
+                <UserRound size={20} aria-hidden="true" />
 
                 <strong>
                   Tài khoản & Hệ thống
@@ -815,7 +813,7 @@ function TeacherProfile() {
             {/* Thông tin cá nhân */}
             <button type="button">
 
-              <UserRound />
+              <UserRound aria-hidden="true" />
 
               <span>
                 <strong>
@@ -827,7 +825,7 @@ function TeacherProfile() {
                 </small>
               </span>
 
-              <ChevronRight />
+              <ChevronRight aria-hidden="true" />
 
             </button>
 
@@ -835,7 +833,7 @@ function TeacherProfile() {
             {/* Password */}
             <button type="button">
 
-              <LockKeyhole />
+              <LockKeyhole aria-hidden="true" />
 
               <span>
                 <strong>
@@ -847,7 +845,7 @@ function TeacherProfile() {
                 </small>
               </span>
 
-              <ChevronRight />
+              <ChevronRight aria-hidden="true" />
 
             </button>
 
@@ -855,7 +853,7 @@ function TeacherProfile() {
             {/* LMS */}
             <button type="button">
 
-              <Link2 />
+              <Link2 aria-hidden="true" />
 
               <span>
                 <strong>
@@ -868,7 +866,7 @@ function TeacherProfile() {
                 </small>
               </span>
 
-              <ChevronRight />
+              <ChevronRight aria-hidden="true" />
 
             </button>
 
@@ -876,7 +874,7 @@ function TeacherProfile() {
             {/* Notification */}
             <button type="button">
 
-              <Bell />
+              <Bell aria-hidden="true" />
 
               <span>
                 <strong>
@@ -888,7 +886,7 @@ function TeacherProfile() {
                 </small>
               </span>
 
-              <ChevronRight />
+              <ChevronRight aria-hidden="true" />
 
             </button>
 
@@ -900,7 +898,7 @@ function TeacherProfile() {
               onClick={logout}
             >
 
-              <LogOut />
+              <LogOut aria-hidden="true" />
 
               <span>
                 <strong>

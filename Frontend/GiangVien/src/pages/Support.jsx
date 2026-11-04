@@ -95,7 +95,7 @@ function Support() {
           className="support-back"
           onClick={() => navigate("/")}
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft size={16} aria-hidden="true" />
           Quay lại Tổng quan
         </button>
 
@@ -107,7 +107,7 @@ function Support() {
           <section className="support-hero">
 
             <div className="support-hero-icon">
-              <HelpCircle size={25} />
+              <HelpCircle size={25} aria-hidden="true" />
             </div>
 
             <div className="support-hero-content">
@@ -142,7 +142,7 @@ function Support() {
               <div className="support-card-header">
 
                 <div className="support-card-icon support-card-icon-green">
-                  <Phone size={18} />
+                  <Phone size={18} aria-hidden="true" />
                 </div>
 
                 <div className="support-card-heading">
@@ -165,7 +165,7 @@ function Support() {
               <div className="support-info-list">
 
                 <div className="support-info-row">
-                  <Building2 size={15} />
+                  <Building2 size={15} aria-hidden="true" />
 
                   <div>
                     <span>Đơn vị</span>
@@ -177,7 +177,7 @@ function Support() {
 
 
                 <div className="support-info-row">
-                  <Phone size={15} />
+                  <Phone size={15} aria-hidden="true" />
 
                   <div>
                     <span>Hotline</span>
@@ -189,7 +189,7 @@ function Support() {
 
 
                 <div className="support-info-row">
-                  <Mail size={15} />
+                  <Mail size={15} aria-hidden="true" />
 
                   <div>
                     <span>Email</span>
@@ -220,7 +220,7 @@ function Support() {
               <div className="support-card-header">
 
                 <div className="support-card-icon support-card-icon-blue">
-                  <GraduationCap size={19} />
+                  <GraduationCap size={19} aria-hidden="true" />
                 </div>
 
                 <div className="support-card-heading">
@@ -267,7 +267,7 @@ function Support() {
 
 
                 <div className="support-info-row">
-                  <Globe size={15} />
+                  <Globe size={15} aria-hidden="true" />
 
                   <div>
                     <span>Website</span>
@@ -298,7 +298,7 @@ function Support() {
           <section className="support-scope">
 
             <div className="support-scope-icon">
-              <ShieldCheck size={18} />
+              <ShieldCheck size={18} aria-hidden="true" />
             </div>
 
             <div className="support-scope-content">
@@ -335,7 +335,7 @@ function Support() {
             <div className="support-highlight">
 
               <div className="support-highlight-icon">
-                <Headphones size={16} />
+                <Headphones size={16} aria-hidden="true" />
               </div>
 
               <div>
@@ -354,7 +354,7 @@ function Support() {
             <div className="support-highlight">
 
               <div className="support-highlight-icon">
-                <GraduationCap size={16} />
+                <GraduationCap size={16} aria-hidden="true" />
               </div>
 
               <div>
@@ -373,7 +373,7 @@ function Support() {
             <div className="support-highlight">
 
               <div className="support-highlight-icon">
-                <BarChart3 size={16} />
+                <BarChart3 size={16} aria-hidden="true" />
               </div>
 
               <div>
