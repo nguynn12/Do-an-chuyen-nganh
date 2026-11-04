@@ -7,7 +7,7 @@ function SummaryCard({ icon, label, value, subtext, className, onClick }) {
       onClick={onClick}
       type="button"
     >
-      <div className="summary-icon">{icon}</div>
+      <div className="summary-icon" aria-hidden="true">{icon}</div>
 
       <div className="summary-content">
         <span>{label}</span>
@@ -15,7 +15,7 @@ function SummaryCard({ icon, label, value, subtext, className, onClick }) {
         {subtext && <small>{subtext}</small>}
       </div>
 
-      <ChevronRight className="summary-arrow" size={18} />
+      <ChevronRight className="summary-arrow" size={18} aria-hidden="true" />
     </button>
   );
 }

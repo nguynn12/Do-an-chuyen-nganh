@@ -102,7 +102,7 @@ function CourseCard({ courses }) {
       <div className="section-title">
 
         <div>
-          <BookOpen size={19} />
+          <BookOpen size={19} aria-hidden="true" />
 
           <strong>
             Khóa học đang giảng dạy
@@ -118,7 +118,7 @@ function CourseCard({ courses }) {
             onClick={handlePrevious}
             disabled={courses.length <= 3}
           >
-            <ChevronLeft size={16} />
+            <ChevronLeft size={16} aria-hidden="true" />
           </button>
 
           <button
@@ -127,7 +127,7 @@ function CourseCard({ courses }) {
             onClick={handleNext}
             disabled={courses.length <= 3}
           >
-            <ChevronRight size={16} />
+            <ChevronRight size={16} aria-hidden="true" />
           </button>
 
         </div>
@@ -225,7 +225,7 @@ function CourseCard({ courses }) {
                         gap: 6,
                       }}
                     >
-                      <Users size={14} />
+                      <Users size={14} aria-hidden="true" />
 
                       Sinh viên:{" "}
 
@@ -257,9 +257,7 @@ function CourseCard({ courses }) {
                         gap: 6,
                       }}
                     >
-                      <ClipboardCheck
-                        size={14}
-                      />
+                      <ClipboardCheck size={14} aria-hidden="true" />
 
                       Tỷ lệ nộp bài:{" "}
 
@@ -280,9 +278,7 @@ function CourseCard({ courses }) {
                         gap: 6,
                       }}
                     >
-                      <GraduationCap
-                        size={14}
-                      />
+                      <GraduationCap size={14} aria-hidden="true" />
 
                       Điểm TB:{" "}
 

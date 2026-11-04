@@ -116,7 +116,7 @@ export default function StudentOverview({
         <section className="section">
           <div className="section-title">
             <div>
-              <BookOpen size={18} style={{ color: "#37883e" }} />
+              <BookOpen size={18} style={{ color: "#37883e" }} aria-hidden="true" />
               <strong>Khóa học đang theo học kỳ này</strong>
             </div>
             <button
@@ -143,18 +143,18 @@ export default function StudentOverview({
                   <h3>{c.name}</h3>
 
                   <p>
-                    <Award size={14} />
+                    <Award size={14} aria-hidden="true" />
                     Điểm trung bình:{" "}
                     <strong>{c.averageGrade ? `${c.averageGrade}/10` : "7.0/10"}</strong>
                   </p>
 
                   <p>
-                    <ClipboardCheck size={14} />
+                    <ClipboardCheck size={14} aria-hidden="true" />
                     Tiến độ hoàn thành: <strong>{c.progress || 100}%</strong>
                   </p>
 
                   <p>
-                    <Clock3 size={14} />
+                    <Clock3 size={14} aria-hidden="true" />
                     Thời gian học: <strong>{c.totalEngagementHours || 0} giờ</strong>
                   </p>
 
@@ -182,7 +182,7 @@ export default function StudentOverview({
         <section className="section">
           <div className="section-title">
             <div>
-              <TrendingUp size={18} style={{ color: "#37883e" }} />
+              <TrendingUp size={18} style={{ color: "#37883e" }} aria-hidden="true" />
               <strong>Trực quan hóa kết quả học tập & Tiến độ</strong>
             </div>
           </div>
@@ -192,7 +192,7 @@ export default function StudentOverview({
             <div className="analytics-card">
               <div className="analytics-card__header">
                 <div className="analytics-card__title">
-                  <Award size={16} />
+                  <Award size={16} aria-hidden="true" />
                   <span>Điểm trung bình theo môn học</span>
                 </div>
                 <button
@@ -231,7 +231,7 @@ export default function StudentOverview({
             <div className="analytics-card">
               <div className="analytics-card__header">
                 <div className="analytics-card__title">
-                  <CheckCircle2 size={16} />
+                  <CheckCircle2 size={16} aria-hidden="true" />
                   <span>Tiến độ hoàn thành bài tập</span>
                 </div>
                 <button
@@ -315,7 +315,7 @@ export default function StudentOverview({
         <div className="right-card">
           <div className="right-heading">
             <div>
-              <Bell size={16} style={{ color: "#37883e" }} />
+              <Bell size={16} style={{ color: "#37883e" }} aria-hidden="true" />
               <strong>Hạn nộp & Nhắc nhở</strong>
             </div>
             <span className="badge">{events.length || 2}</span>
@@ -355,7 +355,7 @@ export default function StudentOverview({
               <span>🌐</span>
               <span>Hệ thống LMS DLU</span>
             </div>
-            <ExternalLink size={14} />
+            <ExternalLink size={14} aria-hidden="true" />
           </button>
 
           <button
@@ -367,7 +367,7 @@ export default function StudentOverview({
               <span>📊</span>
               <span>Báo cáo Power BI sinh viên</span>
             </div>
-            <ChevronRight size={14} />
+            <ChevronRight size={14} aria-hidden="true" />
           </button>
 
           <button
@@ -379,7 +379,7 @@ export default function StudentOverview({
               <span>🎯</span>
               <span>Bảng điểm chi tiết</span>
             </div>
-            <ChevronRight size={14} />
+            <ChevronRight size={14} aria-hidden="true" />
           </button>
 
           <button
@@ -391,7 +391,7 @@ export default function StudentOverview({
               <span>⏱️</span>
               <span>Nhật ký thời gian học</span>
             </div>
-            <ChevronRight size={14} />
+            <ChevronRight size={14} aria-hidden="true" />
           </button>
 
           <button
@@ -403,7 +403,7 @@ export default function StudentOverview({
               <span>🛠️</span>
               <span>Hỗ trợ kỹ thuật ITC</span>
             </div>
-            <ChevronRight size={14} />
+            <ChevronRight size={14} aria-hidden="true" />
           </button>
         </div>
       </aside>

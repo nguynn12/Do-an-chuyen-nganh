@@ -13,7 +13,7 @@ function UrgentTasks({ tasks }) {
   return (
     <section className="section">
       <div className="section-title left">
-        <Clock3 size={19} />
+        <Clock3 size={19} aria-hidden="true" />
         <strong>Việc cần xử lý gấp</strong>
       </div>
 
@@ -23,7 +23,7 @@ function UrgentTasks({ tasks }) {
         ) : (
           tasks.map((task) => (
             <div className="task" key={task.id}>
-              <div className={`task-icon ${task.type}`}>!</div>
+              <div className={`task-icon ${task.type}`} aria-hidden="true">!</div>
 
               <div className="task-info">
                 <strong>{task.title}</strong>
@@ -33,7 +33,7 @@ function UrgentTasks({ tasks }) {
                 </span>
               </div>
 
-              <button onClick={() => navigate(task.path)}>{task.action}</button>
+              <button type="button" onClick={() => navigate(task.path)}>{task.action}</button>
             </div>
           ))
         )}

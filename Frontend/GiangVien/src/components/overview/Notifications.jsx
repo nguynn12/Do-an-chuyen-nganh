@@ -416,7 +416,7 @@ function Notifications({
 
         <div>
 
-          <Bell size={18} />
+          <Bell size={18} aria-hidden="true" />
 
           <strong>
             Thông báo lớp học & Hệ thống
@@ -592,7 +592,7 @@ function Notifications({
                     "transparent",
                   cursor: "pointer",
                   fontSize: "11px",
-                  color: "#666",
+                  color: "#4a5750",
                   padding: 0,
                 }}
               >
@@ -624,7 +624,7 @@ function Notifications({
                     "transparent",
                   cursor: "pointer",
                   fontSize: "11px",
-                  color: "#666",
+                  color: "#4a5750",
                   padding: 0,
                   display: "flex",
                   alignItems: "center",

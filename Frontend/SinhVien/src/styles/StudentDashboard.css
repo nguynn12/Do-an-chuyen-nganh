@@ -18,7 +18,7 @@
   --dlu-orange: #e87524;
   --dlu-orange-warm: #e6a23c;
   --dlu-text-main: #14251e;
-  --dlu-text-muted: #667970;
+  --dlu-text-muted: #4a5750;
   --dlu-border-soft: rgba(11, 85, 63, 0.12);
   --dlu-card-bg: #ffffff;
 }
@@ -741,7 +741,7 @@ button {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #66736b;
+  color: #4a5750;
   font-size: 11px;
   line-height: 1.4;
 }
@@ -938,7 +938,7 @@ button {
   border: 1px solid #d5ddd6;
   border-radius: 4px;
   background: #f5f7f5;
-  color: #536057;
+  color: #344039;
   font-size: 14px;
 }
 
@@ -960,7 +960,7 @@ button {
 }
 
 .calendar-week span {
-  color: #69746d;
+  color: #4a5750;
   font-size: 11px;
   font-weight: 600;
 }
@@ -1039,7 +1039,7 @@ button {
 .notification-info span {
   display: block;
   font-size: 11px;
-  color: #7d8881;
+  color: #4a5750;
   margin-top: 2px;
 }
 
@@ -1808,4 +1808,12 @@ button {
 
 .dlu-retry-btn:hover {
   background-color: var(--dlu-green-700, #18734f);
+}
+
+/* A11Y FOCUS VISIBLE OVERVIEW */
+.quick-link:focus-visible,
+.calendar-title button:focus-visible,
+.course-actions button:focus-visible {
+  outline: 2px solid #37883e;
+  outline-offset: 2px;
 }

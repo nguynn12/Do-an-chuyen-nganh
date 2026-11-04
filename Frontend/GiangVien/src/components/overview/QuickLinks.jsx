@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 
 function QuickLink({ icon, title, onClick }) {
   return (
-    <button className="quick-link" onClick={onClick}>
-      <span>{icon}</span>
+    <button type="button" className="quick-link" onClick={onClick}>
+      <span aria-hidden="true">{icon}</span>
       <strong>{title}</strong>
-      <ChevronRight size={15} />
+      <ChevronRight size={15} aria-hidden="true" />
     </button>
   );
 }

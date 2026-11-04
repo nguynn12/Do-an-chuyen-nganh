@@ -824,7 +824,7 @@ button {
 
   gap: 6px;
 
-  color: #66736b;
+  color: #4a5750;
 
   font-size: 11px;
 
@@ -981,7 +981,7 @@ button {
 .task-info span {
   margin-top: 3px;
 
-  color: #7d8881;
+  color: #4a5750;
 
   font-size: 11px;
 }
@@ -1182,7 +1182,7 @@ button {
 }
 
 .calendar-week span {
-  color: #69746d;
+  color: #4a5750;
 
   font-size: 11px;
 }
@@ -1309,7 +1309,7 @@ button {
 }
 
 .calendar-manage-link {
-  color: #7a857e;
+  color: #4a5750;
 
   font-size: 11px;
   font-weight: 500;
@@ -1424,7 +1424,7 @@ button {
 
 .notification span {
   margin-top: 6px;
-  color: #869188;
+  color: #4a5750;
   font-size: 11px;
 }
 
@@ -1479,7 +1479,7 @@ button {
 
   background: white;
 
-  color: #6f7b74;
+  color: #4a5750;
 
   font-size: 11px;
 }
@@ -2570,12 +2570,12 @@ button:last-child {
 .chart-area { fill:#dcecdf; opacity:.72; }
 .chart-line { fill:none; stroke:#2f8747; stroke-width:1.4; vector-effect:non-scaling-stroke; }
 .chart-dot { fill:#2f8747; vector-effect:non-scaling-stroke; }
-.chart-dates { display:flex; justify-content:space-between; padding:0 5px; color:#637168; font-size: 11px; }
+.chart-dates { display:flex; justify-content:space-between; padding:0 5px; color: #4a5750; font-size: 11px; }
 .donut-layout { height:160px; display:flex; align-items:center; justify-content:center; gap:24px; position:relative; z-index:1; }
 .donut { width:126px; height:126px; flex:0 0 auto; border-radius:50%; display:grid; place-items:center; }
 .donut-hole { width:72px; height:72px; display:grid; place-content:center; text-align:center; border-radius:50%; background:white; box-shadow:0 0 0 1px rgba(0,0,0,.02); }
 .donut-hole b { color:#153b2a; font-size:19px; line-height:1; }
-.donut-hole span { margin-top:5px; color:#536159; font-size: 11px; }
+.donut-hole span { margin-top:5px; color: #4a5750; font-size: 11px; }
 .donut-legend { min-width:145px; display:flex; flex-direction:column; gap:16px; }
 .donut-legend div { display:grid; grid-template-columns:10px 1fr auto; align-items:center; gap:7px; font-size: 11px; }
 .donut-legend i { width:9px; height:9px; border-radius:3px; }

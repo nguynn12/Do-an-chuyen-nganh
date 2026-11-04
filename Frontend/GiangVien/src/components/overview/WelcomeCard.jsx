@@ -24,7 +24,7 @@ function WelcomeCard({ teacher, stats }) {
 
       <div className="summary-grid">
         <SummaryCard
-          icon={<Users size={22} />}
+          icon={<Users size={22} aria-hidden="true" />}
           label="Lớp phụ trách"
           value={`${stats.totalCourses} Môn học`}
           subtext={`${stats.totalStudents} sinh viên`}
@@ -33,7 +33,7 @@ function WelcomeCard({ teacher, stats }) {
         />
 
         <SummaryCard
-          icon={<Clock3 size={22} />}
+          icon={<Clock3 size={22} aria-hidden="true" />}
           label="Bài chờ chấm"
           value={`${stats.pendingGrading} Bài chưa chấm`}
           className="summary-orange"
@@ -41,7 +41,7 @@ function WelcomeCard({ teacher, stats }) {
         />
 
         <SummaryCard
-          icon={<LifeBuoy size={22} />}
+          icon={<LifeBuoy size={22} aria-hidden="true" />}
           label="Yêu cầu hỗ trợ"
           value={`${stats.unreadSupportRequests} Tin chưa đọc`}
           className="summary-blue"
@@ -49,7 +49,7 @@ function WelcomeCard({ teacher, stats }) {
         />
 
         <SummaryCard
-          icon={<Bell size={22} />}
+          icon={<Bell size={22} aria-hidden="true" />}
           label="Thông báo mới"
           value={`${stats.unreadMessages} Thông báo`}
           className="summary-light"
