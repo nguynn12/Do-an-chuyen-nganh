@@ -37,7 +37,7 @@ function StudentLayout() {
   const location = useLocation();
 
   const isDemo =
-    (import.meta.env.DEV === true || import.meta.env.VITE_ALLOW_DEMO === "true") &&
+    import.meta.env.DEV === true &&
     new URLSearchParams(window.location.search).get("demo") === "1";
 
   const [summary, setSummary] = useState(

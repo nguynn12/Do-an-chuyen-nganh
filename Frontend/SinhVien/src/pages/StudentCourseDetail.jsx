@@ -67,10 +67,16 @@ export default function StudentCourseDetail({ courseId: propCourseId, onBack }) 
       .finally(() => setLoading(false));
   }, [courseId]);
 
-  // Lấy username của sinh viên đang đăng nhập (mặc định để test là "sv2310002")
+  // Lấy username của sinh viên đang đăng nhập (chưa đăng nhập thì trả về "")
   const currentUser = useMemo(() => {
     return getStudentUsername();
   }, []);
+
+  useEffect(() => {
+    if (!currentUser) {
+      navigate("/dang-nhap", { replace: true });
+    }
+  }, [currentUser, navigate]);
 
   // Xác định tên môn học để lọc chính xác trong Data Warehouse (dim_course/Course_Name)
   const courseTitle = useMemo(() => {
@@ -85,6 +91,7 @@ export default function StudentCourseDetail({ courseId: propCourseId, onBack }) 
 
   // Cấu hình URL nhúng Power BI mới: Tab Dự báo điểm môn học kèm bộ lọc sinh viên & tên môn học
   const gradePredictionReportUrl = useMemo(() => {
+    if (!currentUser) return "";
     return buildGradePredictionUrl(currentUser, courseTitle);
   }, [currentUser, courseTitle]);
 

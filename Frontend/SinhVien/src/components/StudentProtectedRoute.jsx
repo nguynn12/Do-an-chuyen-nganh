@@ -7,9 +7,8 @@ import { clearAuthStorage } from "../services/studentAuth";
  * Nếu không hợp lệ, xóa sạch phiên Sinh viên và chuyển hướng về /dang-nhap.
  */
 function StudentProtectedRoute({ children }) {
-  const isDemoAllowed =
-    import.meta.env.DEV === true ||
-    import.meta.env.VITE_ALLOW_DEMO === "true";
+  // Lối tắt ?demo=1 CHỈ được phép chạy trong môi trường phát triển (DEV), bản build sản xuất bị vô hiệu hóa
+  const isDemoAllowed = import.meta.env.DEV === true;
 
   const searchParams = new URLSearchParams(window.location.search);
   if (isDemoAllowed && searchParams.get("demo") === "1") {

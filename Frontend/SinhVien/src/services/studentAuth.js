@@ -58,7 +58,7 @@ export function getStudentUsername() {
   } catch (e) {
     console.warn("Lỗi khi đọc username từ localStorage:", e);
   }
-  return "sv2310002";
+  return "";
 }
 
 export function isStudentAuthenticated() {

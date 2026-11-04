@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { BarChart3, Maximize2, Minimize2 } from "lucide-react";
+import { getStudentUsername } from "../services/studentAuth";
 import "../styles/PowerBIEmbed.css";
 
 export default function PowerBIEmbed({
@@ -7,8 +9,16 @@ export default function PowerBIEmbed({
   title = "Báo cáo phân tích Power BI",
   height = "720px",
 }) {
+  const navigate = useNavigate();
+  const username = getStudentUsername();
   const [loading, setLoading] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
+
+  useEffect(() => {
+    if (!username) {
+      navigate("/dang-nhap", { replace: true });
+    }
+  }, [username, navigate]);
 
   // Chiều cao linh hoạt: mở rộng lên 880px khi người dùng cần xem rộng hơn
   const activeHeight = isExpanded ? "880px" : height || "720px";
@@ -17,6 +27,11 @@ export default function PowerBIEmbed({
   useEffect(() => {
     setLoading(true);
   }, [reportUrl]);
+
+  // Không nhúng Power BI khi chưa đăng nhập (username rỗng)
+  if (!username) {
+    return null;
+  }
 
   return (
     <section className="pbi-embed-container">

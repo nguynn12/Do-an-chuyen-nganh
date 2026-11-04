@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   BookOpen,
@@ -21,13 +21,20 @@ export default function StudentCourses({ courses = [], onNavigateToCourse }) {
   // Tab chuyển đổi: "courses" (Danh sách môn học) | "effort" (Dự báo nỗ lực toàn kỳ)
   const [activeTab, setActiveTab] = useState("courses");
 
-  // Lấy username sinh viên đang đăng nhập (mặc định an toàn là "sv2310002")
+  // Lấy username sinh viên đang đăng nhập (chưa đăng nhập thì trả về "")
   const currentUser = useMemo(() => {
     return getStudentUsername();
   }, []);
 
+  useEffect(() => {
+    if (!currentUser) {
+      navigate("/dang-nhap", { replace: true });
+    }
+  }, [currentUser, navigate]);
+
   // Cấu hình URL nhúng Power BI mới: Tab Dự báo nỗ lực toàn kỳ (chỉ lọc theo sinh viên)
   const effortReportUrl = useMemo(() => {
+    if (!currentUser) return "";
     return buildEffortPredictionUrl(currentUser);
   }, [currentUser]);
 
