@@ -153,6 +153,7 @@ function TeacherOverview() {
 
           <ActivityDashboard
             stats={stats}
+            courses={courses}
           />
 
         </div>
