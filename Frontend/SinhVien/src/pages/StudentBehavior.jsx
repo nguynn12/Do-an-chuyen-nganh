@@ -73,7 +73,7 @@ export default function StudentBehavior() {
 
   if (loading && !data) {
     return (
-      <main className="page-full">
+      <main className="page-full" role="status" aria-live="polite">
         <div className="welcome-card" style={{ textAlign: "center", padding: "40px" }}>
           <div style={{ fontSize: "16px", fontWeight: "700", color: "#37883e" }}>
             Đang tổng hợp Hồ sơ Hành vi Học tập...
@@ -335,7 +335,12 @@ export default function StudentBehavior() {
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "12px", flex: 1 }}>
-            {attention?.map((item, idx) => (
+            {(!attention || attention.length === 0) ? (
+              <div style={{ padding: "24px 16px", textAlign: "center", color: "#4a5750", fontSize: "12px", background: "#fcfdfc", borderRadius: "10px", border: "1px dashed #d5ded7" }}>
+                Hiện tại chưa có cảnh báo cần lưu ý cho môn học này.
+              </div>
+            ) : (
+              attention.map((item, idx) => (
               <div
                 key={idx}
                 style={{
@@ -362,13 +367,14 @@ export default function StudentBehavior() {
                   </div>
                 </div>
               </div>
-            ))}
+              ))
+            )}
           </div>
 
           {/* Quick Metrics of Mine */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px", marginTop: "16px", paddingTop: "14px", borderTop: "1px solid #f3f4f6" }}>
             <div style={{ textAlign: "center", padding: "10px", background: "#fafbf9", borderRadius: "10px" }}>
-              <div style={{ fontSize: "11px", color: "#4a5750" }}>Tỷ lệ Đúng hạn</div>
+              <div style={{ fontSize: "11px", color: "#4a5750" }}>Tỷ lệ nộp đúng hạn</div>
               <div style={{ fontSize: "16px", fontWeight: "800", color: "#37883e", marginTop: "2px" }}>
                 {myScores?.onTimeRate !== null ? `${myScores.onTimeRate}%` : "—"}
               </div>
@@ -377,14 +383,14 @@ export default function StudentBehavior() {
             <div style={{ textAlign: "center", padding: "10px", background: "#fafbf9", borderRadius: "10px" }}>
               <div style={{ fontSize: "11px", color: "#4a5750" }}>Nộp trước hạn TB</div>
               <div style={{ fontSize: "16px", fontWeight: "800", color: "var(--dlu-blue, #1e70bf)", marginTop: "2px" }}>
-                {myScores?.avgLeadDays !== null ? `${myScores.avgLeadDays > 0 ? `+${myScores.avgLeadDays}` : myScores.avgLeadDays}d` : "—"}
+                {myScores?.avgLeadDays != null ? `${myScores.avgLeadDays > 0 ? `+${myScores.avgLeadDays}` : myScores.avgLeadDays} ngày` : "—"}
               </div>
             </div>
 
             <div style={{ textAlign: "center", padding: "10px", background: "#fafbf9", borderRadius: "10px" }}>
-              <div style={{ fontSize: "11px", color: "#4a5750" }}>Giờ học tương tác</div>
+              <div style={{ fontSize: "11px", color: "#4a5750" }}>Thời gian tương tác</div>
               <div style={{ fontSize: "16px", fontWeight: "800", color: "#17221d", marginTop: "2px" }}>
-                {myScores?.engagementHours}h
+                {myScores?.engagementHours != null ? `${myScores.engagementHours} giờ` : "0 giờ"}
               </div>
             </div>
           </div>
@@ -422,7 +428,12 @@ export default function StudentBehavior() {
 
           {/* Grouped Bars Comparison */}
           <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-            {submitProfile?.bucketsComparison?.map((b) => (
+            {(!submitProfile?.bucketsComparison || submitProfile.bucketsComparison.length === 0) ? (
+              <div style={{ padding: "24px 16px", textAlign: "center", color: "#4a5750", fontSize: "12px", background: "#fcfdfc", borderRadius: "10px", border: "1px dashed #d5ded7" }}>
+                Chưa có dữ liệu bài nộp được ghi nhận trong môn này.
+              </div>
+            ) : (
+              submitProfile.bucketsComparison.map((b) => (
               <div key={b.bucket}>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", marginBottom: "4px" }}>
                   <span style={{ fontWeight: "700", color: "#203026" }}>{b.bucket}</span>
@@ -461,7 +472,8 @@ export default function StudentBehavior() {
                   </div>
                 </div>
               </div>
-            ))}
+              ))
+            )}
           </div>
 
           {/* Legend */}
@@ -491,7 +503,12 @@ export default function StudentBehavior() {
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-            {factorCorrelation?.map((f, idx) => {
+            {(!factorCorrelation || factorCorrelation.length === 0) ? (
+              <div style={{ padding: "24px 16px", textAlign: "center", color: "#4a5750", fontSize: "12px", background: "#fcfdfc", borderRadius: "10px", border: "1px dashed #d5ded7" }}>
+                Chưa đủ mẫu dữ liệu để phân tích tương quan điểm số.
+              </div>
+            ) : (
+              factorCorrelation.map((f, idx) => {
               const rVal = Math.abs(Number(f.r || 0));
               const rPct = Math.round(rVal * 100);
               return (
@@ -514,7 +531,8 @@ export default function StudentBehavior() {
                   </div>
                 </div>
               );
-            })}
+            })
+            )}
           </div>
 
           {/* Academic disclaimer */}
