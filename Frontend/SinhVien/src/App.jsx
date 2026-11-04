@@ -124,40 +124,11 @@ function StudentLayout() {
     fetchData();
   }, [studentUserKey]);
 
-  // Xác định tab active cho StudentSidebar theo URL pathname
-  const getActiveTab = () => {
-    const p = location.pathname;
-    if (p === "/" || p === "") return "overview";
-    if (p.startsWith("/khoa-hoc")) return p === "/khoa-hoc" ? "courses" : "course-detail";
-    if (p.startsWith("/ho-so-hanh-vi")) return "behavior";
-    if (p.startsWith("/bai-nop")) return "submissions";
-    if (p.startsWith("/bang-diem")) return "grades";
-    if (p.startsWith("/thoi-gian-hoc")) return "engagement";
-    if (p.startsWith("/phan-tich")) return "analytics";
-    return "overview";
-  };
-
-  const handleSelectTab = (tabId) => {
-    const PATH_MAP = {
-      overview: "/",
-      courses: "/khoa-hoc",
-      behavior: "/ho-so-hanh-vi",
-      submissions: "/bai-nop",
-      grades: "/bang-diem",
-      engagement: "/thoi-gian-hoc",
-      analytics: "/phan-tich",
-    };
-    navigate(PATH_MAP[tabId] || "/");
-  };
-
   return (
     <div className="app">
       <StudentHeader student={summary?.student} />
 
-      <StudentSidebar
-        activeTab={getActiveTab()}
-        onSelectTab={handleSelectTab}
-      />
+      <StudentSidebar />
 
       {loading ? (
         <main className="page-full" role="status" aria-live="polite">

@@ -11,20 +11,20 @@ import {
   PanelLeftOpen,
   LogOut,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { clearAuthStorage } from "../services/studentAuth";
 
 const menuItems = [
-  { id: "overview", label: "Tổng quan", icon: Home },
-  { id: "courses", label: "Khóa học", icon: Grid3X3 },
-  { id: "behavior", label: "Hồ sơ hành vi", icon: Compass },
-  { id: "submissions", label: "Bài nộp", icon: CheckCircle2 },
-  { id: "grades", label: "Bảng điểm", icon: Award },
-  { id: "engagement", label: "Thời gian học", icon: Clock },
-  { id: "analytics", label: "Phân tích Power BI", icon: BarChart3 },
+  { path: "/", label: "Tổng quan", icon: Home, end: true },
+  { path: "/khoa-hoc", label: "Khóa học", icon: Grid3X3 },
+  { path: "/ho-so-hanh-vi", label: "Hồ sơ hành vi", icon: Compass },
+  { path: "/bai-nop", label: "Bài nộp", icon: CheckCircle2 },
+  { path: "/bang-diem", label: "Bảng điểm", icon: Award },
+  { path: "/thoi-gian-hoc", label: "Thời gian học", icon: Clock },
+  { path: "/phan-tich", label: "Phân tích Power BI", icon: BarChart3 },
 ];
 
-export default function StudentSidebar({ activeTab, onSelectTab }) {
+export default function StudentSidebar() {
   // Mặc định là THU GỌN (56px) giống hệt bên Giảng viên
   const [collapsed, setCollapsed] = useState(() => {
     const saved = localStorage.getItem("dluStudentSidebarCollapsed");
@@ -42,6 +42,7 @@ export default function StudentSidebar({ activeTab, onSelectTab }) {
   }, [collapsed]);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     clearAuthStorage();
@@ -66,24 +67,38 @@ export default function StudentSidebar({ activeTab, onSelectTab }) {
       <nav className="sidebar-menu">
         {menuItems.map((item) => {
           const Icon = item.icon;
-          const isActive =
-            activeTab === item.id ||
-            (item.id === "courses" && activeTab === "course-detail");
 
           return (
-            <button
-              key={item.id}
-              type="button"
-              className={`sidebar-button ${isActive ? "side-active" : ""}`}
-              onClick={() => onSelectTab(item.id)}
+            <NavLink
+              key={item.path}
+              to={item.path}
+              end={item.end}
+              className={({ isActive }) => {
+                const isCourseActive =
+                  item.path === "/khoa-hoc" &&
+                  location.pathname.startsWith("/khoa-hoc");
+                const active = isActive || isCourseActive;
+                return `sidebar-button ${active ? "side-active" : ""}`;
+              }}
+              style={{ textDecoration: "none" }}
               aria-label={item.label}
-              title={item.label}
+              title={collapsed ? item.label : undefined}
             >
-              <span className="sidebar-icon-wrap">
-                <Icon size={19} strokeWidth={isActive ? 2.25 : 1.85} />
-              </span>
-              {!collapsed && <span className="sidebar-label">{item.label}</span>}
-            </button>
+              {({ isActive }) => {
+                const isCourseActive =
+                  item.path === "/khoa-hoc" &&
+                  location.pathname.startsWith("/khoa-hoc");
+                const active = isActive || isCourseActive;
+                return (
+                  <>
+                    <span className="sidebar-icon-wrap">
+                      <Icon size={19} strokeWidth={active ? 2.25 : 1.85} />
+                    </span>
+                    {!collapsed && <span className="sidebar-label">{item.label}</span>}
+                  </>
+                );
+              }}
+            </NavLink>
           );
         })}
       </nav>
