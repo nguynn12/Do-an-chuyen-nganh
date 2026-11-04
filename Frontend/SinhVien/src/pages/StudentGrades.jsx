@@ -38,10 +38,13 @@ export default function StudentGrades() {
   const [grades, setGrades] = useState([]);
   const [benchmarks, setBenchmarks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [selectedCourse, setSelectedCourse] = useState("ALL");
   const [hoveredPoint, setHoveredPoint] = useState(null);
 
-  useEffect(() => {
+  const fetchData = () => {
+    setLoading(true);
+    setError(null);
     Promise.all([
       studentGet("/grades"),
       studentGet("/benchmark").catch(() => ({ data: [] })),
@@ -54,8 +57,15 @@ export default function StudentGrades() {
           setBenchmarks(benchmarkData.data);
         }
       })
-      .catch((err) => console.error("Lỗi getStudentGrades & benchmark:", err))
+      .catch((err) => {
+        console.error("Lỗi getStudentGrades & benchmark:", err);
+        setError(err.message || "Không thể tải dữ liệu bảng điểm từ máy chủ.");
+      })
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchData();
   }, []);
 
   const total = grades.length;
@@ -167,6 +177,30 @@ export default function StudentGrades() {
       areaString,
     };
   });
+
+  if (error && !loading) {
+    return (
+      <main className="page-full" role="alert">
+        <div className="welcome-card dlu-state-card">
+          <div
+            className="dlu-state-title"
+            style={{ color: "var(--dlu-red, #c53030)" }}
+          >
+            Không thể tải dữ liệu bảng điểm
+          </div>
+          <div className="dlu-state-desc">{error}</div>
+          <button
+            type="button"
+            className="dlu-retry-btn"
+            onClick={fetchData}
+            style={{ marginTop: "16px" }}
+          >
+            Tải lại
+          </button>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="page-full">

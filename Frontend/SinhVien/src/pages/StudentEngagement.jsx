@@ -52,18 +52,30 @@ export default function StudentEngagement() {
     courseEngagement: [],
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [showAllWeeks, setShowAllWeeks] = useState(false);
   const [hoveredCell, setHoveredCell] = useState(null);
 
-  useEffect(() => {
+  const fetchData = () => {
+    setLoading(true);
+    setError(null);
     studentGet("/engagement")
       .then((data) => {
         if (data.success) {
           setEngagementData(data);
+        } else {
+          setError(data.message || "Không thể tải dữ liệu thời gian học từ máy chủ.");
         }
       })
-      .catch((err) => console.error("Lỗi getStudentEngagement:", err))
+      .catch((err) => {
+        console.error("Lỗi getStudentEngagement:", err);
+        setError(err.message || "Không thể tải dữ liệu thời gian học từ máy chủ.");
+      })
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchData();
   }, []);
 
   const totalHours = Number(
@@ -177,6 +189,30 @@ export default function StudentEngagement() {
       maxDayRecord: maxRecord,
     };
   }, [engagementData.dailyTrend, showAllWeeks]);
+
+  if (error && !loading) {
+    return (
+      <main className="page-full" role="alert">
+        <div className="welcome-card dlu-state-card">
+          <div
+            className="dlu-state-title"
+            style={{ color: "var(--dlu-red, #c53030)" }}
+          >
+            Không thể tải dữ liệu thời gian học
+          </div>
+          <div className="dlu-state-desc">{error}</div>
+          <button
+            type="button"
+            className="dlu-retry-btn"
+            onClick={fetchData}
+            style={{ marginTop: "16px" }}
+          >
+            Tải lại
+          </button>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="page-full">

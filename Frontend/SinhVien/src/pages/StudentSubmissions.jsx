@@ -15,19 +15,31 @@ import {
 export default function StudentSubmissions() {
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [filterStatus, setFilterStatus] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [hoveredSlice, setHoveredSlice] = useState(null);
 
-  useEffect(() => {
+  const fetchData = () => {
+    setLoading(true);
+    setError(null);
     studentGet("/submissions")
       .then((data) => {
-        if (data.data) {
+        if (data?.data) {
           setSubmissions(data.data);
+        } else {
+          setError(data?.message || "Không thể tải dữ liệu bài nộp từ máy chủ.");
         }
       })
-      .catch((err) => console.error("Lỗi getStudentSubmissions:", err))
+      .catch((err) => {
+        console.error("Lỗi getStudentSubmissions:", err);
+        setError(err.message || "Không thể tải dữ liệu bài nộp từ máy chủ.");
+      })
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchData();
   }, []);
 
   const total = submissions.length;
@@ -124,6 +136,30 @@ export default function StudentSubmissions() {
   const activeSliceInfo = hoveredSlice
     ? slices.find((s) => s.key === hoveredSlice)
     : null;
+
+  if (error && !loading) {
+    return (
+      <main className="page-full" role="alert">
+        <div className="welcome-card dlu-state-card">
+          <div
+            className="dlu-state-title"
+            style={{ color: "var(--dlu-red, #c53030)" }}
+          >
+            Không thể tải dữ liệu bài nộp
+          </div>
+          <div className="dlu-state-desc">{error}</div>
+          <button
+            type="button"
+            className="dlu-retry-btn"
+            onClick={fetchData}
+            style={{ marginTop: "16px" }}
+          >
+            Tải lại
+          </button>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="page-full">
