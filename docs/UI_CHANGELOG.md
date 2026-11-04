@@ -116,4 +116,6 @@
    - `Frontend/GiangVien`: `npm run build` thành công, 0 lỗi (`dist/` xuất bản chuẩn).
 2. **Kiểm tra thay đổi tệp:**
    - Lệnh `git diff --name-only aa3a151..HEAD` xác nhận **100% thay đổi chỉ thuộc phạm vi `Frontend/`**.
-   - **Tuyệt đối không có bất kỳ thay đổi nào trong `Backend/`, `services/`, cơ sở dữ liệu hay logic nghiệp vụ.**
+   - **Tuyệt đối không có bất kỳ thay đổi nào trong `backend/` hay logic cơ sở dữ liệu.**
+   - **Ghi chú về `Frontend/SinhVien/src/services/`:** Có cập nhật tệp [`Frontend/SinhVien/src/services/apiClient.js`](file:///c:/Users/storm/Downloads/DoAnChuyenNganh/Frontend/SinhVien/src/services/apiClient.js) nhằm chuyển từ thư viện `axios` sang chuẩn `fetch` API nguyên bản của trình duyệt (Native Fetch) để tối ưu hóa kích thước bundle ứng dụng, đồng thời xử lý gán tự động tham số `userId` vào URL, kiểm tra phản hồi HTTP 4xx/5xx để ném lỗi có ngữ nghĩa tiếng Việt, và bắt lỗi an toàn khi phân tích cú pháp JSON phản hồi từ máy chủ.
+
