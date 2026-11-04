@@ -120,7 +120,7 @@ export default function AssignmentManagement() {
 
   if (loading) {
     return (
-      <div className="assign-page-loading">
+      <div className="assign-page-loading" role="status" aria-live="polite">
         <div className="assign-spinner-large" />
         <strong>Đang tải Quản lý bài tập & Chấm điểm...</strong>
         <p>Đồng bộ dữ liệu giảng viên và khóa học DLU</p>
@@ -130,7 +130,7 @@ export default function AssignmentManagement() {
 
   if (error || !selectedCourse) {
     return (
-      <div className="assign-page-error">
+      <div className="assign-page-error" role="alert">
         <h2>Không thể tải module Quản lý bài tập</h2>
         <p>{error || "Không tìm thấy thông tin môn học phù hợp."}</p>
         <button
@@ -159,7 +159,7 @@ export default function AssignmentManagement() {
           <section className="assignment-hero-card">
             <div className="hero-content-group">
               <div className="hero-badge-icon">
-                <ClipboardCheck size={28} />
+                <ClipboardCheck size={28} aria-hidden="true" />
               </div>
               <div className="hero-titles">
                 <div className="hero-breadcrumbs">
@@ -180,14 +180,15 @@ export default function AssignmentManagement() {
               <div className="selector-item">
                 <label>Môn học đang chọn:</label>
                 <div className="selector-select-wrap">
-                  <BookOpen size={16} />
+                  <BookOpen size={16} aria-hidden="true" />
                   <select
+                    aria-label="Chọn môn học để quản lý bài tập"
                     value={selectedCourse.Moodle_Course_ID}
                     onChange={handleSelectCourse}
                   >
                     {courses.map((c) => (
                       <option key={c.Moodle_Course_ID} value={c.Moodle_Course_ID}>
-                        {c.Course_Code} - {c.Course_Name}
+                        {c.Course_Code || c.code} - {c.Course_Name || c.name || "Môn học"}
                       </option>
                     ))}
                   </select>
@@ -197,8 +198,9 @@ export default function AssignmentManagement() {
               <div className="selector-item">
                 <label>Khóa tuyển sinh:</label>
                 <div className="selector-select-wrap">
-                  <GraduationCap size={16} />
+                  <GraduationCap size={16} aria-hidden="true" />
                   <select
+                    aria-label="Chọn khóa tuyển sinh"
                     value={selectedCohort}
                     onChange={(e) => setSelectedCohort(e.target.value)}
                   >
@@ -220,7 +222,7 @@ export default function AssignmentManagement() {
               className={`assign-tab-btn ${activeTab === "bank" ? "active" : ""}`}
               onClick={() => handleTabChange("bank")}
             >
-              <BookOpen size={18} />
+              <BookOpen size={18} aria-hidden="true" />
               <span>Ngân hàng bài tập</span>
             </button>
 
@@ -231,7 +233,7 @@ export default function AssignmentManagement() {
               className={`assign-tab-btn ${activeTab === "campaign" ? "active" : ""}`}
               onClick={() => handleTabChange("campaign")}
             >
-              <Shuffle size={18} />
+              <Shuffle size={18} aria-hidden="true" />
               <span>Tạo đợt giao & Random</span>
             </button>
 
@@ -242,7 +244,7 @@ export default function AssignmentManagement() {
               className={`assign-tab-btn ${activeTab === "history" ? "active" : ""}`}
               onClick={() => handleTabChange("history")}
             >
-              <Layers size={18} />
+              <Layers size={18} aria-hidden="true" />
               <span>Đợt bài đã giao</span>
             </button>
 
@@ -253,7 +255,7 @@ export default function AssignmentManagement() {
               className={`assign-tab-btn tab-highlight ${activeTab === "grading" ? "active" : ""}`}
               onClick={() => handleTabChange("grading")}
             >
-              <ClipboardCheck size={18} />
+              <ClipboardCheck size={18} aria-hidden="true" />
               <span>Bài nộp & Chấm điểm</span>
               <span className="tab-pill-accent">Ưu tiên</span>
             </button>
@@ -265,7 +267,7 @@ export default function AssignmentManagement() {
               className={`assign-tab-btn ${activeTab === "analytics" ? "active" : ""}`}
               onClick={() => handleTabChange("analytics")}
             >
-              <BarChart3 size={18} />
+              <BarChart3 size={18} aria-hidden="true" />
               <span>Phân tích Power BI</span>
             </button>
           </nav>

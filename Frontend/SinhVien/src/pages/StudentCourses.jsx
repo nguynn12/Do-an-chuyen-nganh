@@ -41,11 +41,11 @@ export default function StudentCourses({ courses = [], onNavigateToCourse }) {
       <section className="courses-hero">
         <div className="courses-hero-main">
           <div className="courses-hero-icon">
-            <GraduationCap size={26} />
+            <GraduationCap size={26} aria-hidden="true" />
           </div>
           <div>
             <div className="courses-breadcrumb">
-              <BookOpen size={14} />
+              <BookOpen size={14} aria-hidden="true" />
               <span>Phân tích học tập</span>
               <span>/</span>
               <strong>Khóa học</strong>
@@ -87,7 +87,7 @@ export default function StudentCourses({ courses = [], onNavigateToCourse }) {
             onClick={() => setActiveTab("courses")}
             style={{ cursor: "pointer" }}
           >
-            <BookOpen size={15} />
+            <BookOpen size={15} aria-hidden="true" />
             <span>Danh sách môn học ({(courses || []).length})</span>
           </button>
 
@@ -97,16 +97,17 @@ export default function StudentCourses({ courses = [], onNavigateToCourse }) {
             onClick={() => setActiveTab("effort")}
             style={{ cursor: "pointer" }}
           >
-            <TrendingUp size={15} />
+            <TrendingUp size={15} aria-hidden="true" />
             <span>Dự báo nỗ lực toàn kỳ</span>
           </button>
         </div>
 
         {activeTab === "courses" && (
           <div className="search-box" style={{ width: "280px", background: "white", border: "1px solid #dfe4e1" }}>
-            <Search size={15} style={{ color: "#68766f" }} />
+            <Search size={15} style={{ color: "#4a5750" }} aria-hidden="true" />
             <input
               type="text"
+              aria-label="Tìm kiếm theo tên hoặc mã môn học"
               placeholder="Tìm theo tên hoặc mã môn..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -118,8 +119,26 @@ export default function StudentCourses({ courses = [], onNavigateToCourse }) {
 
       {/* 3. NỘI DUNG THEO TAB ĐƯỢC CHỌN */}
       {activeTab === "courses" && (
-        <div className="courses-grid" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))" }}>
-          {filteredCourses.map((c) => {
+        filteredCourses.length === 0 ? (
+          <div
+            className="empty-card"
+            style={{
+              padding: "36px 20px",
+              textAlign: "center",
+              background: "#ffffff",
+              borderRadius: "12px",
+              border: "1px solid #dfe4e1",
+              color: "#4a5750",
+              fontSize: "13px",
+            }}
+          >
+            {(courses || []).length === 0
+              ? "Hiện tại bạn chưa đăng ký khóa học nào trong học kỳ này."
+              : "Không tìm thấy khóa học phù hợp với từ khóa tìm kiếm."}
+          </div>
+        ) : (
+          <div className="courses-grid" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))" }}>
+            {filteredCourses.map((c) => {
             // Tính tiến độ an toàn: ưu tiên trường progress, nếu không có thì mặc định 0%
             const progressPercent = c.progress !== undefined && c.progress !== null ? c.progress : 0;
 
@@ -136,7 +155,7 @@ export default function StudentCourses({ courses = [], onNavigateToCourse }) {
                   <h3>{c.name}</h3>
 
                   <p>
-                    <Award size={14} />
+                    <Award size={14} aria-hidden="true" />
                     Điểm TB học phần:{" "}
                     <strong style={{ color: c.averageGrade ? "#37883e" : "#64748b" }}>
                       {c.averageGrade ? `${c.averageGrade}/10` : "Chưa có"}
@@ -144,17 +163,17 @@ export default function StudentCourses({ courses = [], onNavigateToCourse }) {
                   </p>
 
                   <p>
-                    <ClipboardCheck size={14} />
+                    <ClipboardCheck size={14} aria-hidden="true" />
                     Tiến độ nộp bài: <strong>{progressPercent}%</strong>
                   </p>
 
                   <p>
-                    <Clock3 size={14} />
+                    <Clock3 size={14} aria-hidden="true" />
                     Tổng giờ tương tác: <strong>{c.totalEngagementHours || 0} giờ</strong>
                   </p>
 
                   <div style={{ marginTop: "10px", marginBottom: "12px" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", marginBottom: "4px", color: "#66736b" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", marginBottom: "4px", color: "#4a5750" }}>
                       <span>Tiến độ hoàn thành</span>
                       <strong>{progressPercent}%</strong>
                     </div>
@@ -180,8 +199,9 @@ export default function StudentCourses({ courses = [], onNavigateToCourse }) {
                 </div>
               </div>
             );
-          })}
-        </div>
+            })}
+          </div>
+        )
       )}
 
       {/* 4. KHU VỰC THỐNG KÊ & DỰ BÁO NỖ LỰC TOÀN KỲ (POWER BI EMBED) */}

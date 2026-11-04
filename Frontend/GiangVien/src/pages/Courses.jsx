@@ -955,7 +955,7 @@ function Courses() {
 
   if (loading) {
     return (
-      <div className="courses-loading">
+      <div className="courses-loading" role="status" aria-live="polite">
 
         <div className="courses-spinner" />
 
@@ -982,7 +982,7 @@ function Courses() {
   ) {
 
     return (
-      <div className="courses-loading">
+      <div className="courses-loading" role="alert">
 
         <h2>
           Không thể tải khóa học
@@ -994,6 +994,7 @@ function Courses() {
         </p>
 
         <button
+          type="button"
           onClick={() =>
             window.location.reload()
           }
@@ -1810,12 +1811,11 @@ function Courses() {
               <div className="courses-search">
 
 
-                <Search
-                  size={17}
-                />
+                <Search size={17} aria-hidden="true" />
 
 
                 <input
+                  aria-label="Tìm kiếm theo tên hoặc mã môn học"
                   value={
                     searchTerm
                   }
@@ -1837,6 +1837,8 @@ function Courses() {
 
 
               <button
+                type="button"
+                aria-label="Bộ lọc khóa học"
                 className="courses-filter-button"
 
                 title="Bộ lọc nâng cao"
@@ -1897,9 +1899,7 @@ function Courses() {
               <div className="courses-empty">
 
 
-                <BookOpen
-                  size={35}
-                />
+                <BookOpen size={35} aria-hidden="true" />
 
 
                 <strong>

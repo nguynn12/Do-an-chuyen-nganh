@@ -212,17 +212,17 @@ export default function StudentSubmissions() {
             <PieChart size={18} style={{ color: "#37883e" }} />
             <strong>Tỷ lệ nộp bài đúng hạn / trễ hạn / chưa nộp</strong>
           </div>
-          <span style={{ fontSize: "12px", color: "#66736b" }}>
+          <span style={{ fontSize: "12px", color: "#4a5750" }}>
             Tổng số: <strong>{total}</strong> bài tập được giao
           </span>
         </div>
 
         {loading ? (
-          <div style={{ padding: "30px", textAlign: "center", color: "#66736b" }}>
+          <div role="status" aria-live="polite" style={{ padding: "30px", textAlign: "center", color: "#4a5750" }}>
             Đang tải dữ liệu biểu đồ...
           </div>
         ) : total === 0 ? (
-          <div style={{ padding: "30px", textAlign: "center", color: "#66736b" }}>
+          <div style={{ padding: "30px", textAlign: "center", color: "#4a5750" }}>
             Chưa có dữ liệu bài tập nào.
           </div>
         ) : (
@@ -368,7 +368,7 @@ export default function StudentSubmissions() {
                         <strong style={{ color: slice.color }}>
                           {slice.count} bài
                         </strong>{" "}
-                        <span style={{ color: "#66736b", fontSize: "12px" }}>
+                        <span style={{ color: "#4a5750", fontSize: "12px" }}>
                           ({slice.pct}%)
                         </span>
                       </div>
@@ -386,7 +386,7 @@ export default function StudentSubmissions() {
 
                     <div className="donut-breakdown-meta">
                       <span>{slice.desc}</span>
-                      <span style={{ fontSize: "10.5px", color: "#37883e" }}>
+                      <span style={{ fontSize: "11px", color: "#37883e" }}>
                         {isActive ? "Đang lọc • Bấm để bỏ" : "Bấm để lọc"}
                       </span>
                     </div>
@@ -472,9 +472,10 @@ export default function StudentSubmissions() {
               border: "1px solid #dfe4e1",
             }}
           >
-            <Search size={14} style={{ color: "#68766f" }} />
+            <Search size={14} style={{ color: "#4a5750" }} />
             <input
               type="text"
+              aria-label="Tìm kiếm bài tập hoặc môn học"
               placeholder="Tìm bài tập hoặc môn..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -484,7 +485,7 @@ export default function StudentSubmissions() {
         </div>
 
         {loading ? (
-          <div style={{ padding: "30px", textAlign: "center", color: "#66736b" }}>
+          <div style={{ padding: "30px", textAlign: "center", color: "#4a5750" }}>
             Đang tải dữ liệu lịch sử nộp bài...
           </div>
         ) : (
@@ -507,7 +508,7 @@ export default function StudentSubmissions() {
                     colSpan="7"
                     style={{
                       textAlign: "center",
-                      color: "#66736b",
+                      color: "#4a5750",
                       padding: "24px",
                     }}
                   >
@@ -526,7 +527,7 @@ export default function StudentSubmissions() {
                         <div style={{ fontWeight: "700", color: "#17221d" }}>
                           {item.Course_Code}
                         </div>
-                        <div style={{ fontSize: "11px", color: "#66736b" }}>
+                        <div style={{ fontSize: "11px", color: "#4a5750" }}>
                           {item.Course_Name}
                         </div>
                       </td>
@@ -536,12 +537,12 @@ export default function StudentSubmissions() {
                         </div>
                       </td>
                       <td>
-                        <span style={{ color: "#66736b", fontSize: "11px" }}>
+                        <span style={{ color: "#4a5750", fontSize: "11px" }}>
                           {item.Due_Date || "—"}
                         </span>
                       </td>
                       <td>
-                        <span style={{ color: "#66736b", fontSize: "11px" }}>
+                        <span style={{ color: "#4a5750", fontSize: "11px" }}>
                           {item.Submit_Date || "Chưa nộp"}
                         </span>
                       </td>
@@ -590,7 +591,7 @@ export default function StudentSubmissions() {
                       <td>
                         <span
                           style={{
-                            color: "#66736b",
+                            color: "#4a5750",
                             fontStyle: item.Feedback_Comment
                               ? "normal"
                               : "italic",
