@@ -96,10 +96,10 @@ export default function StudentOverview({
           <div className="welcome-user">
             <div className="big-avatar">{initials}</div>
             <div>
-              <h2>Xin chào, {student.fullName || "Nguyễn Văn An"}!</h2>
+              <h2>Xin chào, {student.fullName || "Sinh viên"}!</h2>
               <p>
-                Khoa Công nghệ Thông tin | Lớp: {student.cohort || "CTK47B"} | MSSV:{" "}
-                {student.studentCode || student.username || "2310001"} | Học kỳ:{" "}
+                Khoa Công nghệ Thông tin | Lớp: {student.cohort || "—"} | MSSV:{" "}
+                {student.studentCode || student.username || "—"} | Học kỳ:{" "}
                 {student.currentSemester || "Học kỳ 1 (2026-2027)"}
               </p>
             </div>
@@ -129,53 +129,70 @@ export default function StudentOverview({
             </button>
           </div>
 
-          <div className="courses-grid">
-            {courses.slice(0, 4).map((c) => (
-              <div className="course-card" key={c.id}>
-                <div className="course-cover">
-                  <div>
-                    <span>{c.shortName}</span>
+          {courses.length === 0 ? (
+            <div
+              className="empty-card"
+              style={{
+                padding: "24px 16px",
+                background: "#ffffff",
+                borderRadius: "10px",
+                border: "1px solid #dfe4e1",
+                color: "#4a5750",
+                fontSize: "12px",
+                textAlign: "center",
+              }}
+            >
+              Hiện tại chưa có khóa học nào được ghi nhận trong học kỳ này.
+            </div>
+          ) : (
+            <div className="courses-grid">
+              {courses.slice(0, 4).map((c) => (
+                <div className="course-card" key={c.id}>
+                  <div className="course-cover">
+                    <div>
+                      <span>{c.shortName}</span>
+                    </div>
+                    <span className="course-cover-badge">DLU LMS</span>
                   </div>
-                  <span className="course-cover-badge">DLU LMS</span>
-                </div>
 
-                <div className="course-body">
-                  <h3>{c.name}</h3>
+                  <div className="course-body">
+                    <h3>{c.name}</h3>
 
-                  <p>
-                    <Award size={14} aria-hidden="true" />
-                    Điểm trung bình:{" "}
-                    <strong>{c.averageGrade ? `${c.averageGrade}/10` : "7.0/10"}</strong>
-                  </p>
+                    <p>
+                      <Award size={14} aria-hidden="true" />
+                      Điểm trung bình:{" "}
+                      <strong>{c.averageGrade ? `${c.averageGrade}/10` : "7.0/10"}</strong>
+                    </p>
 
-                  <p>
-                    <ClipboardCheck size={14} aria-hidden="true" />
-                    Tiến độ hoàn thành: <strong>{c.progress || 100}%</strong>
-                  </p>
+                    <p>
+                      <ClipboardCheck size={14} aria-hidden="true" />
+                      Tiến độ hoàn thành: <strong>{c.progress || 100}%</strong>
+                    </p>
 
-                  <p>
-                    <Clock3 size={14} aria-hidden="true" />
-                    Thời gian học: <strong>{c.totalEngagementHours || 0} giờ</strong>
-                  </p>
+                    <p>
+                      <Clock3 size={14} aria-hidden="true" />
+                      Thời gian học: <strong>{c.totalEngagementHours || 0} giờ</strong>
+                    </p>
 
-                  <div className="course-actions">
-                    <button
-                      type="button"
-                      onClick={() => onNavigateToTab("grades")}
-                    >
-                      Bảng điểm
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onNavigateToCourse(c.id)}
-                    >
-                      Xem phân tích
-                    </button>
+                    <div className="course-actions">
+                      <button
+                        type="button"
+                        onClick={() => onNavigateToTab("grades")}
+                      >
+                        Bảng điểm
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onNavigateToCourse(c.id)}
+                      >
+                        Xem phân tích
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* 3. SECTION: TRỰC QUAN HÓA DỮ LIỆU HỌC TẬP (CHARTS) */}
@@ -205,26 +222,32 @@ export default function StudentOverview({
                 </button>
               </div>
 
-              {courses.map((c) => {
-                const grade = c.averageGrade || 7.0;
-                const percent = (grade / 10) * 100;
-                return (
-                  <div key={c.id} className="analytics-bar-item">
-                    <div className="analytics-bar-meta">
-                      <span>{c.name} ({c.shortName})</span>
-                      <span style={{ color: "#37883e", fontWeight: "700" }}>
-                        {grade}/10
-                      </span>
+              {courses.length === 0 ? (
+                <div style={{ padding: "20px 0", color: "#4a5750", fontSize: "12px", textAlign: "center" }}>
+                  Chưa có dữ liệu khóa học để hiển thị điểm số.
+                </div>
+              ) : (
+                courses.map((c) => {
+                  const grade = c.averageGrade || 7.0;
+                  const percent = (grade / 10) * 100;
+                  return (
+                    <div key={c.id} className="analytics-bar-item">
+                      <div className="analytics-bar-meta">
+                        <span>{c.name} ({c.shortName})</span>
+                        <span style={{ color: "#37883e", fontWeight: "700" }}>
+                          {grade}/10
+                        </span>
+                      </div>
+                      <div className="analytics-track">
+                        <div
+                          className="analytics-fill"
+                          style={{ width: `${percent}%` }}
+                        />
+                      </div>
                     </div>
-                    <div className="analytics-track">
-                      <div
-                        className="analytics-fill"
-                        style={{ width: `${percent}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
 
             {/* Cột 2: Tiến độ nộp bài theo môn */}
@@ -244,22 +267,28 @@ export default function StudentOverview({
                 </button>
               </div>
 
-              {courses.map((c) => (
-                <div key={c.id} className="analytics-bar-item">
-                  <div className="analytics-bar-meta">
-                    <span>{c.name}</span>
-                    <span style={{ color: "#37883e", fontWeight: "700" }}>
-                      {c.progress || 100}%
-                    </span>
-                  </div>
-                  <div className="analytics-track">
-                    <div
-                      className="analytics-fill"
-                      style={{ width: `${c.progress || 100}%` }}
-                    />
-                  </div>
+              {courses.length === 0 ? (
+                <div style={{ padding: "20px 0", color: "#4a5750", fontSize: "12px", textAlign: "center" }}>
+                  Chưa có dữ liệu khóa học để theo dõi tiến độ nộp bài.
                 </div>
-              ))}
+              ) : (
+                courses.map((c) => (
+                  <div key={c.id} className="analytics-bar-item">
+                    <div className="analytics-bar-meta">
+                      <span>{c.name}</span>
+                      <span style={{ color: "#37883e", fontWeight: "700" }}>
+                        {c.progress || 100}%
+                      </span>
+                    </div>
+                    <div className="analytics-track">
+                      <div
+                        className="analytics-fill"
+                        style={{ width: `${c.progress || 100}%` }}
+                      />
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </section>
