@@ -1,5 +1,14 @@
 import { useEffect, useState } from "react";
-import { Route, Routes } from "react-router-dom";
+import {
+  Navigate,
+  Outlet,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+  useOutletContext,
+  useParams,
+} from "react-router-dom";
 import "./styles/StudentDashboard.css";
 
 import StudentSidebar from "./components/StudentSidebar";
@@ -19,10 +28,19 @@ import StudentBehavior from "./pages/StudentBehavior";
 import { studentGet } from "./services/apiClient";
 import { getStudentUserId } from "./services/studentAuth";
 
-function StudentShell() {
-  const [activeTab, setActiveTab] = useState("overview");
-  const [selectedCourseId, setSelectedCourseId] = useState(null);
-  const isDemo = (import.meta.env.DEV === true || import.meta.env.VITE_ALLOW_DEMO === "true") && new URLSearchParams(window.location.search).get("demo") === "1";
+/**
+ * Layout cha dùng chung cho toàn bộ Cổng Sinh viên.
+ * Duy trì StudentHeader và StudentSidebar liên tục (không unmount khi đổi trang).
+ * Tải dữ liệu chung và chia sẻ qua Outlet Context.
+ */
+function StudentLayout() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const isDemo =
+    (import.meta.env.DEV === true || import.meta.env.VITE_ALLOW_DEMO === "true") &&
+    new URLSearchParams(window.location.search).get("demo") === "1";
+
   const [summary, setSummary] = useState(
     isDemo
       ? {
@@ -50,44 +68,35 @@ function StudentShell() {
   const [error, setError] = useState(null);
   const studentUserKey = getStudentUserId();
 
-  const parseRoute = (hash) => {
-    if (!hash || hash === "#" || hash === "#overview") {
-      setActiveTab("overview");
-      setSelectedCourseId(null);
-      return;
-    }
+  // Chuyển hướng tương thích nếu URL còn hash cũ từ phiên bản trước
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (!hash) return;
 
     const courseMatch = hash.match(/^#course-(.+)$/);
     if (courseMatch) {
-      setSelectedCourseId(courseMatch[1]);
-      setActiveTab("course-detail");
+      window.history.replaceState(null, "", window.location.pathname);
+      navigate(`/khoa-hoc/${courseMatch[1]}`, { replace: true });
       return;
     }
 
     const cleanHash = hash.replace("#", "");
-    if (cleanHash === "hanh-vi" || cleanHash === "behavior") {
-      setActiveTab("behavior");
-      setSelectedCourseId(null);
-      return;
+    const HASH_MAP = {
+      overview: "/",
+      courses: "/khoa-hoc",
+      behavior: "/ho-so-hanh-vi",
+      "hanh-vi": "/ho-so-hanh-vi",
+      submissions: "/bai-nop",
+      grades: "/bang-diem",
+      engagement: "/thoi-gian-hoc",
+      analytics: "/phan-tich",
+    };
+
+    if (HASH_MAP[cleanHash]) {
+      window.history.replaceState(null, "", window.location.pathname);
+      navigate(HASH_MAP[cleanHash], { replace: true });
     }
-
-    if (["courses", "behavior", "submissions", "grades", "engagement", "analytics"].includes(cleanHash)) {
-      setActiveTab(cleanHash);
-      setSelectedCourseId(null);
-      return;
-    }
-
-    setActiveTab("overview");
-    setSelectedCourseId(null);
-  };
-
-  useEffect(() => {
-    parseRoute(window.location.hash);
-
-    const handleHashChange = () => parseRoute(window.location.hash);
-    window.addEventListener("hashchange", handleHashChange);
-    return () => window.removeEventListener("hashchange", handleHashChange);
-  }, []);
+  }, [navigate, location]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -115,12 +124,30 @@ function StudentShell() {
     fetchData();
   }, [studentUserKey]);
 
-  const handleSelectTab = (tabId) => {
-    window.location.hash = tabId === "overview" ? "" : tabId;
+  // Xác định tab active cho StudentSidebar theo URL pathname
+  const getActiveTab = () => {
+    const p = location.pathname;
+    if (p === "/" || p === "") return "overview";
+    if (p.startsWith("/khoa-hoc")) return p === "/khoa-hoc" ? "courses" : "course-detail";
+    if (p.startsWith("/ho-so-hanh-vi")) return "behavior";
+    if (p.startsWith("/bai-nop")) return "submissions";
+    if (p.startsWith("/bang-diem")) return "grades";
+    if (p.startsWith("/thoi-gian-hoc")) return "engagement";
+    if (p.startsWith("/phan-tich")) return "analytics";
+    return "overview";
   };
 
-  const handleNavigateToCourse = (courseId) => {
-    window.location.hash = `course-${courseId}`;
+  const handleSelectTab = (tabId) => {
+    const PATH_MAP = {
+      overview: "/",
+      courses: "/khoa-hoc",
+      behavior: "/ho-so-hanh-vi",
+      submissions: "/bai-nop",
+      grades: "/bang-diem",
+      engagement: "/thoi-gian-hoc",
+      analytics: "/phan-tich",
+    };
+    navigate(PATH_MAP[tabId] || "/");
   };
 
   return (
@@ -128,7 +155,7 @@ function StudentShell() {
       <StudentHeader student={summary?.student} />
 
       <StudentSidebar
-        activeTab={activeTab === "course-detail" ? "courses" : activeTab}
+        activeTab={getActiveTab()}
         onSelectTab={handleSelectTab}
       />
 
@@ -145,7 +172,10 @@ function StudentShell() {
       ) : error ? (
         <main className="page-full" role="alert">
           <div className="welcome-card dlu-state-card">
-            <div className="dlu-state-title" style={{ color: "var(--dlu-red, #c53030)" }}>
+            <div
+              className="dlu-state-title"
+              style={{ color: "var(--dlu-red, #c53030)" }}
+            >
               Không thể tải dữ liệu học tập
             </div>
             <div className="dlu-state-desc">{error}</div>
@@ -159,57 +189,90 @@ function StudentShell() {
           </div>
         </main>
       ) : (
-        <>
-          {activeTab === "overview" && (
-            <StudentOverview
-              summary={summary}
-              courses={courses}
-              onNavigateToCourse={handleNavigateToCourse}
-              onNavigateToTab={handleSelectTab}
-            />
-          )}
-
-          {activeTab === "courses" && (
-            <StudentCourses
-              courses={courses}
-              onNavigateToCourse={handleNavigateToCourse}
-            />
-          )}
-
-          {activeTab === "course-detail" && (
-            <StudentCourseDetail
-              courseId={selectedCourseId}
-              onBack={() => handleSelectTab("courses")}
-            />
-          )}
-
-          {activeTab === "behavior" && <StudentBehavior />}
-
-          {activeTab === "submissions" && <StudentSubmissions />}
-
-          {activeTab === "grades" && <StudentGrades />}
-
-          {activeTab === "engagement" && <StudentEngagement />}
-
-          {activeTab === "analytics" && <StudentAnalytics />}
-        </>
+        <Outlet context={{ summary, courses, loading, error }} />
       )}
     </div>
+  );
+}
+
+// Wrapper component cho trang Tổng quan
+function StudentOverviewWrapper() {
+  const { summary, courses } = useOutletContext();
+  const navigate = useNavigate();
+
+  return (
+    <StudentOverview
+      summary={summary}
+      courses={courses}
+      onNavigateToCourse={(courseId) => navigate(`/khoa-hoc/${courseId}`)}
+      onNavigateToTab={(tabId) => {
+        const PATH_MAP = {
+          overview: "/",
+          courses: "/khoa-hoc",
+          behavior: "/ho-so-hanh-vi",
+          submissions: "/bai-nop",
+          grades: "/bang-diem",
+          engagement: "/thoi-gian-hoc",
+          analytics: "/phan-tich",
+        };
+        navigate(PATH_MAP[tabId] || "/");
+      }}
+    />
+  );
+}
+
+// Wrapper component cho trang Khóa học
+function StudentCoursesWrapper() {
+  const { courses } = useOutletContext();
+  const navigate = useNavigate();
+
+  return (
+    <StudentCourses
+      courses={courses}
+      onNavigateToCourse={(courseId) => navigate(`/khoa-hoc/${courseId}`)}
+    />
+  );
+}
+
+// Wrapper component cho trang Chi tiết môn học
+function StudentCourseDetailWrapper() {
+  const { courseId } = useParams();
+  const navigate = useNavigate();
+
+  return (
+    <StudentCourseDetail
+      courseId={courseId}
+      onBack={() => navigate("/khoa-hoc")}
+    />
   );
 }
 
 export default function App() {
   return (
     <Routes>
+      {/* Route Đăng nhập độc lập */}
       <Route path="/dang-nhap" element={<StudentLogin />} />
+
+      {/* Route cha StudentLayout bọc bởi StudentProtectedRoute */}
       <Route
-        path="/*"
         element={
           <StudentProtectedRoute>
-            <StudentShell />
+            <StudentLayout />
           </StudentProtectedRoute>
         }
-      />
+      >
+        <Route index element={<StudentOverviewWrapper />} />
+        <Route path="khoa-hoc" element={<StudentCoursesWrapper />} />
+        <Route path="khoa-hoc/:courseId" element={<StudentCourseDetailWrapper />} />
+        <Route path="ho-so-hanh-vi" element={<StudentBehavior />} />
+        <Route path="bai-nop" element={<StudentSubmissions />} />
+        <Route path="bang-diem" element={<StudentGrades />} />
+        <Route path="thoi-gian-hoc" element={<StudentEngagement />} />
+        <Route path="phan-tich" element={<StudentAnalytics />} />
+      </Route>
+
+      {/* Điều hướng 404 về trang chủ */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
