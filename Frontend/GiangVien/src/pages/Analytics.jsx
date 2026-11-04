@@ -269,7 +269,7 @@ export default function Analytics() {
           <section className="analytics-header-card">
             <div className="analytics-title-group">
               <div className="analytics-icon-badge">
-                <BarChart3 size={26} />
+                <BarChart3 size={26} aria-hidden="true" />
               </div>
               <div>
                 <h1>Trung tâm Phân tích Học tập Toàn diện (Power BI)</h1>
@@ -286,8 +286,9 @@ export default function Analytics() {
               <div className="analytics-selector-box">
                 <label>Môn học phân tích:</label>
                 <div className="selector-inner">
-                  <BookOpen size={15} />
+                  <BookOpen size={15} aria-hidden="true" />
                   <select
+                    aria-label="Chọn môn học phân tích"
                     value={selectedCourse.Moodle_Course_ID}
                     onChange={(e) => {
                       const found = courses.find(
@@ -298,7 +299,7 @@ export default function Analytics() {
                   >
                     {courses.map((c) => (
                       <option key={c.Moodle_Course_ID} value={c.Moodle_Course_ID}>
-                        {c.Course_Code} — {c.Course_Name} (Key: {c.Course_Key || c.Moodle_Course_ID})
+                        {c.Course_Code || c.code} — {c.Course_Name || c.name || "Môn học"}
                       </option>
                     ))}
                   </select>
@@ -309,8 +310,9 @@ export default function Analytics() {
               <div className="analytics-selector-box">
                 <label>Khóa tuyển sinh:</label>
                 <div className="selector-inner">
-                  <GraduationCap size={15} />
+                  <GraduationCap size={15} aria-hidden="true" />
                   <select
+                    aria-label="Chọn khóa tuyển sinh"
                     value={selectedCohort}
                     onChange={(e) => setSelectedCohort(e.target.value)}
                   >
@@ -328,8 +330,9 @@ export default function Analytics() {
                 <div className="analytics-selector-box student-selector-box">
                   <label>Chọn sinh viên (360):</label>
                   <div className="selector-inner">
-                    <Users size={15} />
+                    <Users size={15} aria-hidden="true" />
                     <select
+                      aria-label="Chọn sinh viên để xem hồ sơ 360"
                       value={selectedStudent?.User_Key || selectedStudent?.Username || ""}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -350,7 +353,7 @@ export default function Analytics() {
                             key={s.User_Key || s.Moodle_User_ID || s.Username}
                             value={s.User_Key || s.Username}
                           >
-                            {s.Username} — {s.Full_Name || s.fullName} (User_Key: {s.User_Key || s.id})
+                            {s.Username} — {s.Full_Name || s.fullName}
                           </option>
                         ))
                       )}
@@ -376,7 +379,7 @@ export default function Analytics() {
                   onClick={() => handleTabChange(tab.key)}
                   title={tab.page.description}
                 >
-                  <Icon size={16} />
+                  <Icon size={16} aria-hidden="true" />
                   <span className="tab-label">{tab.page.label}</span>
                   <span className="tab-badge">{tab.badge}</span>
                 </button>
@@ -387,7 +390,7 @@ export default function Analytics() {
           {/* 3. CONTEXT NOTICE GIẢI THÍCH MỤC ĐÍCH TỪNG PHÂN HỆ */}
           <div className="analytics-context-banner">
             <div className="context-banner-icon">
-              <Info size={17} />
+              <Info size={17} aria-hidden="true" />
             </div>
             <div className="context-banner-text">
               <strong>Trang báo cáo Power BI: <code>{currentTab.page.displayName}</code></strong>
@@ -424,7 +427,7 @@ export default function Analytics() {
                 )}
                 {activeTabKey === "STUDENT_360" && (
                   <span>
-                    <strong>Hồ sơ Student 360:</strong> Báo cáo toàn diện 360 độ của cá nhân sinh viên <strong>{selectedStudent?.Full_Name || selectedStudent?.Username || "đang chọn"}</strong>, bao gồm điểm số, chuyên cần, tiến độ bài tập và cảnh báo cá nhân.
+                    <strong>Hồ sơ Sinh viên 360 độ:</strong> Báo cáo toàn diện 360 độ của cá nhân sinh viên <strong>{selectedStudent?.Full_Name || selectedStudent?.Username || "đang chọn"}</strong>, bao gồm điểm số, chuyên cần, tiến độ bài tập và cảnh báo cá nhân.
                   </span>
                 )}
               </p>

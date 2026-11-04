@@ -53,11 +53,11 @@ export default function StudentAnalytics() {
       <section className="courses-hero" style={{ marginBottom: "20px" }}>
         <div className="courses-hero-main">
           <div className="courses-hero-icon" style={{ background: "linear-gradient(135deg, #37883e, #1e5824)" }}>
-            <BarChart3 size={28} color="#ffffff" />
+            <BarChart3 size={28} color="#ffffff" aria-hidden="true" />
           </div>
           <div>
             <div className="courses-breadcrumb">
-              <BookOpen size={14} />
+              <BookOpen size={14} aria-hidden="true" />
               <span>Phân tích học tập</span>
               <span>/</span>
               <strong>Báo cáo Power BI</strong>
@@ -71,7 +71,7 @@ export default function StudentAnalytics() {
         </div>
 
         <div className="courses-semester">
-          <Sparkles size={18} style={{ color: "#65c777" }} />
+          <Sparkles size={18} style={{ color: "#65c777" }} aria-hidden="true" />
           <div>
             <span>Nguồn dữ liệu</span>
             <strong>LMS Data Warehouse</strong>
@@ -108,7 +108,7 @@ export default function StudentAnalytics() {
               fontWeight: "600",
             }}
           >
-            <ShieldCheck size={14} /> Báo cáo trực quan sinh viên (Student_Analytics_102)
+            <ShieldCheck size={14} aria-hidden="true" /> Báo cáo Phân tích Học tập Sinh viên
           </div>
         </div>
 
@@ -126,7 +126,7 @@ export default function StudentAnalytics() {
             }}
             title="Tải lại báo cáo"
           >
-            <RotateCw size={13} /> Tải lại
+            <RotateCw size={13} aria-hidden="true" /> Tải lại
           </button>
 
           <button
@@ -142,7 +142,7 @@ export default function StudentAnalytics() {
             }}
             title={isFullscreen ? "Thu nhỏ" : "Xem toàn màn hình"}
           >
-            {isFullscreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+            {isFullscreen ? <Minimize2 size={13} aria-hidden="true" /> : <Maximize2 size={13} aria-hidden="true" />}
             {isFullscreen ? "Thu nhỏ" : "Toàn màn hình"}
           </button>
 
@@ -161,7 +161,7 @@ export default function StudentAnalytics() {
             }}
             title="Mở trong tab mới"
           >
-            <ExternalLink size={13} /> Mở tab mới
+            <ExternalLink size={13} aria-hidden="true" /> Mở tab mới
           </a>
         </div>
       </div>
@@ -184,6 +184,8 @@ export default function StudentAnalytics() {
       >
         {isLoading && (
           <div
+            role="status"
+            aria-live="polite"
             style={{
               position: "absolute",
               inset: 0,
@@ -200,7 +202,7 @@ export default function StudentAnalytics() {
             <div style={{ fontSize: "14px", fontWeight: "600" }}>
               Đang tải báo cáo Power BI...
             </div>
-            <div style={{ fontSize: "12px", color: "#66736b", marginTop: "4px" }}>
+            <div style={{ fontSize: "12px", color: "#4a5750", marginTop: "4px" }}>
               Kết nối từ hệ thống máy chủ Microsoft Power BI Service
             </div>
           </div>
@@ -208,7 +210,7 @@ export default function StudentAnalytics() {
 
         <iframe
           key={reloadKey}
-          title="Student_Analytics_102"
+          title="Báo cáo phân tích học tập sinh viên Power BI"
           src={PRIMARY_REPORT_URL}
           style={{
             width: "100%",
@@ -226,7 +228,7 @@ export default function StudentAnalytics() {
       <div className="summary-grid" style={{ marginBottom: "30px" }}>
         <div className="summary-item summary-green">
           <div className="summary-icon">
-            <TrendingUp size={22} />
+            <TrendingUp size={22} aria-hidden="true" />
           </div>
           <div className="summary-content">
             <span>Theo dõi tiến độ học</span>
@@ -237,7 +239,7 @@ export default function StudentAnalytics() {
 
         <div className="summary-item summary-blue">
           <div className="summary-icon">
-            <Award size={22} />
+            <Award size={22} aria-hidden="true" />
           </div>
           <div className="summary-content">
             <span>Phân bố điểm số</span>
@@ -248,7 +250,7 @@ export default function StudentAnalytics() {
 
         <div className="summary-item summary-orange">
           <div className="summary-icon">
-            <Layers size={22} />
+            <Layers size={22} aria-hidden="true" />
           </div>
           <div className="summary-content">
             <span>Mức độ chuyên cần</span>
