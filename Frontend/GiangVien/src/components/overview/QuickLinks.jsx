@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 function QuickLink({ icon, title, onClick }) {
   return (
-    <button type="button" className="quick-link" onClick={onClick}>
+    <button type="button" className="quick-link" onClick={onClick} aria-label={title}>
       <span aria-hidden="true">{icon}</span>
       <strong>{title}</strong>
       <ChevronRight size={15} aria-hidden="true" />
@@ -38,7 +38,7 @@ function QuickLinks() {
 
       <QuickLink
         icon="🛠"
-        title="Hỗ trợ ITC"
+        title="Hỗ trợ ITC DLU"
         onClick={() => navigate("/ho-tro")}
       />
     </div>

@@ -443,7 +443,7 @@ function Notifications({
       {notifications.length === 0 ? (
 
         <div className="empty-row">
-          Không có thông báo.
+          Hiện tại không có thông báo mới.
         </div>
 
       ) : (

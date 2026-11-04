@@ -6,6 +6,7 @@ function SummaryCard({ icon, label, value, subtext, className, onClick }) {
       className={`summary-item ${className}`}
       onClick={onClick}
       type="button"
+      aria-label={`${label}: ${value}${subtext ? ` (${subtext})` : ""}`}
     >
       <div className="summary-icon" aria-hidden="true">{icon}</div>
 

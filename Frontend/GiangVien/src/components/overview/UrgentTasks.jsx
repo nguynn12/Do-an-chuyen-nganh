@@ -2,12 +2,14 @@ import { Clock3 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 function formatDate(value) {
-  if (!value) return "";
-  const [year, month, day] = value.split("-");
+  if (!value || typeof value !== "string") return "—";
+  const parts = value.split("-");
+  if (parts.length < 3) return value;
+  const [year, month, day] = parts;
   return `${day}/${month}/${year}`;
 }
 
-function UrgentTasks({ tasks }) {
+function UrgentTasks({ tasks = [] }) {
   const navigate = useNavigate();
 
   return (

@@ -591,9 +591,7 @@ function Calendar({
           <div className="calendar-event-detail-header">
 
             <div>
-              <CalendarDays
-                size={14}
-              />
+              <CalendarDays size={14} aria-hidden="true" />
 
               <strong>
                 {formatSelectedDate(
@@ -611,7 +609,7 @@ function Calendar({
               }
               aria-label="Đóng"
             >
-              <X size={14} />
+              <X size={14} aria-hidden="true" />
             </button>
 
           </div>
@@ -664,9 +662,7 @@ function Calendar({
 
                     {event.time && (
                       <span>
-                        <Clock
-                          size={11}
-                        />
+                        <Clock size={11} aria-hidden="true" />
 
                         {formatEventTime(
                           event.time

@@ -37,7 +37,7 @@ function formatScore(value) {
 }
 
 
-function CourseCard({ courses }) {
+function CourseCard({ courses = [] }) {
   const navigate = useNavigate();
 
   // Mỗi lần hiển thị tối đa 3 môn
@@ -141,7 +141,7 @@ function CourseCard({ courses }) {
 
       {courses.length === 0 ? (
         <div className="empty-card">
-          Chưa có khóa học trong học kỳ này.
+          Hiện tại chưa có khóa học nào được ghi nhận trong học kỳ này.
         </div>
       ) : (
 
