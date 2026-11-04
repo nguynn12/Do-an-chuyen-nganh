@@ -61,12 +61,12 @@ export default function StudentGrades() {
   const total = grades.length;
   const gradeValues = grades.map((g) => Number(g.Grade || 0));
   const avgGrade =
-    total > 0 ? (gradeValues.reduce((a, b) => a + b, 0) / total).toFixed(1) : 0;
-  const maxGrade = total > 0 ? Math.max(...gradeValues) : 0;
+    total > 0 ? (gradeValues.reduce((a, b) => a + b, 0) / total).toFixed(1) : null;
+  const maxGrade = total > 0 ? Math.max(...gradeValues) : null;
   const passedCount = grades.filter(
     (g) => g.Is_Passed === 1 || Number(g.Grade) >= 5
   ).length;
-  const passRate = total > 0 ? Math.round((passedCount / total) * 100) : 100;
+  const passRate = total > 0 ? Math.round((passedCount / total) * 100) : null;
 
   // Danh sách các môn học duy nhất
   const uniqueCourses = Array.from(
@@ -208,8 +208,8 @@ export default function StudentGrades() {
           </div>
           <div className="summary-content">
             <span>Điểm TB tích lũy</span>
-            <strong>{avgGrade}/10</strong>
-            <small>Tính trên {total} cột điểm</small>
+            <strong>{avgGrade !== null ? `${avgGrade}/10` : "—"}</strong>
+            <small>{total > 0 ? `Tính trên ${total} cột điểm` : "Chưa có dữ liệu"}</small>
           </div>
         </div>
 
@@ -219,9 +219,11 @@ export default function StudentGrades() {
           </div>
           <div className="summary-content">
             <span>Tỷ lệ đạt chuẩn (Pass)</span>
-            <strong>{passRate}%</strong>
+            <strong>{passRate !== null ? `${passRate}%` : "—"}</strong>
             <small>
-              {passedCount}/{total} bài đạt yêu cầu
+              {total > 0
+                ? `${passedCount}/${total} bài đạt yêu cầu`
+                : "Chưa có dữ liệu bài nộp"}
             </small>
           </div>
         </div>
@@ -232,7 +234,7 @@ export default function StudentGrades() {
           </div>
           <div className="summary-content">
             <span>Điểm cao nhất</span>
-            <strong>{maxGrade}/10</strong>
+            <strong>{maxGrade !== null ? `${maxGrade}/10` : "—"}</strong>
             <small>Thành tích xuất sắc nhất</small>
           </div>
         </div>
