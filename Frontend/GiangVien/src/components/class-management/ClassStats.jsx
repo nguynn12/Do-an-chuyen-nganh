@@ -14,7 +14,7 @@ function StatCard({
 }) {
   return (
     <div className={`class-stat-card ${type}`}>
-      <div className="class-stat-icon">
+      <div className="class-stat-icon" aria-hidden="true">
         {icon}
       </div>
 
@@ -78,7 +78,7 @@ function ClassStats({
   return (
     <div className="class-stats-grid">
       <StatCard
-        icon={<Users size={21} />}
+        icon={<Users size={21} aria-hidden="true" />}
         label="Sinh viên"
         value={studentCount ?? 0}
         description="Đang theo học"
@@ -86,7 +86,7 @@ function ClassStats({
       />
 
       <StatCard
-        icon={<UserCheck size={21} />}
+        icon={<UserCheck size={21} aria-hidden="true" />}
         label="Chuyên cần"
         value={formatPercent(attendance)}
         description={
@@ -98,7 +98,7 @@ function ClassStats({
       />
 
       <StatCard
-        icon={<ClipboardCheck size={21} />}
+        icon={<ClipboardCheck size={21} aria-hidden="true" />}
         label="Nộp bài"
         value={formatPercent(submissionRate)}
         description="Tỷ lệ hoàn thành"
@@ -106,7 +106,7 @@ function ClassStats({
       />
 
       <StatCard
-        icon={<GraduationCap size={21} />}
+        icon={<GraduationCap size={21} aria-hidden="true" />}
         label="Điểm trung bình"
         value={formatScore(averageScore)}
         description="Kết quả hiện tại"

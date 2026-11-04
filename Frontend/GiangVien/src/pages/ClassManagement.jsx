@@ -1216,7 +1216,7 @@ const averageAttendance =
 
   if (loading) {
     return (
-      <div className="class-loading">
+      <div className="class-loading" role="status" aria-live="polite">
 
         <div className="class-spinner" />
 
@@ -1246,7 +1246,7 @@ const averageAttendance =
     !course
   ) {
     return (
-      <div className="class-loading">
+      <div className="class-loading" role="alert">
 
         <h2>
           Không thể tải lớp học
@@ -1969,9 +1969,7 @@ const averageAttendance =
                 }
               >
 
-                <UserCheck
-                  size={14}
-                />
+                <UserCheck size={14} aria-hidden="true" />
 
                 Ổn định
 
@@ -2031,9 +2029,7 @@ const averageAttendance =
                 }
               >
 
-                <AlertTriangle
-                  size={14}
-                />
+                <AlertTriangle size={14} aria-hidden="true" />
 
                 Cần chú ý
 
@@ -2120,17 +2116,21 @@ const averageAttendance =
 
               <Users
                 size={35}
+                aria-hidden="true"
               />
 
 
               <strong>
-                Không tìm thấy sinh viên
+                {students.length === 0
+                  ? "Chưa có sinh viên trong lớp"
+                  : "Không tìm thấy sinh viên"}
               </strong>
 
 
               <p>
-                Thử thay đổi từ khóa
-                hoặc bộ lọc.
+                {students.length === 0
+                  ? "Hiện tại khóa học chưa có sinh viên nào được ghi nhận."
+                  : "Vui lòng thử thay đổi từ khóa tìm kiếm hoặc điều chỉnh bộ lọc."}
               </p>
 
             </div>

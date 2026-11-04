@@ -442,9 +442,7 @@ function StudentTable({
                         title="Tùy chọn"
                         aria-label={`Tùy chọn cho sinh viên ${student.fullName || ''}`}
                       >
-                        <MoreHorizontal
-                          size={17}
-                        />
+                        <MoreHorizontal size={17} aria-hidden="true" />
                       </button>
 
 
@@ -459,9 +457,7 @@ function StudentTable({
                         title="Xem hồ sơ phân tích"
                         aria-label={`Xem hồ sơ phân tích của sinh viên ${student.fullName || ''}`}
                       >
-                        <ChevronRight
-                          size={17}
-                        />
+                        <ChevronRight size={17} aria-hidden="true" />
                       </button>
 
                     </div>

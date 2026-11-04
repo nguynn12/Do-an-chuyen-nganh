@@ -135,11 +135,11 @@ export default function SegmentsScatterSection({ courseId, onSelectStudent }) {
 
   if (loading) {
     return (
-      <div className="segments-scatter-card" style={{ padding: "32px", textAlign: "center", background: "#ffffff", borderRadius: "20px", border: "1px solid rgba(55, 136, 62, 0.15)", marginBottom: "28px" }}>
+      <div className="segments-scatter-card" role="status" aria-live="polite" style={{ padding: "32px", textAlign: "center", background: "#ffffff", borderRadius: "20px", border: "1px solid rgba(55, 136, 62, 0.15)", marginBottom: "28px" }}>
         <div style={{ color: "#37883e", fontWeight: "600", marginBottom: "8px" }}>
           Đang tính toán phân khúc sinh viên 2×2...
         </div>
-        <div style={{ fontSize: "13px", color: "#6b7280" }}>
+        <div style={{ fontSize: "13px", color: "#4a5750" }}>
           Đang xác định ngưỡng trung vị lớp và phân loại nhóm từ Data Warehouse
         </div>
       </div>
@@ -150,6 +150,7 @@ export default function SegmentsScatterSection({ courseId, onSelectStudent }) {
     return (
       <div
         className="segments-scatter-card"
+        role="alert"
         style={{
           padding: "24px",
           background: "#fef2f2",

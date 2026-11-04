@@ -110,11 +110,11 @@ export default function EarlyWarningRiskSection({ courseId, onSelectStudent }) {
 
   if (loading) {
     return (
-      <div className="early-warning-card" style={{ padding: "32px", textAlign: "center", background: "#ffffff", borderRadius: "20px", border: "1px solid rgba(220, 38, 38, 0.15)", marginBottom: "28px" }}>
+      <div className="early-warning-card" role="status" aria-live="polite" style={{ padding: "32px", textAlign: "center", background: "#ffffff", borderRadius: "20px", border: "1px solid rgba(220, 38, 38, 0.15)", marginBottom: "28px" }}>
         <div style={{ color: "#37883e", fontWeight: "600", marginBottom: "8px" }}>
           Đang tính toán điểm cảnh báo sớm và phân tích rủi ro...
         </div>
-        <div style={{ fontSize: "13px", color: "#6b7280" }}>
+        <div style={{ fontSize: "13px", color: "#4a5750" }}>
           Đang tổng hợp cờ trễ hạn, mức độ không hoạt động và xu hướng điểm số từ Data Warehouse
         </div>
       </div>
@@ -125,6 +125,7 @@ export default function EarlyWarningRiskSection({ courseId, onSelectStudent }) {
     return (
       <div
         className="early-warning-card"
+        role="alert"
         style={{
           padding: "24px",
           background: "#fef2f2",
