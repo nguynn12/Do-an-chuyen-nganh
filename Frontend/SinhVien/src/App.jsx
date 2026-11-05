@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  Navigate,
   Outlet,
   Route,
   Routes,
@@ -23,6 +22,7 @@ import StudentGrades from "./pages/StudentGrades";
 import StudentEngagement from "./pages/StudentEngagement";
 import StudentAnalytics from "./pages/StudentAnalytics";
 import StudentBehavior from "./pages/StudentBehavior";
+import NotFound from "./pages/NotFound";
 
 import { studentGet } from "./services/apiClient";
 import { getStudentUserId } from "./services/studentAuth";
@@ -226,10 +226,13 @@ export default function App() {
         <Route path="bang-diem" element={<StudentGrades />} />
         <Route path="thoi-gian-hoc" element={<StudentEngagement />} />
         <Route path="phan-tich" element={<StudentAnalytics />} />
+
+        {/* Route 404 cho các đường dẫn không tồn tại trong Cổng Sinh viên */}
+        <Route path="*" element={<NotFound />} />
       </Route>
 
-      {/* Điều hướng 404 về trang chủ */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      {/* Tuyến dự phòng 404 cho các route ngoài layout */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }
