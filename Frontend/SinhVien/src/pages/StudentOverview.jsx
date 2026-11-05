@@ -161,12 +161,25 @@ export default function StudentOverview({
                     <p>
                       <Award size={14} aria-hidden="true" />
                       Điểm trung bình:{" "}
-                      <strong>{c.averageGrade ? `${c.averageGrade}/10` : "7.0/10"}</strong>
+                      <strong>
+                        {c.averageGrade !== null &&
+                        c.averageGrade !== undefined &&
+                        !isNaN(Number(c.averageGrade))
+                          ? `${c.averageGrade}/10`
+                          : "Chưa có"}
+                      </strong>
                     </p>
 
                     <p>
                       <ClipboardCheck size={14} aria-hidden="true" />
-                      Tiến độ hoàn thành: <strong>{c.progress || 100}%</strong>
+                      Tiến độ hoàn thành:{" "}
+                      <strong>
+                        {c.progress !== null &&
+                        c.progress !== undefined &&
+                        !isNaN(Number(c.progress))
+                          ? `${c.progress}%`
+                          : "—"}
+                      </strong>
                     </p>
 
                     <p>
@@ -228,14 +241,25 @@ export default function StudentOverview({
                 </div>
               ) : (
                 courses.map((c) => {
-                  const grade = c.averageGrade || 7.0;
-                  const percent = (grade / 10) * 100;
+                  const hasGrade =
+                    c.averageGrade !== null &&
+                    c.averageGrade !== undefined &&
+                    !isNaN(Number(c.averageGrade));
+                  const grade = hasGrade ? Number(c.averageGrade) : null;
+                  const percent = hasGrade
+                    ? Math.max(0, Math.min(100, (grade / 10) * 100))
+                    : 0;
                   return (
                     <div key={c.id} className="analytics-bar-item">
                       <div className="analytics-bar-meta">
                         <span>{c.name} ({c.shortName})</span>
-                        <span style={{ color: "#37883e", fontWeight: "700" }}>
-                          {grade}/10
+                        <span
+                          style={{
+                            color: hasGrade ? "#37883e" : "#64748b",
+                            fontWeight: "700",
+                          }}
+                        >
+                          {hasGrade ? `${grade}/10` : "Chưa có"}
                         </span>
                       </div>
                       <div className="analytics-track">
@@ -272,22 +296,37 @@ export default function StudentOverview({
                   Chưa có dữ liệu khóa học để theo dõi tiến độ nộp bài.
                 </div>
               ) : (
-                courses.map((c) => (
-                  <div key={c.id} className="analytics-bar-item">
-                    <div className="analytics-bar-meta">
-                      <span>{c.name}</span>
-                      <span style={{ color: "#37883e", fontWeight: "700" }}>
-                        {c.progress || 100}%
-                      </span>
+                courses.map((c) => {
+                  const hasProgress =
+                    c.progress !== null &&
+                    c.progress !== undefined &&
+                    !isNaN(Number(c.progress));
+                  const progress = hasProgress ? Number(c.progress) : null;
+                  const percent = hasProgress
+                    ? Math.max(0, Math.min(100, progress))
+                    : 0;
+                  return (
+                    <div key={c.id} className="analytics-bar-item">
+                      <div className="analytics-bar-meta">
+                        <span>{c.name}</span>
+                        <span
+                          style={{
+                            color: hasProgress ? "#37883e" : "#64748b",
+                            fontWeight: "700",
+                          }}
+                        >
+                          {hasProgress ? `${progress}%` : "—"}
+                        </span>
+                      </div>
+                      <div className="analytics-track">
+                        <div
+                          className="analytics-fill"
+                          style={{ width: `${percent}%` }}
+                        />
+                      </div>
                     </div>
-                    <div className="analytics-track">
-                      <div
-                        className="analytics-fill"
-                        style={{ width: `${c.progress || 100}%` }}
-                      />
-                    </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>
@@ -347,7 +386,7 @@ export default function StudentOverview({
               <Bell size={16} style={{ color: "#37883e" }} aria-hidden="true" />
               <strong>Hạn nộp & Nhắc nhở</strong>
             </div>
-            <span className="badge">{events.length || 2}</span>
+            <span className="badge">{events.length}</span>
           </div>
 
           {events.length > 0 ? (
