@@ -166,25 +166,88 @@ export default function RandomCampaignTab({ teacherId, selectedCourse, onCampaig
         </div>
       )}
 
-      {/* SUCCESS RESULT */}
-      {successResult && (
-        <div className="assign-success-banner">
-          <CheckCircle2 size={24} className="banner-success-icon" />
-          <div>
-            <strong>Giao bài tập thành công!</strong>
-            <p>
-              {successResult.message ||
-                "Đợt giao bài đã được lưu vào hệ thống và phân phối cố định cho sinh viên."}
-            </p>
-            {successResult.waitingMigration && (
-              <small className="notice-migration">
-                * Lưu ý: Cơ sở dữ liệu đang ở trạng thái chờ migration. Bản ghi đã được xử lý và kiểm
-                thử toàn vẹn.
-              </small>
-            )}
+      {/* SUCCESS RESULT / MIGRATION NOTICE */}
+      {successResult &&
+        (successResult.waitingMigration ? (
+          <div
+            role="alert"
+            className="assign-banner-warning"
+            style={{
+              background: "var(--dlu-amber-tint, #fff8f0)",
+              border: "1px solid var(--dlu-amber-border, #feebc8)",
+              borderRadius: "10px",
+              padding: "14px 18px",
+              display: "flex",
+              gap: "12px",
+              alignItems: "flex-start",
+              color: "#7c2d12",
+              fontSize: "13px",
+              marginBottom: "16px",
+            }}
+          >
+            <AlertCircle
+              size={22}
+              style={{
+                color: "var(--dlu-amber, #d9782b)",
+                flexShrink: 0,
+                marginTop: "2px",
+              }}
+              aria-hidden="true"
+            />
+            <div>
+              <strong
+                style={{
+                  display: "block",
+                  color: "var(--dlu-amber, #d9782b)",
+                  fontSize: "14px",
+                  marginBottom: "4px",
+                }}
+              >
+                Chưa lưu được đợt giao bài
+              </strong>
+              <p style={{ margin: 0, color: "#9a3412", lineHeight: 1.5 }}>
+                Cơ sở dữ liệu chưa có bảng assignment_campaign nên đợt giao bài chưa được ghi lại. Cần chạy migration trước.
+              </p>
+            </div>
           </div>
-        </div>
-      )}
+        ) : (
+          <div
+            className="assign-banner-success"
+            style={{
+              marginBottom: "16px",
+              display: "flex",
+              gap: "12px",
+              alignItems: "flex-start",
+              padding: "14px 18px",
+            }}
+          >
+            <CheckCircle2
+              size={22}
+              className="banner-success-icon"
+              style={{
+                flexShrink: 0,
+                marginTop: "2px",
+                color: "var(--dlu-green, #18734f)",
+              }}
+              aria-hidden="true"
+            />
+            <div>
+              <strong
+                style={{
+                  display: "block",
+                  fontSize: "14px",
+                  marginBottom: "4px",
+                }}
+              >
+                Giao bài tập thành công!
+              </strong>
+              <p style={{ margin: 0, lineHeight: 1.5 }}>
+                {successResult.message ||
+                  "Đợt giao bài đã được lưu vào hệ thống và phân phối cố định cho sinh viên."}
+              </p>
+            </div>
+          </div>
+        ))}
 
       <div className="campaign-two-columns">
         {/* LEFT COLUMN: CẤU HÌNH ĐỢT GIAO BÀI */}
