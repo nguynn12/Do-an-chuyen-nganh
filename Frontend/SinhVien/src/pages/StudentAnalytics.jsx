@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   BarChart3,
   BookOpen,
@@ -11,6 +11,7 @@ import {
   TrendingUp,
   Award,
   Layers,
+  AlertCircle,
 } from "lucide-react";
 import "../styles/StudentDashboard.css";
 import "../styles/PowerBIEmbed.css";
@@ -22,10 +23,29 @@ export default function StudentAnalytics() {
   const [reloadKey, setReloadKey] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const containerRef = useRef(null);
+
+  useEffect(() => {
+    setIsLoading(true);
+    setLoadError(false);
+
+    const timer = setTimeout(() => {
+      setIsLoading((curr) => {
+        if (curr) {
+          setLoadError(true);
+          return false;
+        }
+        return false;
+      });
+    }, 12000);
+
+    return () => clearTimeout(timer);
+  }, [reloadKey]);
 
   const handleReload = () => {
     setIsLoading(true);
+    setLoadError(false);
     setReloadKey((prev) => prev + 1);
   };
 
@@ -208,6 +228,85 @@ export default function StudentAnalytics() {
           </div>
         )}
 
+        {loadError && (
+          <div
+            role="alert"
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "#ffffff",
+              zIndex: 10,
+              padding: "24px",
+              textAlign: "center",
+            }}
+          >
+            <AlertCircle
+              size={42}
+              style={{ color: "var(--dlu-red, #c53030)", marginBottom: "14px" }}
+              aria-hidden="true"
+            />
+            <div
+              style={{
+                fontSize: "16px",
+                fontWeight: "700",
+                color: "#14251e",
+                marginBottom: "8px",
+              }}
+            >
+              Không thể tải báo cáo Power BI
+            </div>
+            <div
+              style={{
+                fontSize: "13px",
+                color: "#667970",
+                maxWidth: "440px",
+                marginBottom: "20px",
+                lineHeight: "1.5",
+              }}
+            >
+              Kết nối tới Microsoft Power BI Service quá thời gian chờ (12 giây) hoặc bị trình duyệt chặn nhúng iframe.
+            </div>
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                flexWrap: "wrap",
+                justifyContent: "center",
+              }}
+            >
+              <button
+                type="button"
+                className="dlu-retry-btn"
+                style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+                onClick={handleReload}
+              >
+                <RotateCw size={14} aria-hidden="true" /> Thử lại
+              </button>
+              <button
+                type="button"
+                className="btn-dlu-secondary"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  height: "36px",
+                  padding: "0 16px",
+                  fontSize: "12px",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                }}
+                onClick={() => window.open(PRIMARY_REPORT_URL, "_blank")}
+              >
+                <ExternalLink size={14} aria-hidden="true" /> Mở liên kết trực tiếp
+              </button>
+            </div>
+          </div>
+        )}
+
         <iframe
           key={reloadKey}
           title="Báo cáo phân tích học tập sinh viên Power BI"
@@ -216,11 +315,14 @@ export default function StudentAnalytics() {
             width: "100%",
             height: "calc(100% + 42px)",
             border: "none",
-            display: "block",
+            display: loadError ? "none" : "block",
           }}
           frameBorder="0"
           allowFullScreen={true}
-          onLoad={() => setIsLoading(false)}
+          onLoad={() => {
+            setIsLoading(false);
+            setLoadError(false);
+          }}
         />
       </div>
 
