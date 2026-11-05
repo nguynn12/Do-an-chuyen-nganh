@@ -2,9 +2,7 @@ import { Navigate } from "react-router-dom";
 import { clearTeacherSession } from "../services/teacherAuth.js";
 
 function ProtectedRoute({ children }) {
-  const isDemoAllowed =
-    import.meta.env.DEV === true ||
-    import.meta.env.VITE_ALLOW_DEMO === "true";
+  const isDemoAllowed = import.meta.env.DEV === true;
 
   const searchParams = new URLSearchParams(window.location.search);
   if (isDemoAllowed && searchParams.get("demo") === "1") {
