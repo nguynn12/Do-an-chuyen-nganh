@@ -20,7 +20,7 @@ export default function DluHeader({
   // Xử lý họ tên và thông tin hiển thị
   const fullName =
     user?.fullName ||
-    (role === "teacher" ? "Trần Bình Trần" : "Sinh viên");
+    (role === "teacher" ? "Giảng viên" : "Sinh viên");
 
   const degree = user?.degree ? `${user.degree} ` : "";
   const displayTitle = `${degree}${fullName}`;
