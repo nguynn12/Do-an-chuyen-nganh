@@ -310,17 +310,11 @@ function Grading() {
   // ======================================================
 
   function handleOpenLms(row) {
-    console.log(
-      "Mở trên LMS:",
-      row
-    );
-
-    // Sau này khi có URL Moodle thật:
-    //
-    // window.open(
-    //   `https://lms.dlu.edu.vn/mod/assign/view.php?id=${row.Moodle_Module_ID}`,
-    //   "_blank"
-    // );
+    const moduleId = row?.Moodle_Module_ID || row?.moduleId;
+    const lmsUrl = moduleId
+      ? `https://lms.dlu.edu.vn/mod/assign/view.php?id=${moduleId}`
+      : "https://lms.dlu.edu.vn";
+    window.open(lmsUrl, "_blank", "noopener,noreferrer");
   }
 
 
