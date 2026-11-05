@@ -18,6 +18,7 @@ import AssignmentManagement from "./pages/AssignmentManagement";
 // THÊM - TRANG SO SÁNH LỚP HỌC
 // ============================================================
 import ClassComparison from "./pages/ClassComparison/ClassComparison";
+import { IS_ASSIGNMENT_MANAGEMENT_ENABLED } from "./config/featureFlags";
 
 
 function PrivatePage({ children }) {
@@ -105,35 +106,61 @@ function App() {
 
 
       {/* =====================================================
-          QUẢN LÝ BÀI TẬP, GIAO BÀI & CHẤM ĐIỂM (MODULE MẠNH)
+          QUẢN LÝ BÀI TẬP, GIAO BÀI & CHẤM ĐIỂM
+          (Chỉ kích hoạt khi công tắc VITE_ENABLE_ASSIGNMENT_MANAGEMENT bật)
       ===================================================== */}
 
-      <Route
-        path="/quan-ly-bai-tap"
-        element={
-          <PrivatePage>
-            <AssignmentManagement />
-          </PrivatePage>
-        }
-      />
-
-      <Route
-        path="/quan-ly-bai-tap/:courseId"
-        element={
-          <PrivatePage>
-            <AssignmentManagement />
-          </PrivatePage>
-        }
-      />
-
-      <Route
-        path="/bai-cho-cham"
-        element={
-          <PrivatePage>
-            <AssignmentManagement />
-          </PrivatePage>
-        }
-      />
+      {IS_ASSIGNMENT_MANAGEMENT_ENABLED ? (
+        <>
+          <Route
+            path="/quan-ly-bai-tap"
+            element={
+              <PrivatePage>
+                <AssignmentManagement />
+              </PrivatePage>
+            }
+          />
+          <Route
+            path="/quan-ly-bai-tap/:courseId"
+            element={
+              <PrivatePage>
+                <AssignmentManagement />
+              </PrivatePage>
+            }
+          />
+          <Route
+            path="/quan-ly-bai-tap/*"
+            element={
+              <PrivatePage>
+                <AssignmentManagement />
+              </PrivatePage>
+            }
+          />
+          <Route
+            path="/bai-cho-cham"
+            element={
+              <PrivatePage>
+                <AssignmentManagement />
+              </PrivatePage>
+            }
+          />
+        </>
+      ) : (
+        <>
+          <Route
+            path="/quan-ly-bai-tap"
+            element={<Navigate to="/" replace />}
+          />
+          <Route
+            path="/quan-ly-bai-tap/*"
+            element={<Navigate to="/" replace />}
+          />
+          <Route
+            path="/bai-cho-cham"
+            element={<Navigate to="/" replace />}
+          />
+        </>
+      )}
 
 
       {/* =====================================================
