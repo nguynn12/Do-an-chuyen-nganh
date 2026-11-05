@@ -93,7 +93,7 @@ export default function StudentEngagement() {
     activeDays > 0 ? (totalHours / activeDays).toFixed(1) : 0;
 
   const topCourse =
-    engagementData.courseEngagement[0]?.Course_Name || "Cơ sở dữ liệu";
+    engagementData.courseEngagement[0]?.Course_Name || "—";
 
   // Chuẩn bị ma trận Heatmap theo tuần và ngày trong tuần (T2 - CN)
   const { weeks, totalWeeksCount, maxDayRecord } = useMemo(() => {
