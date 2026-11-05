@@ -3,13 +3,15 @@
 ========================================================= */
 
 .comparison-page {
-  width: 100%;
+  width: auto;
   min-height: 100vh;
-  padding: 24px;
+  margin-left: var(--dlu-sidebar-width, 56px);
+  padding: calc(var(--dlu-header-height, 58px) + 24px) 24px 32px;
   box-sizing: border-box;
 
   background: #f4f7f5;
   color: #16261c;
+  transition: margin-left 0.2s ease;
 }
 
 /* =========================================================
@@ -110,7 +112,7 @@
 
 .comparison-selected-class > span {
   color: #758179;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.06em;
 }
@@ -246,7 +248,7 @@
   margin-bottom: 8px;
 
   color: #78857c;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.07em;
 }
@@ -281,7 +283,7 @@
   margin-bottom: 2px;
 
   color: #39713d;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
 }
 
@@ -496,7 +498,8 @@
 
 @media (max-width: 750px) {
   .comparison-page {
-    padding: 12px;
+    margin-left: 0;
+    padding: calc(var(--dlu-header-height, 58px) + 12px) 12px 24px;
   }
 
   .comparison-page-header {
@@ -538,10 +541,10 @@
 .comparison-overview-class,.comparison-overview-diff-title{min-height:64px;padding:11px 13px;display:flex;flex-direction:column;justify-content:center;border-radius:11px;}
 .comparison-overview-class{background:#f5f9f3;border:1px solid #dfe9dc;}
 .comparison-overview-class.class-b{background:#f8faf8;}
-.comparison-overview-class span{margin-bottom:3px;color:#87938b;font-size:8px;font-weight:900;letter-spacing:.06em;}
+.comparison-overview-class span{margin-bottom:3px;color:#87938b;font-size:11px;font-weight:900;letter-spacing:.06em;}
 .comparison-overview-class strong{color:#1e3325;font-size:13px;}
-.comparison-overview-class small{margin-top:2px;color:#4f7b3d;font-size:10px;font-weight:800;}
-.comparison-overview-diff-title{align-items:center;text-align:center;background:#edf5ea;color:#4c7d3e;border:1px solid #dce8d8;font-size:9px;font-weight:900;}
+.comparison-overview-class small{margin-top:2px;color:#4f7b3d;font-size:11px;font-weight:800;}
+.comparison-overview-diff-title{align-items:center;text-align:center;background:#edf5ea;color:#4c7d3e;border:1px solid #dce8d8;font-size:11px;font-weight:900;}
 .comparison-metrics{display:flex;flex-direction:column;gap:8px;}
 .comparison-metric-row{min-height:58px;}
 .comparison-metric-name,.comparison-metric-value,.comparison-difference{min-width:0;padding:12px 14px;display:flex;align-items:center;border:1px solid #e2e9e3;border-radius:11px;}
@@ -555,14 +558,14 @@
 .comparison-insights-section{margin-bottom:30px;}
 .comparison-insights-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
 .comparison-insight-card{min-height:112px;padding:16px;display:flex;align-items:flex-start;gap:13px;background:#f8faf8;border:1px solid #e1e8e2;border-radius:13px;}
-.comparison-insight-number{width:32px;height:32px;flex:0 0 32px;display:flex;align-items:center;justify-content:center;border-radius:9px;background:#edf5ea;color:#4a7b3c;font-size:10px;font-weight:900;}
+.comparison-insight-number{width:32px;height:32px;flex:0 0 32px;display:flex;align-items:center;justify-content:center;border-radius:9px;background:#edf5ea;color:#4a7b3c;font-size:11px;font-weight:900;}
 .comparison-insight-card h3{margin:1px 0 6px;color:#203126;font-size:12px;}
 .comparison-insight-card p{margin:0;color:#69776d;font-size:11px;line-height:1.65;}
 .comparison-insight-card.positive{background:#f5faf3;border-color:#dcebd7;}
 .comparison-insight-card.warning{background:#fffaf3;border-color:#f0e1c7;}
 .comparison-insight-card.warning .comparison-insight-number{background:#fff0d8;color:#aa7423;}
 .comparison-insight-card.neutral .comparison-insight-number{background:#eef1ef;color:#6f7d74;}
-.comparison-insight-note{margin-top:12px;padding:12px 14px;display:flex;gap:7px;align-items:flex-start;background:#f4f8f2;border:1px dashed #d4e2d1;border-radius:11px;color:#65736a;font-size:10px;line-height:1.55;}
+.comparison-insight-note{margin-top:12px;padding:12px 14px;display:flex;gap:7px;align-items:flex-start;background:#f4f8f2;border:1px dashed #d4e2d1;border-radius:11px;color:#65736a;font-size:11px;line-height:1.55;}
 .comparison-insight-note strong{flex:0 0 auto;color:#47783d;}
 @media(max-width:900px){.comparison-overview-head,.comparison-metric-row{grid-template-columns:minmax(125px,1fr) minmax(100px,.8fr) minmax(100px,.8fr) 90px;gap:7px}.comparison-analysis-section,.comparison-insights-section{padding:17px}}
 @media(max-width:750px){.comparison-insights-grid{grid-template-columns:1fr}.comparison-overview-head{display:none}.comparison-metric-row{grid-template-columns:1fr 1fr}.comparison-metric-name,.comparison-difference{grid-column:1/-1}.comparison-difference{min-height:42px}}
@@ -587,7 +590,7 @@
 
 /* Header của 2 lớp */
 .comparison-overview-class span {
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.04em;
 }

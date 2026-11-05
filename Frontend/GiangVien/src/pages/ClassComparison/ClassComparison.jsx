@@ -1,5 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import Header from "../../components/Header";
+import Sidebar from "../../components/Sidebar";
+import { getTeacher, getTeacherCourses } from "../../services/teacherApi";
 import "./ClassComparison.css";
 
 // ============================================================
@@ -11,44 +14,23 @@ const API_BASE_URL = "";
 const POWER_BI_BASE_URL =
   "https://app.powerbi.com/view?r=eyJrIjoiN2NkMjk3MzUtMWU4MS00ODIwLWE5Y2YtYWYzNTA1N2EzMWI3IiwidCI6Ijg0NTAzNjliLTExZmEtNDQxMy04ZGM3LTA2MGFiOWYzNGY0MSIsImMiOjEwfQ%3D%3D";
 
-const COURSES = {
-  10: {
-    code: "GAME401",
-    name: "Phát triển ứng dụng Game nâng cao",
-  },
-  11: {
-    code: "AI401",
-    name: "Trí tuệ nhân tạo",
-  },
-  12: {
-    code: "WEB401",
-    name: "Phát triển Web nâng cao",
-  },
-  13: {
-    code: "TEST401",
-    name: "Kiểm thử phần mềm",
-  },
-};
-
+// Ánh xạ mã trang báo cáo Power BI Service theo khóa học và khóa sinh viên
 const POWER_BI_PAGES = {
   10: {
     K47: "b9ef05d030d0d10de5a2",
     K46: "68a0ce8c095221933963",
     K45: "2ceff00560d09ab7be86",
   },
-
   11: {
     K47: "4697afec1d51ee78e0a4",
     K46: "bb50fd7953840ad36e0b",
     K45: "cb0f20ad0ce3187e0c5e",
   },
-
   12: {
     K47: "cc41e639909530844076",
     K46: "c01d90503ee56bb0265c",
     K45: "90ef4635d47b3e91e96b",
   },
-
   13: {
     K47: "c9f8184ce9d0608d9d26",
     K46: "dc0b90db8433e2287263",
@@ -101,10 +83,12 @@ function ReportCard({
   label,
   courseKey,
   cohort,
+  courseInfo,
   reportUrl,
   side,
 }) {
-  const course = COURSES[courseKey];
+  const code = courseInfo?.code || `COURSE ${courseKey}`;
+  const name = courseInfo?.name || `Môn ${courseKey}`;
 
   return (
     <article
@@ -118,16 +102,16 @@ function ReportCard({
 
           <div className="comparison-course-line">
             <div className="comparison-course-icon">
-              {course?.code?.slice(0, 2) || "--"}
+              {code?.slice(0, 2) || "--"}
             </div>
 
             <div>
               <div className="comparison-course-code">
-                {course?.code || `COURSE ${courseKey}`}
+                {code}
               </div>
 
               <h2>
-                {course?.name || `Môn ${courseKey}`}
+                {name}
               </h2>
             </div>
           </div>
@@ -144,9 +128,7 @@ function ReportCard({
             key={`${courseKey}-${cohort}`}
             className="comparison-report-frame"
             src={reportUrl}
-            title={`Power BI - ${
-              course?.name || courseKey
-            } - ${cohort}`}
+            title={`Power BI - ${name} - ${cohort}`}
             frameBorder="0"
             allowFullScreen
           />
@@ -238,12 +220,62 @@ function MetricRow({
 }
 
 // ============================================================
-// MAIN
+// MAIN COMPONENT
 // ============================================================
 
 export default function ClassComparison() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+
+  // Thông tin Giảng viên đang đăng nhập
+  const teacherId =
+    Number(localStorage.getItem("currentTeacherId")) || 1;
+  const [teacher, setTeacher] = useState(null);
+  const [teacherCourses, setTeacherCourses] = useState([]);
+
+  // ==========================================================
+  // NẠP THÔNG TIN GIẢNG VIÊN VÀ DANH SÁCH MÔN HỌC ĐỘNG TỪ API
+  // ==========================================================
+  useEffect(() => {
+    let isCancelled = false;
+
+    async function loadTeacherData() {
+      try {
+        const [teacherData, coursesData] = await Promise.all([
+          getTeacher(teacherId).catch(() => null),
+          getTeacherCourses(teacherId).catch(() => []),
+        ]);
+
+        if (!isCancelled) {
+          if (teacherData) setTeacher(teacherData);
+          if (Array.isArray(coursesData)) setTeacherCourses(coursesData);
+        }
+      } catch (err) {
+        console.error("Lỗi nạp dữ liệu giảng viên / môn học:", err);
+      }
+    }
+
+    loadTeacherData();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [teacherId]);
+
+  // Từ điển môn học động nạp từ API getTeacherCourses
+  const courseMap = useMemo(() => {
+    const map = {};
+    (teacherCourses || []).forEach((c) => {
+      const key = c.Course_Key || c.Moodle_Course_ID || c.id;
+      if (key != null) {
+        map[Number(key)] = {
+          code: c.Course_Code || c.code || `MÔN ${key}`,
+          name: c.Course_Name || c.name || `Khóa học ${key}`,
+        };
+      }
+    });
+    return map;
+  }, [teacherCourses]);
 
   // ==========================================================
   // URL PARAMS
@@ -260,20 +292,17 @@ export default function ClassComparison() {
     searchParams.get("cohortB")
   );
 
-  const selectedClassA = COURSES[courseA];
-  const selectedClassB = COURSES[courseB];
-
   const reportA = getReportUrl(courseA, cohortA);
   const reportB = getReportUrl(courseB, cohortB);
 
   const valid =
-    Boolean(selectedClassA) &&
-    Boolean(selectedClassB) &&
+    Boolean(courseA) &&
+    Boolean(courseB) &&
     Boolean(cohortA) &&
     Boolean(cohortB);
 
   // ==========================================================
-  // STATE
+  // STATE DỮ LIỆU SO SÁNH
   // ==========================================================
 
   const [comparisonData, setComparisonData] =
@@ -286,7 +315,7 @@ export default function ClassComparison() {
     useState("");
 
   // ==========================================================
-  // API
+  // GỌI API SO SÁNH 2 LỚP
   // ==========================================================
 
   useEffect(() => {
@@ -311,15 +340,6 @@ export default function ClassComparison() {
           `${API_BASE_URL}/api/comparison?` +
           params.toString();
 
-        console.log(
-          "=========================================="
-        );
-        console.log("CLASS COMPARISON - NEW VERSION");
-        console.log("API:", url);
-        console.log(
-          "=========================================="
-        );
-
         const response = await fetch(url, {
           method: "GET",
           headers: {
@@ -337,8 +357,6 @@ export default function ClassComparison() {
         }
 
         const result = await response.json();
-
-        console.log("COMPARISON RESULT:", result);
 
         if (!result?.success) {
           throw new Error(
@@ -387,7 +405,7 @@ export default function ClassComparison() {
   ]);
 
   // ==========================================================
-  // DATA
+  // DATA PHÂN TÍCH
   // ==========================================================
 
   const apiClassA =
@@ -395,6 +413,29 @@ export default function ClassComparison() {
 
   const apiClassB =
     comparisonData?.classB || null;
+
+  // Lấy thông tin môn học động: ưu tiên từ API so sánh, sau đó từ getTeacherCourses
+  const selectedClassA = useMemo(() => {
+    if (apiClassA?.course) {
+      return {
+        code: apiClassA.course.courseCode || apiClassA.course.code,
+        name: apiClassA.course.courseName || apiClassA.course.name,
+      };
+    }
+    if (courseMap[courseA]) return courseMap[courseA];
+    return { code: `COURSE ${courseA}`, name: `Khóa học ${courseA}` };
+  }, [apiClassA, courseMap, courseA]);
+
+  const selectedClassB = useMemo(() => {
+    if (apiClassB?.course) {
+      return {
+        code: apiClassB.course.courseCode || apiClassB.course.code,
+        name: apiClassB.course.courseName || apiClassB.course.name,
+      };
+    }
+    if (courseMap[courseB]) return courseMap[courseB];
+    return { code: `COURSE ${courseB}`, name: `Khóa học ${courseB}` };
+  }, [apiClassB, courseMap, courseB]);
 
   const summaryA =
     apiClassA?.summary || {};
@@ -423,377 +464,394 @@ export default function ClassComparison() {
     : [];
 
   // ==========================================================
-  // INVALID PARAMS
+  // THAM SỐ KHÔNG HỢP LỆ
   // ==========================================================
 
   if (!valid) {
     return (
-      <main className="comparison-page">
-        <div className="comparison-invalid">
-          <div className="comparison-invalid-icon">
-            !
+      <div className="app">
+        <Header teacher={teacher} />
+        <Sidebar />
+        <main className="comparison-page">
+          <div className="comparison-invalid">
+            <div className="comparison-invalid-icon">
+              !
+            </div>
+
+            <h2>
+              Không xác định được lớp cần so sánh
+            </h2>
+
+            <p>
+              Hãy quay lại lớp học và chọn hai lớp
+              trước khi bắt đầu so sánh.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+            >
+              ← Quay lại
+            </button>
           </div>
-
-          <h2>
-            Không xác định được lớp cần so sánh
-          </h2>
-
-          <p>
-            Hãy quay lại lớp học và chọn hai lớp
-            trước khi bắt đầu so sánh.
-          </p>
-
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-          >
-            ← Quay lại
-          </button>
-        </div>
-      </main>
+        </main>
+      </div>
     );
   }
 
   // ==========================================================
-  // UI
+  // GIAO DIỆN CHÍNH
   // ==========================================================
 
   return (
-    <main className="comparison-page">
+    <div className="app">
+      {/* HEADER DÙNG CHUNG CỦA GIẢNG VIÊN */}
+      <Header teacher={teacher} />
 
-      {/* ====================================================
-          HEADER
-      ==================================================== */}
+      {/* SIDEBAR DÙNG CHUNG CỦA GIẢNG VIÊN */}
+      <Sidebar />
 
-      <section className="comparison-page-header">
-        <div>
-          <div className="comparison-eyebrow">
-            POWER BI ANALYTICS
-          </div>
+      <main className="comparison-page">
 
-          <h1>So sánh lớp học</h1>
+        {/* ====================================================
+            TIÊU ĐỀ TRANG
+        ==================================================== */}
 
-          <p>
-            Đối chiếu trực quan kết quả học tập
-            giữa hai lớp.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          className="comparison-back-button"
-          onClick={() => navigate(-1)}
-        >
-          <span>←</span>
-          Quay lại lớp
-        </button>
-      </section>
-
-      {/* ====================================================
-          CLASS SUMMARY
-      ==================================================== */}
-
-      <section className="comparison-selection-summary">
-        <div className="comparison-selected-class">
-          <span>LỚP HIỆN TẠI</span>
-
-          <strong>
-            {selectedClassA.name}
-          </strong>
-
-          <small>
-            {selectedClassA.code} • {cohortA}
-          </small>
-        </div>
-
-        <div className="comparison-vs">
-          <span>VS</span>
-        </div>
-
-        <div className="comparison-selected-class comparison-selected-class-right">
-          <span>SO SÁNH VỚI</span>
-
-          <strong>
-            {selectedClassB.name}
-          </strong>
-
-          <small>
-            {selectedClassB.code} • {cohortB}
-          </small>
-        </div>
-      </section>
-
-      {/* ====================================================
-          POWER BI
-      ==================================================== */}
-
-      <section className="comparison-section">
-        <div className="comparison-section-heading">
-          <div className="comparison-section-icon">
-            ↗
-          </div>
-
+        <section className="comparison-page-header">
           <div>
-            <h2>Phân tích trực quan</h2>
+            <div className="comparison-eyebrow">
+              POWER BI ANALYTICS
+            </div>
+
+            <h1>So sánh lớp học</h1>
 
             <p>
-              Báo cáo Power BI của hai lớp được
-              hiển thị song song.
+              Đối chiếu trực quan kết quả học tập
+              giữa hai lớp trên cùng hệ thống Data Warehouse.
             </p>
           </div>
-        </div>
 
-        <div className="comparison-reports-grid">
-          <ReportCard
-            label="LỚP HIỆN TẠI"
-            courseKey={courseA}
-            cohort={cohortA}
-            reportUrl={reportA}
-            side="a"
-          />
-
-          <ReportCard
-            label="SO SÁNH VỚI"
-            courseKey={courseB}
-            cohort={cohortB}
-            reportUrl={reportB}
-            side="b"
-          />
-        </div>
-      </section>
-
-      {/* ====================================================
-          TỔNG QUAN - LUÔN HIỆN
-      ==================================================== */}
-
-      <section className="comparison-analysis-section">
-        <div className="comparison-section-heading">
-          <div className="comparison-section-icon">
-            ≡
-          </div>
-
-          <div>
-            <h2>Tổng quan so sánh</h2>
-
-            <p>
-              Dữ liệu được tổng hợp trực tiếp từ
-              hệ thống LMS.
-            </p>
-          </div>
-        </div>
-
-        {/* LOADING */}
-
-        {loading && (
-          <div
-            className="comparison-data-state"
-            style={{
-              padding: "25px",
-              background: "#f7faf7",
-              border: "1px solid #e1e9e2",
-              borderRadius: "12px",
-            }}
+          <button
+            type="button"
+            className="comparison-back-button"
+            onClick={() => navigate(-1)}
           >
+            <span>←</span>
+            Quay lại lớp
+          </button>
+        </section>
+
+        {/* ====================================================
+            TÓM TẮT HAI LỚP ĐƯỢC CHỌN
+        ==================================================== */}
+
+        <section className="comparison-selection-summary">
+          <div className="comparison-selected-class">
+            <span>LỚP HIỆN TẠI</span>
+
             <strong>
-              Đang tổng hợp dữ liệu so sánh...
+              {selectedClassA.name}
             </strong>
 
-            <div
-              style={{
-                marginTop: "5px",
-                color: "#7b887f",
-                fontSize: "12px",
-              }}
-            >
-              Đang lấy dữ liệu hai lớp từ
-              backend.
-            </div>
+            <small>
+              {selectedClassA.code} • {cohortA}
+            </small>
           </div>
-        )}
 
-        {/* ERROR */}
+          <div className="comparison-vs">
+            <span>VS</span>
+          </div>
 
-        {!loading && apiError && (
-          <div
-            className="comparison-data-error"
-            style={{
-              padding: "20px",
-              background: "#fff5f3",
-              border: "1px solid #f1cbc5",
-              borderRadius: "12px",
-              color: "#a53c30",
-            }}
-          >
+          <div className="comparison-selected-class comparison-selected-class-right">
+            <span>SO SÁNH VỚI</span>
+
             <strong>
-              Không tải được dữ liệu phân tích
+              {selectedClassB.name}
             </strong>
 
-            <div
-              style={{
-                marginTop: "6px",
-                fontSize: "12px",
-              }}
-            >
-              {apiError}
+            <small>
+              {selectedClassB.code} • {cohortB}
+            </small>
+          </div>
+        </section>
+
+        {/* ====================================================
+            POWER BI NHÚNG SONG SONG
+        ==================================================== */}
+
+        <section className="comparison-section">
+          <div className="comparison-section-heading">
+            <div className="comparison-section-icon">
+              ↗
+            </div>
+
+            <div>
+              <h2>Phân tích trực quan</h2>
+
+              <p>
+                Báo cáo Power BI của hai lớp được
+                hiển thị song song.
+              </p>
             </div>
           </div>
-        )}
 
-        {/* NO DATA */}
+          <div className="comparison-reports-grid">
+            <ReportCard
+              label="LỚP HIỆN TẠI"
+              courseKey={courseA}
+              cohort={cohortA}
+              courseInfo={selectedClassA}
+              reportUrl={reportA}
+              side="a"
+            />
 
-        {!loading &&
-          !apiError &&
-          !comparisonData && (
+            <ReportCard
+              label="SO SÁNH VỚI"
+              courseKey={courseB}
+              cohort={cohortB}
+              courseInfo={selectedClassB}
+              reportUrl={reportB}
+              side="b"
+            />
+          </div>
+        </section>
+
+        {/* ====================================================
+            TỔNG QUAN ĐỐI CHIẾU CHỈ SỐ
+        ==================================================== */}
+
+        <section className="comparison-analysis-section">
+          <div className="comparison-section-heading">
+            <div className="comparison-section-icon">
+              ≡
+            </div>
+
+            <div>
+              <h2>Tổng quan so sánh</h2>
+
+              <p>
+                Dữ liệu được tổng hợp trực tiếp từ
+                hệ thống LMS.
+              </p>
+            </div>
+          </div>
+
+          {/* TRẠNG THÁI LOADING */}
+
+          {loading && (
             <div
+              className="comparison-data-state"
               style={{
-                padding: "20px",
+                padding: "25px",
                 background: "#f7faf7",
                 border: "1px solid #e1e9e2",
                 borderRadius: "12px",
-                color: "#69776d",
               }}
             >
-              Chưa nhận được dữ liệu từ backend.
+              <strong>
+                Đang tổng hợp dữ liệu so sánh...
+              </strong>
+
+              <div
+                style={{
+                  marginTop: "5px",
+                  color: "#7b887f",
+                  fontSize: "12px",
+                }}
+              >
+                Đang lấy dữ liệu hai lớp từ
+                backend.
+              </div>
             </div>
           )}
 
-        {/* DATA */}
+          {/* TRẠNG THÁI LỖI */}
 
-        {!loading &&
-          !apiError &&
-          comparisonData && (
-            <>
-              <div className="comparison-overview-head">
-                <div />
+          {!loading && apiError && (
+            <div
+              className="comparison-data-error"
+              style={{
+                padding: "20px",
+                background: "#fff5f3",
+                border: "1px solid #f1cbc5",
+                borderRadius: "12px",
+                color: "#a53c30",
+              }}
+            >
+              <strong>
+                Không tải được dữ liệu phân tích
+              </strong>
 
-                <div className="comparison-overview-class class-a">
-                  <span>LỚP HIỆN TẠI</span>
-
-                  <strong>
-                    {apiClassA?.course?.courseCode ||
-                      selectedClassA.code}
-                  </strong>
-
-                  <small>
-                    {apiClassA?.cohort || cohortA}
-                  </small>
-                </div>
-
-                <div className="comparison-overview-class class-b">
-                  <span>SO SÁNH VỚI</span>
-
-                  <strong>
-                    {apiClassB?.course?.courseCode ||
-                      selectedClassB.code}
-                  </strong>
-
-                  <small>
-                    {apiClassB?.cohort || cohortB}
-                  </small>
-                </div>
-
-                <div className="comparison-overview-diff-title">
-                  CHÊNH LỆCH
-                </div>
+              <div
+                style={{
+                  marginTop: "6px",
+                  fontSize: "12px",
+                }}
+              >
+                {apiError}
               </div>
-
-              <div className="comparison-metrics">
-                <MetricRow
-                  label="Số sinh viên"
-                  valueA={summaryA.totalStudents}
-                  valueB={summaryB.totalStudents}
-                  difference={
-                    toNumber(
-                      summaryA.totalStudents
-                    ) -
-                    toNumber(
-                      summaryB.totalStudents
-                    )
-                  }
-                  type="integer"
-                />
-
-                <MetricRow
-                  label="Điểm trung bình"
-                  valueA={summaryA.averageGrade}
-                  valueB={summaryB.averageGrade}
-                  difference={
-                    difference.averageGrade
-                  }
-                />
-
-                <MetricRow
-                  label="Tỷ lệ đạt"
-                  valueA={summaryA.passRate}
-                  valueB={summaryB.passRate}
-                  difference={
-                    difference.passRate
-                  }
-                  type="percent"
-                />
-
-                <MetricRow
-                  label="Tỷ lệ nộp đúng hạn"
-                  valueA={summaryA.onTimeRate}
-                  valueB={summaryB.onTimeRate}
-                  difference={
-                    difference.onTimeRate
-                  }
-                  type="percent"
-                />
-
-                <MetricRow
-                  label="Tổng bài đã nộp"
-                  valueA={summaryA.totalSubmitted}
-                  valueB={summaryB.totalSubmitted}
-                  difference={
-                    toNumber(
-                      summaryA.totalSubmitted
-                    ) -
-                    toNumber(
-                      summaryB.totalSubmitted
-                    )
-                  }
-                  type="integer"
-                />
-
-                <MetricRow
-                  label="Tổng bài nộp trễ"
-                  valueA={summaryA.totalLate}
-                  valueB={summaryB.totalLate}
-                  difference={
-                    toNumber(summaryA.totalLate) -
-                    toNumber(summaryB.totalLate)
-                  }
-                  type="integer"
-                />
-              </div>
-            </>
-          )}
-      </section>
-
-      {/* NHẬN XÉT SO SÁNH TỰ ĐỘNG */}
-      {!loading && !apiError && comparisonData && (
-        <section className="comparison-insights-section">
-          <div className="comparison-section-heading">
-            <div className="comparison-section-icon">✦</div>
-            <div>
-              <h2>Nhận xét so sánh</h2>
-              <p>Nhận xét tự động từ các chỉ số tổng hợp của hai lớp.</p>
             </div>
-          </div>
-          <div className="comparison-insights-grid">
-            {comparisonInsights.map((item, index) => (
-              <article key={`${item.title}-${index}`} className={`comparison-insight-card ${item.tone}`}>
-                <div className="comparison-insight-number">{String(index + 1).padStart(2, "0")}</div>
-                <div><h3>{item.title}</h3><p>{item.text}</p></div>
-              </article>
-            ))}
-          </div>
-          <div className="comparison-insight-note"><strong>Gợi ý:</strong><span>Đối chiếu thêm Power BI phía trên khi cần xem chi tiết.</span></div>
+          )}
+
+          {/* TRẠNG THÁI RỖNG */}
+
+          {!loading &&
+            !apiError &&
+            !comparisonData && (
+              <div
+                style={{
+                  padding: "20px",
+                  background: "#f7faf7",
+                  border: "1px solid #e1e9e2",
+                  borderRadius: "12px",
+                  color: "#69776d",
+                }}
+              >
+                Chưa nhận được dữ liệu từ backend.
+              </div>
+            )}
+
+          {/* DỮ LIỆU ĐỐI CHIẾU */}
+
+          {!loading &&
+            !apiError &&
+            comparisonData && (
+              <>
+                <div className="comparison-overview-head">
+                  <div />
+
+                  <div className="comparison-overview-class class-a">
+                    <span>LỚP HIỆN TẠI</span>
+
+                    <strong>
+                      {apiClassA?.course?.courseCode ||
+                        selectedClassA.code}
+                    </strong>
+
+                    <small>
+                      {apiClassA?.cohort || cohortA}
+                    </small>
+                  </div>
+
+                  <div className="comparison-overview-class class-b">
+                    <span>SO SÁNH VỚI</span>
+
+                    <strong>
+                      {apiClassB?.course?.courseCode ||
+                        selectedClassB.code}
+                    </strong>
+
+                    <small>
+                      {apiClassB?.cohort || cohortB}
+                    </small>
+                  </div>
+
+                  <div className="comparison-overview-diff-title">
+                    CHÊNH LỆCH
+                  </div>
+                </div>
+
+                <div className="comparison-metrics">
+                  <MetricRow
+                    label="Số sinh viên"
+                    valueA={summaryA.totalStudents}
+                    valueB={summaryB.totalStudents}
+                    difference={
+                      toNumber(
+                        summaryA.totalStudents
+                      ) -
+                      toNumber(
+                        summaryB.totalStudents
+                      )
+                    }
+                    type="integer"
+                  />
+
+                  <MetricRow
+                    label="Điểm trung bình"
+                    valueA={summaryA.averageGrade}
+                    valueB={summaryB.averageGrade}
+                    difference={
+                      difference.averageGrade
+                    }
+                  />
+
+                  <MetricRow
+                    label="Tỷ lệ đạt"
+                    valueA={summaryA.passRate}
+                    valueB={summaryB.passRate}
+                    difference={
+                      difference.passRate
+                    }
+                    type="percent"
+                  />
+
+                  <MetricRow
+                    label="Tỷ lệ nộp đúng hạn"
+                    valueA={summaryA.onTimeRate}
+                    valueB={summaryB.onTimeRate}
+                    difference={
+                      difference.onTimeRate
+                    }
+                    type="percent"
+                  />
+
+                  <MetricRow
+                    label="Tổng bài đã nộp"
+                    valueA={summaryA.totalSubmitted}
+                    valueB={summaryB.totalSubmitted}
+                    difference={
+                      toNumber(
+                        summaryA.totalSubmitted
+                      ) -
+                      toNumber(
+                        summaryB.totalSubmitted
+                      )
+                    }
+                    type="integer"
+                  />
+
+                  <MetricRow
+                    label="Tổng bài nộp trễ"
+                    valueA={summaryA.totalLate}
+                    valueB={summaryB.totalLate}
+                    difference={
+                      toNumber(summaryA.totalLate) -
+                      toNumber(summaryB.totalLate)
+                    }
+                    type="integer"
+                  />
+                </div>
+              </>
+            )}
         </section>
-      )}
 
-    </main>
+        {/* NHẬN XÉT SO SÁNH TỰ ĐỘNG */}
+        {!loading && !apiError && comparisonData && (
+          <section className="comparison-insights-section">
+            <div className="comparison-section-heading">
+              <div className="comparison-section-icon">✦</div>
+              <div>
+                <h2>Nhận xét so sánh</h2>
+                <p>Nhận xét tự động từ các chỉ số tổng hợp của hai lớp.</p>
+              </div>
+            </div>
+            <div className="comparison-insights-grid">
+              {comparisonInsights.map((item, index) => (
+                <article key={`${item.title}-${index}`} className={`comparison-insight-card ${item.tone}`}>
+                  <div className="comparison-insight-number">{String(index + 1).padStart(2, "0")}</div>
+                  <div><h3>{item.title}</h3><p>{item.text}</p></div>
+                </article>
+              ))}
+            </div>
+            <div className="comparison-insight-note">
+              <strong>Gợi ý:</strong>
+              <span>Đối chiếu thêm Power BI phía trên khi cần xem chi tiết.</span>
+            </div>
+          </section>
+        )}
+
+      </main>
+    </div>
   );
 }
