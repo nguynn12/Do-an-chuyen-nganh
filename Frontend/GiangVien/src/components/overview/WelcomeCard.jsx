@@ -1,5 +1,6 @@
 import { Users, Clock3, Bell, LifeBuoy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { IS_ASSIGNMENT_MANAGEMENT_ENABLED } from "../../config/featureFlags";
 import SummaryCard from "./SummaryCard";
 
 function WelcomeCard({ teacher, stats }) {
@@ -37,7 +38,7 @@ function WelcomeCard({ teacher, stats }) {
           label="Bài chờ chấm"
           value={stats?.pendingGrading != null ? `${stats.pendingGrading} bài chưa chấm` : "0 bài chưa chấm"}
           className="summary-orange"
-          onClick={() => navigate("/bai-cho-cham")}
+          onClick={() => navigate(IS_ASSIGNMENT_MANAGEMENT_ENABLED ? "/bai-cho-cham" : "/cham-diem")}
         />
 
         <SummaryCard

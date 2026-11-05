@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { BarChart3, Folder, Headphones, BookOpen, FileText, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { IS_ASSIGNMENT_MANAGEMENT_ENABLED } from "../../config/featureFlags";
 import { getCourseEngagementTrend, getCourseSegments } from "../../services/teacherApi";
 
 function ActivityDashboard({ stats, courses = [] }) {
@@ -318,14 +319,16 @@ function ActivityDashboard({ stats, courses = [] }) {
           <strong>Tài nguyên nhanh</strong>
         </div>
         <div className="resource-grid">
-          <button
-            type="button"
-            onClick={() => navigate("/quan-ly-bai-tap")}
-            title="Mở Quản lý bài tập & Ngân hàng đề thi"
-          >
-            <FileText size={25} aria-hidden="true" />
-            <span>Ngân hàng đề thi</span>
-          </button>
+          {IS_ASSIGNMENT_MANAGEMENT_ENABLED && (
+            <button
+              type="button"
+              onClick={() => navigate("/quan-ly-bai-tap")}
+              title="Mở Quản lý bài tập & Ngân hàng đề thi"
+            >
+              <FileText size={25} aria-hidden="true" />
+              <span>Ngân hàng đề thi</span>
+            </button>
+          )}
           <button
             type="button"
             onClick={() => navigate("/ho-tro")}

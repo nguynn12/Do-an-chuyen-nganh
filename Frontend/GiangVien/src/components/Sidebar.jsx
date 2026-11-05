@@ -11,11 +11,14 @@ import {
   ClipboardCheck,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { IS_ASSIGNMENT_MANAGEMENT_ENABLED } from "../config/featureFlags";
 
 const menuItems = [
   { path: "/", label: "Tổng quan", icon: Home },
   { path: "/khoa-hoc", label: "Khóa học", icon: BookOpen },
-  { path: "/quan-ly-bai-tap", label: "Quản lý bài tập", icon: ClipboardCheck },
+  ...(IS_ASSIGNMENT_MANAGEMENT_ENABLED
+    ? [{ path: "/quan-ly-bai-tap", label: "Quản lý bài tập", icon: ClipboardCheck }]
+    : []),
   { path: "/phan-tich", label: "Phân tích học tập", icon: ChartNoAxesCombined },
   { path: "/lich", label: "Lịch giảng dạy", icon: CalendarDays },
   // Không hard-code badge thông báo. Khi có API thật thì truyền số thật vào đây sau.
