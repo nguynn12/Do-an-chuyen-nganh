@@ -11,6 +11,10 @@ import StudentSubmissions from "./pages/StudentSubmissions";
 import StudentGrades from "./pages/StudentGrades";
 import StudentEngagement from "./pages/StudentEngagement";
 
+import { AIKeyProvider } from "./context/AIKeyContext";
+import AIKeyModal from "./components/AIKeyModal";
+import AIStudyCoachWidget from "./components/AIStudyCoachWidget";
+
 export default function App() {
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedCourseId, setSelectedCourseId] = useState(null);
@@ -34,7 +38,7 @@ export default function App() {
     }
 
     const cleanHash = hash.replace("#", "");
-    if (["courses", "submissions", "grades", "engagement"].includes(cleanHash)) {
+    if (["courses", "submissions", "grades", "engagement", "ai"].includes(cleanHash)) {
       setActiveTab(cleanHash);
       setSelectedCourseId(null);
       return;
@@ -92,73 +96,121 @@ export default function App() {
   };
 
   return (
-    <div className="app">
-      {/* 1. Header cố định đỉnh màn hình (62px, #17221d, viền #41954c) */}
-      <StudentHeader student={summary?.student} />
+    <AIKeyProvider>
+      <div className="app">
+        {/* 1. Header cố định đỉnh màn hình (62px, #17221d, viền #41954c) */}
+        <StudentHeader student={summary?.student} />
 
-      {/* 2. Sidebar cố định bên trái (45px, #19201c, icon active #3e8f46) */}
-      <StudentSidebar
-        activeTab={activeTab === "course-detail" ? "courses" : activeTab}
-        onSelectTab={handleSelectTab}
-      />
+        {/* 2. Sidebar cố định bên trái (45px, #19201c, icon active #3e8f46) */}
+        <StudentSidebar
+          activeTab={activeTab === "course-detail" ? "courses" : activeTab}
+          onSelectTab={handleSelectTab}
+        />
 
-      {/* 3. Nội dung trang */}
-      {loading ? (
-        <main className="page-full">
-          <div
-            className="welcome-card"
-            style={{
-              padding: "60px",
-              textAlign: "center",
-              color: "#66736b",
-              marginTop: "20px",
-            }}
-          >
+        {/* 3. Nội dung trang */}
+        {loading ? (
+          <main className="page-full">
             <div
+              className="welcome-card"
               style={{
-                fontSize: "16px",
-                fontWeight: "700",
-                marginBottom: "8px",
-                color: "#17221d",
+                padding: "60px",
+                textAlign: "center",
+                color: "#66736b",
+                marginTop: "20px",
               }}
             >
-              Đang đồng bộ dữ liệu từ Data Warehouse...
+              <div
+                style={{
+                  fontSize: "16px",
+                  fontWeight: "700",
+                  marginBottom: "8px",
+                  color: "#17221d",
+                }}
+              >
+                Đang đồng bộ dữ liệu từ Data Warehouse...
+              </div>
+              <div style={{ fontSize: "12px" }}>Vui lòng đợi trong giây lát.</div>
             </div>
-            <div style={{ fontSize: "12px" }}>Vui lòng đợi trong giây lát.</div>
-          </div>
-        </main>
-      ) : (
-        <>
-          {activeTab === "overview" && (
-            <StudentOverview
-              summary={summary}
-              courses={courses}
-              onNavigateToCourse={handleNavigateToCourse}
-              onNavigateToTab={handleSelectTab}
-            />
-          )}
+          </main>
+        ) : (
+          <>
+            {activeTab === "overview" && (
+              <StudentOverview
+                summary={summary}
+                courses={courses}
+                onNavigateToCourse={handleNavigateToCourse}
+                onNavigateToTab={handleSelectTab}
+              />
+            )}
 
-          {activeTab === "courses" && (
-            <StudentCourses
-              courses={courses}
-              onNavigateToCourse={handleNavigateToCourse}
-            />
-          )}
+            {activeTab === "courses" && (
+              <StudentCourses
+                courses={courses}
+                onNavigateToCourse={handleNavigateToCourse}
+              />
+            )}
 
-          {activeTab === "course-detail" && (
-            <StudentCourseDetail
-              courseId={selectedCourseId}
-              onBack={() => handleSelectTab("courses")}
-            />
-          )}
+            {activeTab === "course-detail" && (
+              <StudentCourseDetail
+                courseId={selectedCourseId}
+                onBack={() => handleSelectTab("courses")}
+              />
+            )}
 
-          {activeTab === "submissions" && <StudentSubmissions />}
+            {activeTab === "submissions" && <StudentSubmissions />}
 
-          {activeTab === "grades" && <StudentGrades />}
+            {activeTab === "grades" && <StudentGrades />}
 
-          {activeTab === "engagement" && <StudentEngagement />}
-        </>
-      )}
-    </div>
+            {activeTab === "engagement" && <StudentEngagement />}
+
+            {activeTab === "ai" && (
+              <main className="page-full" style={{ padding: "24px 30px" }}>
+                <div style={{ maxWidth: "1050px", margin: "0 auto" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      marginBottom: "20px",
+                      background: "#ffffff",
+                      padding: "16px 22px",
+                      borderRadius: "14px",
+                      border: "1px solid #e2e8f0",
+                    }}
+                  >
+                    <div>
+                      <h2
+                        style={{
+                          margin: 0,
+                          fontSize: "18px",
+                          fontWeight: "700",
+                          color: "#1b5e20",
+                        }}
+                      >
+                        Cố vấn học tập AI (AI Study Coach)
+                      </h2>
+                      <p
+                        style={{
+                          margin: "4px 0 0 0",
+                          fontSize: "12.5px",
+                          color: "#64748b",
+                        }}
+                      >
+                        Trợ lý sư phạm thông minh cá nhân hóa phân tích dữ liệu điểm số và chuyên cần từ Data Warehouse
+                      </p>
+                    </div>
+                  </div>
+
+                  <AIStudyCoachWidget userKey={summary?.student?.userKey} />
+                </div>
+              </main>
+            )}
+          </>
+        )}
+
+        {/* 4. Modal cấu hình AI Key (BYOK) */}
+        <AIKeyModal />
+      </div>
+    </AIKeyProvider>
   );
 }
