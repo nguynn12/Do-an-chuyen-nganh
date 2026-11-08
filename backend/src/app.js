@@ -12,6 +12,9 @@ import courseRoutes from "./GiangVien/routes/courseRoutes.js";
 // Phân hệ Sinh viên
 import studentRoutes from "./SinhVien/routes/studentRoutes.js";
 
+// AI Module
+import aiRoutes from "./ai/routes/aiRoutes.js";
+
 const app = express();
 
 const allowedOrigins = [
@@ -31,6 +34,7 @@ app.use(
       return callback(null, true);
     },
     credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization", "x-user-gemini-key"],
   })
 );
 
@@ -55,6 +59,9 @@ app.use("/api/courses", courseRoutes);
 // 3. Cổng Sinh viên APIs
 app.use("/api/v1/student", studentRoutes);
 app.use("/api/student", studentRoutes);
+
+// 4. AI Gateway APIs
+app.use("/api/ai", aiRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
