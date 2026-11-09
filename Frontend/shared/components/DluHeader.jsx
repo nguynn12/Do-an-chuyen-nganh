@@ -13,6 +13,7 @@ export default function DluHeader({
   searchPlaceholder,
   onProfileClick,
   onLogout,
+  logoSrc,
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const profileRef = useRef(null);
@@ -77,9 +78,17 @@ export default function DluHeader({
     <header className="dlu-unified-header">
       {/* 1. KHỐI THƯƠNG HIỆU ĐẠI HỌC ĐÀ LẠT */}
       <div className="dlu-uh-brand" aria-label="Đại học Đà Lạt">
-        <div className="dlu-uh-seal" aria-hidden="true">
-          <span className="dlu-uh-seal-mark">DLU</span>
-        </div>
+        {logoSrc ? (
+          <img
+            src={logoSrc}
+            alt="Logo Trường Đại học Đà Lạt"
+            className="dlu-uh-logo-img"
+          />
+        ) : (
+          <div className="dlu-uh-seal" aria-hidden="true">
+            <span className="dlu-uh-seal-mark">DLU</span>
+          </div>
+        )}
 
         <div className="dlu-uh-school-text">
           <span className="dlu-uh-school-name">TRƯỜNG ĐẠI HỌC ĐÀ LẠT</span>

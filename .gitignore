@@ -31,6 +31,7 @@ build/
 !.env.example
 !Backend/.env.example
 Backend/.env
+backend/.env
 
 # =========================
 # POWER BI

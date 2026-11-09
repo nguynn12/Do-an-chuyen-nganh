@@ -26,9 +26,25 @@ export const powerBiEnv = {
   coursePageName: env.VITE_POWERBI_COURSE_PAGE_NAME || "",
 };
 
-// Scope truy cập Power BI REST API cho báo cáo
+// Scope truy cập Power BI REST API cho báo cáo (Read-Only dùng để xem và nhúng)
 export const POWERBI_SCOPES = [
   "https://analysis.windows.net/powerbi/api/Report.Read.All",
+];
+
+// Scopes mở rộng cho Auto Publish & Quản trị Workspace (Task 05.9)
+// Tận dụng các quyền Delegated User đã được cấp consent trong Microsoft Entra ID:
+// - User.Read, Report.Read.All, Report.ReadWrite.All, Dataset.ReadWrite.All, SemanticModel.ReadWrite.All
+export const POWERBI_PUBLISH_SCOPES = [
+  "https://analysis.windows.net/powerbi/api/Report.ReadWrite.All",
+  "https://analysis.windows.net/powerbi/api/Dataset.ReadWrite.All",
+  "https://analysis.windows.net/powerbi/api/Workspace.Read.All",
+  "https://analysis.windows.net/powerbi/api/Report.Read.All",
+];
+
+// Scopes cho Fabric REST API (khi workspace được gán Fabric Capacity F SKU)
+export const FABRIC_SCOPES = [
+  "https://api.fabric.microsoft.com/Item.ReadWrite.All",
+  "https://api.fabric.microsoft.com/Workspace.Read.All",
 ];
 
 // Định danh Bảng và Cột trong Semantic Model Power BI để lọc môn học
@@ -89,8 +105,16 @@ export const POWER_BI_PAGES_CONFIG = {
   GRADE_SIMULATOR: {
     id: "698597e05a5f41367411",
     displayName: "08 - Grade Simulator",
-    label: "Mô phỏng điểm số",
-    description: "Điều chỉnh trọng số What-If và dự báo điểm tổng kết",
+    aliasDisplayNames: [
+      "08 - Grade Simulator",
+      "Grade Simulator",
+      "Chi tiết chuyên cần",
+      "Chi tiết chuyên cần & Điểm điều chỉnh",
+      "Mô phỏng điểm số",
+    ],
+    label: "Chi tiết chuyên cần & Mô phỏng điểm số",
+    description:
+      "Thanh trượt What-If cho điểm chuyên cần dự kiến, giữa kỳ, cuối kỳ, tỷ lệ trọng số và bảng đầu điểm LMS",
   },
   STUDENT_360: {
     id: "d5de91d225dd166bb75a",
@@ -108,18 +132,28 @@ export const DW_COURSE_MAPPING = {
   13: { code: "TEST401", name: "Kiểm thử phần mềm" },
 };
 
+// Danh sách các Origin cục bộ được phép chạy callback để chống lệch cổng giữa 5173 và 5174
+const ALLOWED_LOCAL_ORIGINS = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:5174",
+];
+
 /**
  * Trả về Redirect URI cho MSAL.
- * Ưu tiên:
- * 1. Biến môi trường VITE_POWERBI_REDIRECT_URI (nếu có)
- * 2. Trang callback riêng biệt /auth.html để chạy MSAL Redirect Bridge
+ * Khớp đúng origin khởi tạo của cửa sổ hiện tại (nếu thuộc allowlist) để đảm bảo
+ * BroadcastChannel giữa Main Frame và Popup callback hoạt động trên cùng Origin.
  */
 export function getMsalRedirectUri() {
+  if (typeof window !== "undefined") {
+    const origin = window.location.origin;
+    if (ALLOWED_LOCAL_ORIGINS.includes(origin)) {
+      return `${origin}/auth.html`;
+    }
+  }
   if (powerBiEnv.redirectUri) {
     return powerBiEnv.redirectUri;
-  }
-  if (typeof window !== "undefined") {
-    return `${window.location.origin}/auth.html`;
   }
   return "http://localhost:5173/auth.html";
 }
@@ -132,16 +166,10 @@ export function buildSecureEmbedUrl(reportId, workspaceId) {
   const targetWorkspaceId = workspaceId || powerBiEnv.workspaceId;
 
   if (powerBiEnv.embedUrl && powerBiEnv.embedUrl.includes("reportEmbed")) {
-    let url = powerBiEnv.embedUrl;
-    if (!url.includes("reportId=") && targetReportId) {
-      const sep = url.includes("?") ? "&" : "?";
-      url = `${url}${sep}reportId=${targetReportId}`;
-    }
-    if (!url.includes("groupId=") && targetWorkspaceId) {
-      const sep = url.includes("?") ? "&" : "?";
-      url = `${url}${sep}groupId=${targetWorkspaceId}`;
-    }
-    return url;
+    const url = new URL(powerBiEnv.embedUrl);
+    if (targetReportId) url.searchParams.set('reportId', targetReportId);
+    if (targetWorkspaceId) url.searchParams.set('groupId', targetWorkspaceId);
+    return url.toString();
   }
 
   if (targetReportId) {
@@ -153,6 +181,17 @@ export function buildSecureEmbedUrl(reportId, workspaceId) {
   }
 
   return DEFAULT_EMBED_URL;
+}
+
+export function validateSecureEmbedTarget(reportId, embedUrl) {
+  const url = new URL(embedUrl);
+  if (url.protocol !== 'https:' || url.hostname !== 'app.powerbi.com' || url.pathname.toLowerCase() !== '/reportembed') {
+    throw new Error('URL phải là Power BI reportEmbed có xác thực.');
+  }
+  if (url.searchParams.get('reportId')?.toLowerCase() !== String(reportId).toLowerCase()) {
+    throw new Error('Report ID không khớp embedUrl.');
+  }
+  return url.toString();
 }
 
 /**

@@ -31,6 +31,10 @@ import calendarRoutes from "./GiangVien/routes/calendarRoutes.js";
 // ===== QUẢN LÝ BÀI TẬP & CHẤM ĐIỂM =====
 import assignmentRoutes from "./GiangVien/routes/assignmentRoutes.js";
 
+// ===== TRỢ LÝ AI LMS =====
+import aiAssistantRoutes from "./GiangVien/routes/aiAssistantRoutes.js";
+import aiStudioRoutes from "./GiangVien/routes/aiStudioRoutes.js";
+
 
 // ============================================================
 // PHÂN HỆ SINH VIÊN
@@ -172,6 +176,25 @@ app.use(
 app.use(
   "/api/comparison",
   comparisonRoutes
+);
+
+
+// ------------------------------------------------------------
+// Trợ lý AI LMS (Hỗ trợ phân tích & vẽ biểu đồ an toàn)
+// ------------------------------------------------------------
+
+app.use(
+  "/api/ai/assistant",
+  aiAssistantRoutes
+);
+
+// ------------------------------------------------------------
+// AI Dashboard Studio (Nguồn dữ liệu Excel/CSV & LMS, Chat AI)
+// ------------------------------------------------------------
+
+app.use(
+  "/api/ai/studio",
+  aiStudioRoutes
 );
 
 

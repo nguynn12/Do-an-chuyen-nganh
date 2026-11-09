@@ -2243,6 +2243,23 @@ tr:last-child td {
   gap: 6px;
 }
 
+.course-selector {
+  min-width: 220px;
+  max-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.course-select {
+  width: 100% !important;
+  max-width: 280px;
+  padding: 0 32px 0 13px !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
 .cohort-selector-label {
   color: #7c897f;
   font-size: 9px;
@@ -2337,9 +2354,12 @@ tr:last-child td {
     flex-direction: column;
   }
 
+  .course-selector,
+  .course-select,
   .cohort-selector,
   .cohort-select {
     width: 100%;
+    max-width: 100%;
   }
 }
 
@@ -2349,7 +2369,7 @@ tr:last-child td {
 
 .powerbi-section {
   max-width: 1450px;
-  margin: 20px auto 0;
+  margin: 0 auto 28px;
   padding: 24px;
 
   border: 1px solid var(--border-soft);

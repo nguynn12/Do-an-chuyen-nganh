@@ -2571,13 +2571,19 @@ button:last-child {
 .chart-line { fill:none; stroke:#2f8747; stroke-width:1.4; vector-effect:non-scaling-stroke; }
 .chart-dot { fill:#2f8747; vector-effect:non-scaling-stroke; }
 .chart-dates { display:flex; justify-content:space-between; padding:0 5px; color:#637168; font-size:8px; }
-.donut-layout { height:160px; display:flex; align-items:center; justify-content:center; gap:24px; position:relative; z-index:1; }
+.student-activity-card { min-width:0; }
+.student-activity-card .activity-heading svg { flex-shrink:0; }
+.student-activity-card .activity-heading strong { white-space:normal; }
+.donut-layout { min-height:160px; display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:16px; padding:12px 0; position:relative; z-index:1; }
 .donut { width:126px; height:126px; flex:0 0 auto; border-radius:50%; display:grid; place-items:center; }
 .donut-hole { width:72px; height:72px; display:grid; place-content:center; text-align:center; border-radius:50%; background:white; box-shadow:0 0 0 1px rgba(0,0,0,.02); }
 .donut-hole b { color:#153b2a; font-size:19px; line-height:1; }
 .donut-hole span { margin-top:5px; color:#536159; font-size:9px; }
-.donut-legend { min-width:145px; display:flex; flex-direction:column; gap:16px; }
-.donut-legend div { display:grid; grid-template-columns:10px 1fr auto; align-items:center; gap:7px; font-size:9px; }
+.donut-legend { flex:1 1 180px; min-width:0; display:flex; flex-direction:column; gap:16px; }
+.donut-legend div { display:grid; grid-template-columns:10px minmax(0,1fr) auto; align-items:center; gap:7px; font-size:9px; }
+.donut-legend span { line-height:1.5; overflow-wrap:normal; word-break:normal; }
+.donut-legend b { white-space:nowrap; }
+.donut-legend i.inactive { background:#d8ded9; }
 .donut-legend i { width:9px; height:9px; border-radius:3px; }
 .donut-legend i.good { background:#2f8b45; }.donut-legend i.watch { background:#f2b632; }.donut-legend i.risk { background:#ef4d45; }
 .donut-legend b { color:#2d7d40; }.donut-legend div:nth-child(2) b { color:#d79818; }.donut-legend div:nth-child(3) b { color:#e4443d; }
@@ -2680,33 +2686,57 @@ button:last-child {
   top: 94px;
   padding: 18px 0 15px;
   align-items: stretch;
-  background: linear-gradient(180deg, #0a543f 0%, #063e32 55%, #07392f 100%);
-  border-right: 1px solid rgba(255,255,255,.08);
-  box-shadow: 4px 0 18px rgba(9,61,45,.12);
+  background-color: #003828;
+  border-right: 1px solid rgba(255,255,255,.12);
+  box-shadow: 4px 0 18px rgba(9,61,45,.16);
   overflow: hidden;
+  position: fixed;
 }
 .dlu-sidebar::before {
-  content: ""; position: absolute; inset: auto -40px 0 -40px; height: 230px; opacity: .10; pointer-events: none;
-  background: repeating-linear-gradient(70deg, transparent 0 15px, #d8c584 16px 18px, transparent 19px 30px);
-  clip-path: polygon(0 80%, 8% 64%, 17% 75%, 28% 47%, 38% 70%, 48% 25%, 58% 68%, 70% 49%, 81% 72%, 91% 55%, 100% 76%, 100% 100%, 0 100%);
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0, 77, 54, 0.94) 0%,
+      rgba(0, 77, 54, 0.88) 25%,
+      rgba(0, 63, 47, 0.80) 48%,
+      rgba(0, 63, 47, 0.58) 70%,
+      rgba(0, 50, 37, 0.86) 88%,
+      rgba(0, 40, 30, 0.97) 100%
+    ),
+    url("../assets/anh_dai_hoc_da_lat_campus.jpg") no-repeat center 68% / cover;
+  opacity: 1;
 }
-.dlu-sidebar .sidebar-menu { align-items: stretch; gap: 3px; }
+.dlu-sidebar .sidebar-menu { position: relative; z-index: 1; align-items: stretch; gap: 3px; }
 .dlu-sidebar .sidebar-button {
   width: 100%; height: 47px; padding: 0 15px; border-radius: 0;
   display: flex; align-items: center; justify-content: flex-start; gap: 12px;
   color: rgba(255,255,255,.82); transform: none;
 }
 .dlu-sidebar .sidebar-button:hover { background: rgba(255,255,255,.07); color: #fff; transform: none; }
-.dlu-sidebar .sidebar-button.side-active { background: linear-gradient(90deg, rgba(46,136,86,.68), rgba(35,122,76,.35)); box-shadow: none; color: #fff; }
+.dlu-sidebar .sidebar-button.side-active {
+  background: linear-gradient(90deg, rgba(0, 107, 71, 0.85), rgba(0, 77, 54, 0.65)) !important;
+  border-left: 3px solid #c9a86a !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+  color: #fff !important;
+  font-weight: 600;
+}
+.dlu-sidebar .sidebar-button.side-active .sidebar-icon-wrap {
+  color: #fce8a9;
+}
 .dlu-sidebar .sidebar-button.side-active::before { left: 0; width: 4px; height: 100%; border-radius: 0; background: #9bd18e; }
 .sidebar-icon-wrap { width: 23px; display: inline-flex; align-items: center; justify-content: center; flex: 0 0 23px; }
 .sidebar-label { display: inline-block; font-size: 11px; font-weight: 500; white-space: nowrap; }
 .sidebar-badge { margin-left: auto; width: 21px; height: 21px; display: grid; place-items: center; border-radius: 50%; background: #e74f4a; color: #fff; font-size: 9px; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,.12); }
 .dlu-sidebar .sidebar-tooltip { display: none; }
-.dlu-sidebar-art { position: relative; z-index: 1; margin-top: auto; padding: 8px 10px 16px; color: rgba(224,211,153,.68); text-align: center; }
-.dlu-sidebar-art::before { content: ""; display: block; height: 68px; margin: 0 14px 8px; border-bottom: 1px solid rgba(220,202,137,.28); background: linear-gradient(90deg, transparent 46%, rgba(220,202,137,.6) 47% 53%, transparent 54%); clip-path: polygon(45% 100%,45% 35%,48% 20%,49% 0,51% 20%,55% 35%,55% 100%); }
-.dlu-sidebar-art strong { display: block; font-family: Georgia, serif; font-size: 11px; font-weight: 500; letter-spacing: .5px; }
-.dlu-sidebar-art small { display: block; margin-top: 5px; font-family: Georgia, serif; font-size: 8px; font-style: italic; }
+.dlu-sidebar-art { position: relative; z-index: 1; margin-top: auto; padding: 4px 8px 10px; color: rgba(224,211,153,.85); text-align: center; }
+.dlu-sidebar-art::before { content: ""; display: block; height: 60px; margin: 0 14px 6px; border-bottom: 1px solid rgba(220,202,137,.28); background: linear-gradient(90deg, transparent 46%, rgba(220,202,137,.6) 47% 53%, transparent 54%); clip-path: polygon(45% 100%,45% 35%,48% 20%,49% 0,51% 20%,55% 35%,55% 100%); }
+.dlu-sidebar-art strong { display: block; font-family: Georgia, serif; font-size: 10.5px; font-weight: 600; letter-spacing: .5px; color: #f5dfa8; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+.dlu-sidebar-art small { display: block; margin-top: 3px; font-family: Georgia, serif; font-size: 8px; font-style: italic; color: rgba(245,223,168,0.78); }
 .dlu-sidebar .side-bottom { margin-top: 0; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.09); }
 .dlu-sidebar .logout-button { color: rgba(255,255,255,.82); }
 
@@ -2774,22 +2804,36 @@ button:last-child {
 }
 
 .sidebar-collapse-button {
+  position: relative;
+  z-index: 1;
   width: 100%;
-  height: 34px;
-  margin: 0 0 8px;
-  padding: 0 10px;
+  height: 28px;
+  margin: 0 0 10px;
+  padding: 0 8px;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 7px;
-  border: 0;
-  border-radius: 8px;
-  background: rgba(255,255,255,.055);
-  color: rgba(255,255,255,.76);
-  font-size: 9px;
-  font-weight: 600;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
 }
-.sidebar-collapse-button:hover { background: rgba(255,255,255,.10); color: #fff; }
+.sidebar-collapse-button:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+.sidebar-collapse-button:active {
+  transform: scale(0.97);
+}
 
 .dlu-sidebar .sidebar-menu { gap: 4px !important; }
 .dlu-sidebar .sidebar-button {
@@ -2812,8 +2856,10 @@ button:last-child {
 
 .dlu-sidebar.is-collapsed { padding-left: 7px !important; padding-right: 7px !important; }
 .dlu-sidebar.is-collapsed .sidebar-collapse-button {
-  width: 40px;
+  width: 36px;
+  height: 28px;
   padding: 0;
+  margin: 0 auto 10px;
   justify-content: center;
 }
 .dlu-sidebar.is-collapsed .sidebar-button {
@@ -2828,6 +2874,10 @@ button:last-child {
 .dlu-sidebar.is-collapsed .dlu-sidebar-art small { display: none !important; }
 .dlu-sidebar.is-collapsed .dlu-sidebar-art { transform: scale(.72); transform-origin: bottom center; }
 .dlu-sidebar.is-collapsed .dlu-tower { margin-left: auto; margin-right: auto; }
+.dlu-sidebar.is-collapsed .sidebar-button.side-active {
+  border-left: none !important;
+  box-shadow: inset 0 0 0 2px #c9a86a, 0 2px 6px rgba(0, 0, 0, 0.25) !important;
+}
 
 /* Dashboard luôn né đúng header/sidebar, không bị che */
 .page {
@@ -4077,3 +4127,46 @@ body {
   font-size: 8px !important;
   font-weight: 400 !important;
 }
+.schedule-legend { flex-wrap: wrap; gap: 12px; }
+.legend-dot.makeup, .legend-dot.practice, .legend-dot.consultation { background: #4d9c86; }
+.legend-dot.invigilation, .legend-dot.grading { background: #c27859; }
+.legend-dot.seminar, .legend-dot.research { background: #8a79b2; }
+.legend-dot.personal, .legend-dot.other { background: #82909c; }
+.schedule-day-preview.event-makeup, .schedule-day-preview.event-practice, .schedule-day-preview.event-consultation { background: #e1f2ed; color: #347965; }
+.schedule-day-preview.event-invigilation, .schedule-day-preview.event-grading { background: #faeade; color: #9a6244; }
+.schedule-day-preview.event-seminar, .schedule-day-preview.event-research { background: #eee8f8; color: #786099; }
+.schedule-day-preview.event-personal, .schedule-day-preview.event-other { background: #e9eef2; color: #5b6b78; }
+/* Planning controls shared by the dashboard drawer and full-page calendar. */
+.schedule-form-fields { border: 0; padding: 0; margin: 0; display: grid; gap: 14px; min-width: 0; }
+.schedule-form-fields textarea { width: 100%; min-height: 90px; resize: vertical; box-sizing: border-box; padding: 10px; font: inherit; font-size: 12px; line-height: 1.6; color: #304b39; background: #fff; border: 1px solid #d9e1da; border-radius: 8px; }
+.schedule-form-fields textarea:focus { outline: 2px solid #94b79a; outline-offset: 1px; }
+.schedule-view-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 16px; }
+.schedule-view-toolbar > div { display: flex; gap: 3px; background: #eff4ed; padding: 4px; border-radius: 9px; }
+.schedule-view-toolbar button { border: 0; border-radius: 6px; padding: 7px 15px; background: transparent; color: #70816f; font: inherit; font-size: 12px; cursor: pointer; }
+.schedule-view-toolbar button.active { color: #2d6545; background: #fff; box-shadow: 0 2px 5px #254d3510; font-weight: 700; }
+.schedule-view-toolbar > span { color: #8a9888; font-size: 10px; }
+.schedule-panel-calendar .schedule-today-button { width: auto; padding: 0 10px; font-size: 11px; }
+.schedule-type-key { margin-top: 20px; color: #7c8e7b; font-size: 11px; }
+.schedule-type-key summary { cursor: pointer; padding: 7px 0; }
+.schedule-repeat-box { padding: 13px; border-radius: 10px; background: #f1f6ee; display: grid; gap: 12px; }
+.schedule-repeat-box p { font-size: 11px; color: #75856f; line-height: 1.7; margin: 0; }
+.schedule-create-form label.schedule-check { display: flex; flex-direction: row; align-items: flex-start; gap: 8px; cursor: pointer; }
+.schedule-create-form .schedule-check input { width: 16px !important; height: 16px !important; min-width: 16px; margin: 2px 0; padding: 0; accent-color: #356f4d; }
+.schedule-check span { display: flex; align-items: center; gap: 7px; line-height: 1.6; }
+.schedule-conflict-warning { background: #fff7e6; color: #8e672d; border: 1px solid #efdbaf; padding: 12px; border-radius: 10px; font-size: 12px; }
+.schedule-conflict-warning > strong { display: flex; align-items: center; gap: 7px; }
+.schedule-conflict-warning ul { padding-left: 18px; line-height: 1.8; }
+.schedule-form-hint { font-size: 10px; line-height: 1.7; color: #889782; }
+.schedule-success { color: #3e754d; background: #eaf4e7; padding: 10px 12px; font-size: 12px; line-height: 1.7; border-radius: 8px; }
+.schedule-event-meta { display: flex; gap: 6px; align-items: center; font-size: 11px; color: #73816c; margin: 9px 0 0; }
+.schedule-online-link { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: #397d69; margin-top: 8px; text-decoration: none; }
+.schedule-online-link:hover { text-decoration: underline; }
+.schedule-event-notes { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 11px; color: #7e8979; line-height: 1.7; margin: 8px 0 0; }
+.schedule-panel .schedule-event { flex-wrap: wrap; }
+.schedule-panel .schedule-event-time { flex-basis: 100%; }
+.schedule-no-event > svg { color: #9ab094; margin-top: 3px; }
+.schedule-panel-embedded .schedule-week-view .schedule-day { min-height: 230px; }
+.schedule-panel-embedded .schedule-week-view .schedule-day-preview { white-space: normal; overflow-wrap: anywhere; padding: 6px; line-height: 1.6; }
+.schedule-panel-embedded .schedule-create-actions button { font-size: 12px; min-height: 39px; }
+.schedule-panel-embedded .schedule-detail { max-height: none; }
+@media (max-width: 700px) { .schedule-panel-embedded .schedule-week-view .schedule-day { min-height: 150px; } .schedule-panel-embedded .schedule-week-view .schedule-day-preview { padding: 3px; font-size: 9px; } .schedule-view-toolbar > span { font-size: 9px; } .schedule-panel-embedded .schedule-calendar-nav { flex-wrap: wrap; gap: 12px; } }

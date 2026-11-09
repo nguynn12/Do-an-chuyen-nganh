@@ -1,3 +1,4 @@
+import DataLoadError from './components/DataLoadError';
 import { useEffect, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import "./styles/StudentDashboard.css";
@@ -46,6 +47,8 @@ function StudentShell() {
       : null
   );
   const [courses, setCourses] = useState([]);
+  const [loadError,setLoadError]=useState("");
+  const [reload,setReload]=useState(0);
   const [loading, setLoading] = useState(!isDemo);
   const studentUserKey = getStudentUserId();
 
@@ -89,28 +92,31 @@ function StudentShell() {
   }, []);
 
   useEffect(() => {
+    let cancelled=false;
     const fetchData = async () => {
       try {
-        setLoading(true);
+        setLoading(true);setLoadError("");
         const [sumData, crsData] = await Promise.all([
           studentGet("/dashboard-summary"),
           studentGet("/courses"),
         ]);
 
+        if(cancelled)return;
         if (sumData) {
           setSummary(sumData);
         }
 
         setCourses(Array.isArray(crsData) ? crsData : []);
-      } catch (err) {
-        console.error("Lỗi nạp dữ liệu dashboard sinh viên:", err);
+      } catch (_err) {
+        if(!cancelled)setLoadError("Không tải được thông tin tổng quan và danh sách môn học. Vui lòng thử lại.");
       } finally {
-        setLoading(false);
+        if(!cancelled)setLoading(false);
       }
     };
 
     fetchData();
-  }, [studentUserKey]);
+    return()=>{cancelled=true;};
+  }, [studentUserKey,reload]);
 
   const handleSelectTab = (tabId) => {
     window.location.hash = tabId === "overview" ? "" : tabId;
@@ -129,7 +135,7 @@ function StudentShell() {
         onSelectTab={handleSelectTab}
       />
 
-      {loading ? (
+      {loadError ? <DataLoadError message={loadError} onRetry={()=>setReload(n=>n+1)}/> : loading ? (
         <main className="page-full">
           <div
             className="welcome-card"

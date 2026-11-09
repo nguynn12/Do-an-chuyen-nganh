@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import DluHeader from "../../../shared/components/DluHeader";
+import { clearTeacherSession } from "../services/authService";
+import dluLogo from "../assets/logo_dlu_official.png";
 
 function Header({ teacher = {} }) {
   const navigate = useNavigate();
@@ -9,14 +11,14 @@ function Header({ teacher = {} }) {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("teacherToken");
-    localStorage.removeItem("teacherUser");
-    navigate("/dang-nhap");
+    clearTeacherSession();
+    navigate("/dang-nhap", { replace: true });
   };
 
   return (
     <DluHeader
       role="teacher"
+      logoSrc={dluLogo}
       user={{
         fullName: teacher?.fullName,
         degree: teacher?.degree,

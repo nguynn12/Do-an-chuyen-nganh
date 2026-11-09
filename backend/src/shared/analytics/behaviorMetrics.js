@@ -89,7 +89,7 @@ export async function calculateCourseBehaviorMetrics(
   courseIdentifier,
   options = {}
 ) {
-  const { cutOffDate = null } = options;
+  const { cutOffDate = null, cohort = null } = options;
 
   // 1. Xác định thông tin môn học trong Dim_Course
   const [courseRows] = await dbConnection.query(
@@ -127,7 +127,23 @@ export async function calculateCourseBehaviorMetrics(
 
   const referenceDate = maxDataDate ? new Date(maxDataDate) : new Date("2026-05-28");
 
-  // 3. Lấy danh sách tất cả sinh viên ghi danh trong môn
+  // 3. Lấy danh sách sinh viên ghi danh trong môn (có lọc theo Cohort nếu được yêu cầu)
+  let cohortCondition = "";
+  const studentQueryParams = [courseKey];
+
+  if (cohort) {
+    const normCohort = String(cohort).trim().toUpperCase();
+    const patternMap = {
+      K45: "sv21%",
+      K46: "sv22%",
+      K47: "sv23%",
+      K48: "sv24%",
+    };
+    const pattern = patternMap[normCohort] || `${normCohort.toLowerCase()}%`;
+    cohortCondition = "AND du.Username LIKE ?";
+    studentQueryParams.push(pattern);
+  }
+
   const [students] = await dbConnection.query(
     `SELECT 
        du.User_Key AS userKey,
@@ -140,9 +156,9 @@ export async function calculateCourseBehaviorMetrics(
        fe.Status AS enrolmentStatus
      FROM Fact_Enrolment fe
      INNER JOIN Dim_User du ON du.User_Key = fe.User_Key
-     WHERE fe.Course_Key = ? AND du.Primary_Role = 'Student'
+     WHERE fe.Course_Key = ? AND du.Primary_Role = 'Student' ${cohortCondition}
      ORDER BY du.Full_Name ASC`,
-    [courseKey]
+    studentQueryParams
   );
 
   const totalStudents = students.length;

@@ -28,7 +28,7 @@ function UrgentTasks({ tasks }) {
               <div className="task-info">
                 <strong>{task.title}</strong>
                 <span>
-                  Hạn: {formatDate(task.dueDate)}
+                  {task.dueDate ? `Hạn: ${formatDate(task.dueDate)}` : "Đang chờ xử lý"}
                   {task.description ? `, ${task.description}` : ""}
                 </span>
               </div>

@@ -5,15 +5,25 @@ const STUDENT_KEYS = [
   "studentMoodleId",
   "studentName",
   "studentUsername",
+  "studentEmail",
+  "studentToken",
+  "studentUser",
+  "rememberStudentLogin",
+  "user",
 ];
 
 export function getStudentUserId() {
   return localStorage.getItem("studentUserKey") || "";
 }
 
+export function getStudentToken() {
+  if (typeof window === "undefined") return "";
+  return localStorage.getItem("studentToken") || "";
+}
+
 export function getStudentUsername() {
   try {
-    const rawUser = localStorage.getItem("user");
+    const rawUser = localStorage.getItem("studentUser") || localStorage.getItem("user");
     if (rawUser) {
       let parsedUser;
       try {
@@ -45,7 +55,7 @@ export function getStudentUsername() {
   } catch (e) {
     console.warn("Lỗi khi đọc username từ localStorage:", e);
   }
-  return "sv2310002";
+  return "";
 }
 
 export function isStudentAuthenticated() {
@@ -56,16 +66,61 @@ export function isStudentAuthenticated() {
   );
 }
 
-export function saveStudentSession(user) {
+export function saveStudentSession(user, remember = false, token = null) {
+  if (!user) return;
+
+  const userKey = String(user.userKey || "");
+  const moodleUserId = String(user.moodleUserId || "");
+  const username = user.username || "";
+  const fullName = user.fullName || "";
+  const email = user.email || "";
+  const role = user.role || "student";
+  const authToken = token || user.token || "";
+
   localStorage.setItem("isLoggedIn", "true");
-  localStorage.setItem("userRole", user.role);
-  localStorage.setItem("studentUserKey", String(user.userKey));
-  localStorage.setItem("studentMoodleId", String(user.moodleUserId));
-  localStorage.setItem("studentName", user.fullName || "");
-  localStorage.setItem("studentUsername", user.username || "");
+  localStorage.setItem("userRole", role);
+  localStorage.setItem("studentUserKey", userKey);
+  localStorage.setItem("studentMoodleId", moodleUserId);
+  localStorage.setItem("studentName", fullName);
+  localStorage.setItem("studentUsername", username);
+  localStorage.setItem("studentEmail", email);
+
+  if (authToken) {
+    localStorage.setItem("studentToken", authToken);
+  }
+
+  localStorage.setItem(
+    "studentUser",
+    JSON.stringify({
+      userKey,
+      moodleUserId,
+      username,
+      fullName,
+      email,
+      role,
+    })
+  );
+
+  if (remember) {
+    localStorage.setItem("rememberStudentLogin", "true");
+  } else {
+    localStorage.removeItem("rememberStudentLogin");
+  }
 }
 
 export function clearAuthStorage() {
+  if (typeof window === "undefined") return;
   STUDENT_KEYS.forEach((key) => localStorage.removeItem(key));
-  localStorage.clear();
+  // Không gọi localStorage.clear() bừa bãi để tránh mất cấu hình giao diện UI như collapsed sidebar
+  localStorage.removeItem("isLoggedIn");
+  localStorage.removeItem("userRole");
+  localStorage.removeItem("studentUserKey");
+  localStorage.removeItem("studentMoodleId");
+  localStorage.removeItem("studentName");
+  localStorage.removeItem("studentUsername");
+  localStorage.removeItem("studentEmail");
+  localStorage.removeItem("studentToken");
+  localStorage.removeItem("studentUser");
+  localStorage.removeItem("rememberStudentLogin");
 }
+

@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {GROUP_SLICERS,readGroupSliders,parseGradeCardCsv,verifyGroupCard} from './src/services/gradeSlicerBridge.js';
+const expected={midterm:5.6,final:3.6,chuyen_can:15,giua_ky:70,cuoi_ky:15};
+const slicers=Object.fromEntries(Object.entries(GROUP_SLICERS).map(([key,target])=>[key,{getSlicerState:async()=>({filters:[{target,operator:'In',values:[expected[key]]}]})}]));
+assert.deepEqual(await readGroupSliders(slicers),expected);
+assert.equal(parseGradeCardCsv('Điểm Giữa kỳ động\r\n5.60\r\n'),5.6);
+assert.equal(parseGradeCardCsv('Điểm Cuối kỳ động\r\n"3,60"\r\n'),3.6);
+assert.equal(parseGradeCardCsv('Grade\n0\n'),0);
+for(const csv of ['Grade\n','Grade\n--','Grade\n11','Grade\n5.6\n7.1']) assert.throws(()=>parseGradeCardCsv(csv));
+const report={getPages:async()=>[{name:'698597e05a5f41367411',getVisuals:async()=>[{name:'4b9f98571b67cbae90f5',exportData:async()=>({data:'Grade\n5.90'})},{name:'aaf8a2389c93046613aa',exportData:async()=>({data:'Grade\n3.60'})}]}]};
+await assert.rejects(()=>verifyGroupCard(report,'giua_ky',5.6),/5.60.*5.90/);
+assert.equal(await verifyGroupCard(report,'cuoi_ky',3.6),3.6);
+console.log('PASS: all five group sliders read, decimal comma/dot and zero supported, blank/ambiguous cards rejected, mismatched card blocked, matching card accepted');

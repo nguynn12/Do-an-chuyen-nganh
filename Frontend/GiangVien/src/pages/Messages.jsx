@@ -24,7 +24,7 @@ import Sidebar from "../components/Sidebar";
 import LoadingScreen from "../components/common/LoadingScreen";
 import ErrorScreen from "../components/common/ErrorScreen";
 import useTeacherDashboard from "../hooks/useTeacherDashboard";
-import { getTeacherLearningAlertsApi } from "../services/teacherApi";
+import { getTeacherLearningAlertsApi, updateLearningAlertApi, markAllLearningAlertsApi, deleteLearningAlertApi, broadcastLearningAlertApi } from "../services/teacherApi";
 
 import "../styles/TeacherOverview.css";
 import "../styles/Messages.css";
@@ -39,6 +39,9 @@ export default function Messages() {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [onlyUnread, setOnlyUnread] = useState(false);
   const [showComposeModal, setShowComposeModal] = useState(false);
+  const [actionError, setActionError] = useState('');
+  const [sending, setSending] = useState(false);
+  const [feedback, setFeedback] = useState('');
 
   // Form soạn thông báo
   const [newTitle, setNewTitle] = useState("");
@@ -58,7 +61,7 @@ export default function Messages() {
         }
       })
       .catch((err) => {
-        console.error("Lỗi nạp cảnh báo học tập từ CSDL:", err);
+        setActionError(err.message || "Không tải được thông báo.");
       })
       .finally(() => {
         setAlertsLoading(false);
@@ -97,51 +100,43 @@ export default function Messages() {
     });
   }, [notifications, activeTab, onlyUnread, searchKeyword]);
 
-  // Đánh dấu 1 thông báo là đã đọc / chưa đọc
-  const toggleRead = (id) => {
-    setNotifications((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, unread: !item.unread } : item
-      )
-    );
+  const toggleRead = async (id) => {
+    const item = notifications.find(item => item.id === id);
+    if (!item) return;
+    try {
+      setActionError('');
+      await updateLearningAlertApi(teacher.id, id, item.unread);
+      setNotifications(prev => prev.map(row => row.id === id ? {...row, unread: !item.unread} : row));
+    } catch (err) { setActionError(err.message); }
   };
-
-  // Đánh dấu tất cả đã đọc
-  const markAllAsRead = () => {
-    setNotifications((prev) => prev.map((item) => ({ ...item, unread: false })));
+  const markAllAsRead = async () => {
+    try {
+      setActionError(''); await markAllLearningAlertsApi(teacher.id);
+      setNotifications(prev => prev.map(item => ({...item, unread:false})));
+    } catch (err) { setActionError(err.message); }
   };
-
-  // Xóa thông báo
-  const deleteNotification = (id) => {
-    setNotifications((prev) => prev.filter((item) => item.id !== id));
+  const deleteNotification = async (id) => {
+    try {
+      setActionError(''); await deleteLearningAlertApi(teacher.id, id);
+      setNotifications(prev => prev.filter(item => item.id !== id));
+    } catch (err) { setActionError(err.message); }
   };
-
-  // Gửi thông báo mới
-  const handleSendBroadcast = (e) => {
+  const handleSendBroadcast = async (e) => {
     e.preventDefault();
-    if (!newTitle.trim() || !newDesc.trim()) return;
-
-    const matchedCourse = courses.find((c) => c.name === newCourse);
-    const targetCourseId = matchedCourse ? (matchedCourse.courseId || matchedCourse.id) : null;
-
-    const newItem = {
-      id: Date.now(),
-      type: newType,
-      title: newTitle.trim(),
-      desc: newDesc.trim(),
-      courseName: newCourse,
-      courseId: targetCourseId,
-      time: "Vừa xong",
-      unread: true,
-      priority: newType === "risk" ? "high" : "medium",
-      actionPath: targetCourseId ? `/quan-ly-lop/${targetCourseId}` : null,
-      actionLabel: targetCourseId ? "Xem phân tích lớp" : null,
-    };
-
-    setNotifications([newItem, ...notifications]);
-    setNewTitle("");
-    setNewDesc("");
-    setShowComposeModal(false);
+    if (sending || !newTitle.trim() || !newDesc.trim()) return;
+    const matchedCourse = courses.find(c => c.name === newCourse);
+    if (newCourse !== 'Tất cả các lớp phụ trách' && !matchedCourse) {
+      setActionError('Lớp đã chọn không còn khả dụng.'); return;
+    }
+    setSending(true); setActionError(''); setFeedback('');
+    try {
+      const result = await broadcastLearningAlertApi(teacher.id, {title:newTitle.trim(), desc:newDesc.trim(), type:newType,
+        courseId:matchedCourse ? Number(matchedCourse.courseId || matchedCourse.id) : null});
+      setNotifications(await getTeacherLearningAlertsApi(teacher.id));
+      setFeedback(`Đã gửi thông báo tới ${result.recipientCount} sinh viên.`);
+      setNewTitle(''); setNewDesc(''); setShowComposeModal(false);
+    } catch (err) { setActionError(err.message); }
+    finally { setSending(false); }
   };
 
   if (loading) {
@@ -154,6 +149,8 @@ export default function Messages() {
 
   return (
     <div className="app">
+      {actionError && <div role="alert" style={{position:'fixed',top:70,left:'25%',zIndex:10000,background:'#fff0ef',padding:16}}>{actionError}</div>}
+      {feedback && <div role="status" style={{position:'fixed',top:70,left:'25%',zIndex:10000,background:'#e9f7ee',padding:16}}>{feedback}</div>}
       {/* HEADER */}
       <Header teacher={teacher} />
 
@@ -292,10 +289,11 @@ export default function Messages() {
             </div>
 
             <div className="messages-actions-right">
-              <div className="search-box">
-                <Search size={15} className="search-icon" />
+              <div className="messages-search-box">
+                <Search size={15} className="messages-search-icon" />
                 <input
                   type="text"
+                  aria-label="Tìm thông báo, mã môn"
                   placeholder="Tìm thông báo, mã môn..."
                   value={searchKeyword}
                   onChange={(e) => setSearchKeyword(e.target.value)}
@@ -523,6 +521,7 @@ export default function Messages() {
                     type="text"
                     required
                     placeholder="VD: Nhắc nhở hạn chót nộp bài thực hành Lab 4..."
+                    maxLength={255}
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
                   />
@@ -534,6 +533,7 @@ export default function Messages() {
                     rows={4}
                     required
                     placeholder="Nhập nội dung nhắc nhở sinh viên về yêu cầu bài nộp, thời gian hết hạn hoặc tiêu chí đánh giá..."
+                    maxLength={10000}
                     value={newDesc}
                     onChange={(e) => setNewDesc(e.target.value)}
                   />
@@ -548,7 +548,7 @@ export default function Messages() {
                 >
                   Hủy bỏ
                 </button>
-                <button type="submit" className="btn-compose">
+                <button type="submit" disabled={sending} className="btn-compose">
                   <Send size={14} /> Phát thông báo ngay
                 </button>
               </div>

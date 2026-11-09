@@ -15,10 +15,7 @@ function WelcomeCard({ teacher, stats }) {
             Xin chào, {teacher.degree} {teacher.fullName}
           </h2>
 
-          <p>
-            {teacher.department} | Niên khóa: {teacher.schoolYear} |{" "}
-            {teacher.semester}
-          </p>
+          <p>{[teacher.department, teacher.schoolYear && `Niên khóa: ${teacher.schoolYear}`, teacher.semester].filter(Boolean).join(' | ') || 'Cổng giảng viên · Phân tích học tập'}</p>
         </div>
       </div>
 

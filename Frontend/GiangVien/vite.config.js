@@ -8,6 +8,15 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url))
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      react: resolve(__dirname, 'node_modules/react'),
+      'react-dom': resolve(__dirname, 'node_modules/react-dom'),
+      'lucide-react': resolve(__dirname, 'node_modules/lucide-react'),
+      'react-router-dom': resolve(__dirname, 'node_modules/react-router-dom'),
+    },
+    dedupe: ['react', 'react-dom', 'lucide-react', 'react-router-dom'],
+  },
   server: {
     port: 5173,
     proxy: {

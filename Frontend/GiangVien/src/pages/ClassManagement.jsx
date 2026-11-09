@@ -33,6 +33,7 @@ import SubmissionBehaviorSection from "../components/class-management/Submission
 import SegmentsScatterSection from "../components/class-management/SegmentsScatterSection";
 import EarlyWarningRiskSection from "../components/class-management/EarlyWarningRiskSection";
 import SimpleRiskList from "../components/class-management/SimpleRiskList";
+import AiAssistantWidget from "../components/ai-assistant/AiAssistantWidget";
 import {
   getTeacher,
   getTeacherCourses,
@@ -40,6 +41,8 @@ import {
   getCourseStudentAnalytics,
   getCourseGradeDistribution,
   getCourseEngagementTrend,
+  getCourseCohorts,
+  getCourseDetails,
 } from "../services/teacherApi";
 
 import "../styles/TeacherOverview.css";
@@ -183,7 +186,7 @@ function getStudentAssessment(
   };
 }
 
-function formatLearningTime(minutes) {
+function _formatLearningTime(minutes) {
   const value = Number(minutes || 0);
 
   if (value <= 0) {
@@ -286,6 +289,11 @@ function ClassManagement() {
     setCourse,
   ] = useState(null);
 
+  const [
+    courses,
+    setCourses,
+  ] = useState([]);
+
 
   const [
     students,
@@ -327,13 +335,83 @@ function ClassManagement() {
   const [engagementTrend, setEngagementTrend] = useState([]);
   const [hoveredWeek, setHoveredWeek] = useState(null);
 
-  // Khóa đang xem trên dashboard.
-  // Bước tiếp theo backend sẽ nhận giá trị này để lọc dữ liệu K45/K46/K47.
+  // Danh sách khóa có dữ liệu thực tế cho môn học hiện tại (từ Data Warehouse)
+  const [availableCohorts, setAvailableCohorts] = useState([]);
+  const [loadingCohorts, setLoadingCohorts] = useState(false);
+
+  // Khóa đang xem trên dashboard (Source of Truth từ dropdown).
   const [selectedCohort, setSelectedCohort] = useState("K47");
+
+  // Cohort có hiệu lực thực tế dựa trên availableCohorts của môn học
+  const effectiveCohort = useMemo(() => {
+    if (availableCohorts && availableCohorts.length > 0) {
+      const exists = availableCohorts.some(
+        (item) => (item.cohort || item.Cohort) === selectedCohort
+      );
+      if (exists) return selectedCohort;
+      return availableCohorts[0].cohort || availableCohorts[0].Cohort || "K47";
+    }
+    return selectedCohort || "K47";
+  }, [availableCohorts, selectedCohort]);
+
+  // Tự động đồng bộ selectedCohort khi effectiveCohort thay đổi (ví dụ khi chuyển môn)
+  useEffect(() => {
+    if (effectiveCohort !== selectedCohort) {
+      setSelectedCohort(effectiveCohort);
+    }
+  }, [effectiveCohort, selectedCohort]);
+
+  // DW Course_Key tương ứng với môn học đang chọn
+  const selectedCourseKey = useMemo(() => {
+    const numId = Number(courseId);
+    if (course && Number(course.courseId || course.id) === numId && course.courseKey) {
+      return Number(course.courseKey);
+    }
+    const fromCourses = courses.find((item) => Number(item.Moodle_Course_ID) === numId);
+    if (fromCourses?.Course_Key) {
+      return Number(fromCourses.Course_Key);
+    }
+    return null;
+  }, [course, courses, courseId]);
 
 
   // ====================================================
-  // LOAD DATA
+  // 1. TẢI DANH SÁCH COHORT THỰC TẾ THEO MÔN HỌC
+  // ====================================================
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadCohorts() {
+      const numericCourseId = Number(courseId);
+      if (!numericCourseId) return;
+
+      try {
+        setLoadingCohorts(true);
+        const cohortRes = await getCourseCohorts(numericCourseId).catch((err) => {
+          console.error("Lỗi tải danh sách cohort:", err);
+          return [];
+        });
+
+        if (cancelled) return;
+        const list = Array.isArray(cohortRes) ? cohortRes : (cohortRes?.data ?? []);
+        setAvailableCohorts(list);
+      } catch (err) {
+        console.error("Lỗi loadCohorts:", err);
+      } finally {
+        if (!cancelled) setLoadingCohorts(false);
+      }
+    }
+
+    loadCohorts();
+    return () => {
+      cancelled = true;
+    };
+  }, [courseId]);
+
+
+  // ====================================================
+  // 2. TẢI DỮ LIỆU LỚP HỌC THEO COURSE VÀ EFFECTIVE COHORT
   // ====================================================
 
   useEffect(() => {
@@ -356,7 +434,7 @@ function ClassManagement() {
             localStorage.getItem(
               "currentTeacherId"
             )
-          );
+          ) || 2;
 
 
         if (!teacherId) {
@@ -380,9 +458,11 @@ function ClassManagement() {
           );
         }
 
+        console.log(`[ClassManagement] Tải dữ liệu Môn: ${numericCourseId}, Khóa: ${effectiveCohort}`);
+
 
         // ==============================================
-        // CALL API
+        // CALL API ĐỒNG BỘ THEO COURSE + EFFECTIVE COHORT
         // ==============================================
 
         const [
@@ -395,25 +475,25 @@ function ClassManagement() {
         ] = await Promise.all([
           getTeacher(
             teacherId
-          ),
+          ).catch(() => null),
 
           getTeacherCourses(
             teacherId
-          ),
+          ).catch(() => []),
 
           getCourseStudents(
             numericCourseId,
-            selectedCohort
+            effectiveCohort
           ),
 
           getCourseStudentAnalytics(
             numericCourseId,
-            selectedCohort
+            effectiveCohort
           ),
 
           getCourseGradeDistribution(
             numericCourseId,
-            selectedCohort
+            effectiveCohort
           ).catch((err) => {
             console.error("Lỗi tải phân bố điểm:", err);
             return [];
@@ -421,7 +501,7 @@ function ClassManagement() {
 
           getCourseEngagementTrend(
             numericCourseId,
-            selectedCohort
+            effectiveCohort
           ).catch((err) => {
             console.error("Lỗi tải xu hướng tương tác:", err);
             return [];
@@ -433,28 +513,34 @@ function ClassManagement() {
           return;
         }
 
-        if (distributionData && distributionData.length > 0) {
-          setGradeDistributions(distributionData);
+        let allCourses = teacherCourses && Array.isArray(teacherCourses) ? [...teacherCourses] : [];
+
+        let currentCourse = allCourses.find(
+          (item) => Number(item.Moodle_Course_ID) === numericCourseId || Number(item.Course_Key) === numericCourseId
+        );
+
+        if (!currentCourse) {
+          const detail = await getCourseDetails(numericCourseId).catch(() => null);
+          if (detail) {
+            currentCourse = detail;
+            const alreadyExists = allCourses.some((c) => (detail.Moodle_Course_ID && Number(c.Moodle_Course_ID) === Number(detail.Moodle_Course_ID)) || (detail.Course_Key && Number(c.Course_Key) === Number(detail.Course_Key)));
+            if (!alreadyExists) {
+              allCourses.push(currentCourse);
+            }
+          }
         }
 
-        if (trendData && trendData.length > 0) {
-          setEngagementTrend(trendData);
+        if (allCourses.length > 0) {
+          setCourses(allCourses);
         }
+
+        setGradeDistributions(distributionData || []);
+        setEngagementTrend(trendData || []);
 
 
         // ==============================================
         // TÌM MÔN GIẢNG VIÊN PHỤ TRÁCH
         // ==============================================
-
-        const currentCourse =
-          teacherCourses.find(
-            (item) =>
-              Number(
-                item.Moodle_Course_ID
-              ) ===
-              numericCourseId
-          );
-
 
         if (!currentCourse) {
           throw new Error(
@@ -467,11 +553,13 @@ function ClassManagement() {
         // TEACHER
         // ==============================================
 
-        setTeacher(
-          normalizeTeacher(
-            teacherData
-          )
-        );
+        if (teacherData) {
+          setTeacher(
+            normalizeTeacher(
+              teacherData
+            )
+          );
+        }
 
 
         // ==============================================
@@ -775,16 +863,14 @@ totalTrackedDays:
 
 
         const submissionRate =
-          totalAssignmentsExpected >
-          0
-            ? Math.round(
+          totalAssignmentsExpected > 0
+            ? Number(
                 (
-                  totalSubmittedAssignments /
-                  totalAssignmentsExpected
-                ) *
+                  (totalSubmittedAssignments / totalAssignmentsExpected) *
                   100
+                ).toFixed(2)
               )
-            : 0;
+            : null;
 
 
         // ==============================================
@@ -953,7 +1039,7 @@ const averageAttendance =
       cancelled = true;
     };
 
-  }, [courseId, selectedCohort]);
+  }, [courseId, effectiveCohort]);
 
 
   // ====================================================
@@ -1054,7 +1140,7 @@ const averageAttendance =
   // RISK STUDENTS (DANH SÁCH CẦN CHÚ Ý)
   // ====================================================
 
-  const riskStudents = useMemo(() => {
+  const _riskStudents = useMemo(() => {
     return students
       .map((s) => ({
         student: s,
@@ -1215,7 +1301,7 @@ const averageAttendance =
   // LOADING
   // ====================================================
 
-  if (loading) {
+  if (loading && !course) {
     return (
       <div className="class-loading">
 
@@ -1383,6 +1469,37 @@ const averageAttendance =
 
           <div className="class-hero-actions">
 
+            {courses && courses.length > 0 && (
+              <div className="course-selector">
+                <span className="cohort-selector-label">
+                  Môn học đang xem
+                </span>
+
+                <div className="cohort-select-wrap">
+                  <select
+                    className="cohort-select course-select"
+                    value={course?.courseId || courseId}
+                    onChange={(event) => {
+                      const nextCourseId = event.target.value;
+                      if (nextCourseId && String(nextCourseId) !== String(courseId)) {
+                        navigate(`/quan-ly-lop/${nextCourseId}`);
+                      }
+                    }}
+                    aria-label="Chọn môn học"
+                  >
+                    {courses.map((item, idx) => (
+                      <option
+                        key={`course-${item.Moodle_Course_ID || item.Course_Key || idx}-${idx}`}
+                        value={item.Moodle_Course_ID}
+                      >
+                        {item.Course_Name || item.Course_Code || `Môn ${item.Moodle_Course_ID}`}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            )}
+
             <div className="cohort-selector">
               <span className="cohort-selector-label">
                 Khóa đang xem
@@ -1391,7 +1508,7 @@ const averageAttendance =
               <div className="cohort-select-wrap">
                 <select
                   className="cohort-select"
-                  value={selectedCohort}
+                  value={effectiveCohort}
                   onChange={(event) => {
                     const cohort = event.target.value;
                     setSelectedCohort(cohort);
@@ -1403,14 +1520,27 @@ const averageAttendance =
                     setSelectedActivityKey("OVERALL");
                   }}
                   aria-label="Chọn khóa sinh viên"
+                  disabled={loadingCohorts || availableCohorts.length <= 1}
                 >
-                  <option value="K47">Khóa 47</option>
-                  <option value="K46">Khóa 46</option>
-                  <option value="K45">Khóa 45</option>
+                  {availableCohorts && availableCohorts.length > 0 ? (
+                    availableCohorts.map((item) => {
+                      const c = item.cohort || item.Cohort;
+                      const count = Number(item.studentCount ?? item.StudentCount ?? item.student_count ?? 0);
+                      return (
+                        <option key={c} value={c}>
+                          Khóa {String(c).replace("K", "")} ({count} SV)
+                        </option>
+                      );
+                    })
+                  ) : (
+                    <option value={effectiveCohort}>
+                      Khóa {String(effectiveCohort).replace("K", "")}
+                    </option>
+                  )}
                 </select>
 
                 <span className="cohort-current-badge">
-                  {selectedCohort}
+                  {effectiveCohort}
                 </span>
               </div>
             </div>
@@ -1454,12 +1584,29 @@ const averageAttendance =
           }
         />
 
+        {/* ==============================================
+            TỔNG QUAN LỚP HỌC (POWER BI COURSE OVERVIEW)
+        ============================================== */}
+        <PowerBIClassReport
+          courseKey={selectedCourseKey}
+          cohort={effectiveCohort}
+        />
+
+        {/* ==============================================
+            TRỢ LÝ AI PHÂN TÍCH LMS (AI ASSISTANT - TASK 02)
+        ============================================== */}
+        <AiAssistantWidget
+          courseId={courseId}
+          courseName={course.name}
+          courseCode={course.code}
+        />
 
         {/* ==============================
             DANH SÁCH SINH VIÊN CẦN CHÚ Ý (CẢNH BÁO SỚM & RISK SCORE)
         ============================== */}
         <EarlyWarningRiskSection
           courseId={courseId}
+          cohort={effectiveCohort}
           onSelectStudent={handleViewStudent}
         />
 
@@ -1843,7 +1990,10 @@ const averageAttendance =
         {/* ==============================
             HÀNH VI NỘP BÀI (NƯỚC RÚT / TRÌ HOÃN)
         ============================== */}
-        <SubmissionBehaviorSection courseId={courseId} />
+        <SubmissionBehaviorSection
+          courseId={courseId}
+          cohort={effectiveCohort}
+        />
 
 
         {/* ==============================
@@ -1851,6 +2001,7 @@ const averageAttendance =
         ============================== */}
         <SegmentsScatterSection
           courseId={courseId}
+          cohort={effectiveCohort}
           onSelectStudent={handleViewStudent}
         />
 
@@ -2130,13 +2281,6 @@ const averageAttendance =
           )}
 
         </section>
-
-
-<PowerBIClassReport
-          courseKey={course.courseKey}
-          cohort={selectedCohort}
-        />
-
 
       </main>
 

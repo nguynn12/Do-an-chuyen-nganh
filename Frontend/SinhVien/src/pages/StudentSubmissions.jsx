@@ -1,3 +1,4 @@
+import DataLoadError from '../components/DataLoadError';
 import React, { useEffect, useState } from "react";
 import { studentGet } from "../services/apiClient";
 import {
@@ -15,20 +16,25 @@ import {
 export default function StudentSubmissions() {
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError,setLoadError]=useState("");
+  const [reload,setReload]=useState(0);
   const [filterStatus, setFilterStatus] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [hoveredSlice, setHoveredSlice] = useState(null);
 
   useEffect(() => {
+    let cancelled=false;setLoading(true);setLoadError("");
     studentGet("/submissions")
       .then((data) => {
+        if(cancelled)return;
         if (data.data) {
           setSubmissions(data.data);
         }
       })
-      .catch((err) => console.error("Lỗi getStudentSubmissions:", err))
-      .finally(() => setLoading(false));
-  }, []);
+      .catch(() => {if(!cancelled)setLoadError("Không tải được dữ liệu bài nộp. Vui lòng thử lại.");})
+      .finally(() => {if(!cancelled)setLoading(false);});
+    return()=>{cancelled=true;};
+  }, [reload]);
 
   const total = submissions.length;
   const onTimeList = submissions.filter(
@@ -125,6 +131,7 @@ export default function StudentSubmissions() {
     ? slices.find((s) => s.key === hoveredSlice)
     : null;
 
+  if(loadError)return <DataLoadError message={loadError} onRetry={()=>setReload(n=>n+1)}/>;
   return (
     <main className="page-full">
       {/* 1. HERO BANNER */}

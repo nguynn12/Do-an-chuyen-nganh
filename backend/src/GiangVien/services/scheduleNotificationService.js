@@ -31,19 +31,8 @@ function formatEventDateTime(eventDate, eventTime) {
 // ============================================================
 
 function getEventTypeLabel(eventType) {
-  switch (String(eventType || "").toLowerCase()) {
-    case "class":
-      return "Lịch giảng dạy";
-
-    case "exam":
-      return "Lịch chấm bài";
-
-    case "meeting":
-      return "Lịch họp";
-
-    default:
-      return "Lịch công việc";
-  }
+  const labels = {'class': 'Lịch dạy', 'makeup': 'Dạy bù', 'practice': 'Thực hành / Thí nghiệm', 'exam': 'Lịch thi', 'invigilation': 'Coi thi', 'grading': 'Chấm bài / Chấm thi', 'deadline': 'Hạn nộp bài', 'meeting': 'Cuộc họp', 'consultation': 'Tư vấn sinh viên', 'seminar': 'Hội thảo / Tập huấn', 'research': 'Nghiên cứu khoa học', 'personal': 'Lịch cá nhân', 'other': 'Khác'};
+  return labels[String(eventType || "").toLowerCase()] || "Lịch công việc";
 }
 
 
@@ -79,6 +68,8 @@ export async function getUpcomingTeacherSchedules({
       ts.Title,
       ts.Event_Type,
       ts.Description,
+      ts.Location,
+      ts.Meeting_Url,
 
       du.Moodle_User_ID,
       du.Username,
@@ -283,6 +274,9 @@ export async function generateScheduleNotifications({
       `${marker} ` +
       `${schedule.Title} sắp diễn ra vào ${eventDateTime}. ` +
       `Vui lòng chuẩn bị trước khi sự kiện bắt đầu.`;
+
+    if (schedule.Location) message += ` Địa điểm: ${schedule.Location}.`;
+    if (schedule.Meeting_Url) message += ` Link online: ${schedule.Meeting_Url}`;
 
 
     if (schedule.Description) {

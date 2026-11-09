@@ -1,0 +1,35 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+import {createRequire} from 'node:module';
+import React from 'react';
+import {renderToStaticMarkup} from 'react-dom/server';
+import {transformWithOxc} from 'vite';
+const require=createRequire(import.meta.url),{parse}=require('@babel/parser');
+const icon=()=>null;
+async function load(file,name,overrides={}) {
+ let source=fs.readFileSync(file,'utf8');const ast=parse(source,{sourceType:'module',plugins:['jsx']});
+ const context={React,...React,useNavigate:()=>()=>{},...overrides};
+ const imports=ast.program.body.filter(node=>node.type==='ImportDeclaration');
+ for(const declaration of imports)for(const specifier of declaration.specifiers) if(!(specifier.local.name in context))context[specifier.local.name]=icon;
+ for(const declaration of imports.reverse())source=source.slice(0,declaration.start)+source.slice(declaration.end);
+ source=source.replace('export default ','');
+ const output=await transformWithOxc(source,file,{jsx:{runtime:'classic',development:false}});
+ return vm.runInNewContext(output.code+`;${name}`,context);
+}
+let checks=0;
+const check=value=>{assert.ok(value);checks++;};
+const Radar=await load('../SinhVien/src/components/StudentCompetencyRadar.jsx','StudentCompetencyRadar');
+const Overview=await load('../SinhVien/src/pages/StudentOverview.jsx','StudentOverview',{StudentCompetencyRadar:Radar});
+const summary={student:{fullName:'Test Student',username:'sv2310002'},kpis:{totalAssignments:1,submittedAssignments:0,averageGrade:0,averagePercentage:0,attendanceRate:0,punctualityScore:0}};
+let html=renderToStaticMarkup(React.createElement(Overview,{summary,courses:[{id:1,name:'No score',averageGrade:null,progress:0},{id:2,name:'Zero score',averageGrade:0,progress:0}],onNavigateToCourse(){},onNavigateToTab(){}}));
+check(html.includes('Chưa có điểm'));check(html.includes('0/10'));check(!html.includes('7.0/10'));check(!html.includes('7/10'));check(!html.includes('100<!-- -->%'));check(!html.includes('85%'));
+html=renderToStaticMarkup(React.createElement(Radar,{summary:{kpis:{}},onNavigateToAnalytics(){}}));
+check(html.includes('Chưa đủ dữ liệu'));check(!html.includes('Hồ sơ học tập an toàn'));check(!html.includes('205.2'));check(!html.includes('85%'));
+const Welcome=await load('src/components/overview/WelcomeCard.jsx','WelcomeCard',{SummaryCard:({label,value})=>React.createElement('div',null,label,value)});
+html=renderToStaticMarkup(React.createElement(Welcome,{teacher:{fullName:'Test'},stats:{totalCourses:0,totalStudents:0,pendingGrading:0,unreadSupportRequests:0,unreadMessages:3}}));
+check(!html.includes('Niên khóa:'));check(html.includes('3 Thông báo'));
+const Stats=await load('src/components/courses/CourseStats.jsx','CourseStats');
+html=renderToStaticMarkup(React.createElement(Stats,{courses:[{attendance:null}]}));check(html.includes('—'));
+html=renderToStaticMarkup(React.createElement(Stats,{courses:[{attendance:0}]}));check(html.includes('0%'));
+console.log(`PASS ${checks} UI rendering assertions: null vs zero metrics, no fabricated radar data, welcome metadata and unread count.`);

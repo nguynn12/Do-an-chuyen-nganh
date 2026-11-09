@@ -1,4 +1,7 @@
+import { requireOwnTeacherPath } from '../../shared/middleware/teacherPathIdentity.js';
+import { updateLearningAlert, broadcastClassNotification, getTeacherActivity } from '../controllers/learningAlertController.js';
 import express from "express";
+import { requireTeacherAuth } from "../../shared/middleware/authMiddleware.js";
 
 import {
   getTeacherById,
@@ -16,6 +19,16 @@ import {
 
 const router =
   express.Router();
+
+// BẢO MẬT: Bắt buộc xác thực danh tính Giảng viên
+router.use(requireTeacherAuth);
+router.use('/:teacherId', requireOwnTeacherPath);
+router.get('/:teacherId/activity', getTeacherActivity);
+router.put('/:teacherId/learning-alerts/read-all', updateLearningAlert);
+router.patch('/:teacherId/learning-alerts/:alertId', updateLearningAlert);
+router.delete('/:teacherId/learning-alerts/:alertId', updateLearningAlert);
+router.post('/:teacherId/learning-alerts/broadcast', broadcastClassNotification);
+
 
 
 // ======================================================

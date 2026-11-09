@@ -1,3 +1,4 @@
+import DataLoadError from '../components/DataLoadError';
 import { useEffect, useState, useMemo } from "react";
 import { studentGet } from "../services/apiClient";
 import { getStudentUsername } from "../services/studentAuth";
@@ -20,23 +21,17 @@ export default function StudentCourseDetail({ courseId, onBack }) {
   const [allSubmissions, setAllSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [reload,setReload]=useState(0);
 
   useEffect(() => {
     if (!courseId) return;
+    let cancelled=false;
     setLoading(true);
     setError(null);
 
-    Promise.all([
-      studentGet(`/courses/${courseId}`).catch((err) => {
-        console.error("Lỗi getCourseDetail:", err);
-        return null;
-      }),
-      studentGet("/submissions").catch((err) => {
-        console.error("Lỗi getSubmissions:", err);
-        return { data: [] };
-      }),
-    ])
+    Promise.all([studentGet(`/courses/${courseId}`),studentGet('/submissions')])
       .then(([courseRes, subRes]) => {
+        if(cancelled)return;
         if (courseRes?.course) {
           setCourseData(courseRes.course);
         } else {
@@ -47,12 +42,13 @@ export default function StudentCourseDetail({ courseId, onBack }) {
           setAllSubmissions(subRes.data);
         }
       })
-      .catch((err) => {
-        console.error("Lỗi nạp dữ liệu môn học:", err);
+      .catch((_err) => {
+        if(cancelled)return;
         setError("Không thể kết nối đến máy chủ.");
       })
-      .finally(() => setLoading(false));
-  }, [courseId]);
+      .finally(() => {if(!cancelled)setLoading(false);});
+    return()=>{cancelled=true;};
+  }, [courseId,reload]);
 
   // Lấy username của sinh viên đang đăng nhập (mặc định để test là "sv2310002")
   const currentUser = useMemo(() => {
@@ -164,21 +160,7 @@ export default function StudentCourseDetail({ courseId, onBack }) {
     );
   }
 
-  if (error || !courseData) {
-    return (
-      <main className="page-full">
-        <div className="welcome-card welcome-card--error">
-          <AlertCircle size={36} className="welcome-card__error-icon" />
-          <div className="welcome-card__error-title">
-            {error || "Lỗi tải môn học"}
-          </div>
-          <button className="btn-dlu-secondary" onClick={onBack}>
-            <ArrowLeft size={16} /> Quay lại danh sách môn học
-          </button>
-        </div>
-      </main>
-    );
-  }
+  if (error || !courseData) return <DataLoadError message={error || 'Không tìm thấy thông tin môn học.'} onRetry={()=>setReload(n=>n+1)}/>;
 
   return (
     <main className="page-full">

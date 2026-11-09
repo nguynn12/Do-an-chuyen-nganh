@@ -8,38 +8,24 @@ import {
 import "../styles/StudentCompetencyRadar.css";
 
 export default function StudentCompetencyRadar({ summary, onNavigateToAnalytics }) {
-  const kpis = summary?.kpis || {};
-
-  // Tính toán 5 trục năng lực (thang điểm 0 - 100)
   const metrics = useMemo(() => {
-    // 1. Chuyên cần (thời gian học)
-    const hours = kpis.totalEngagementHours != null ? kpis.totalEngagementHours : 205.2;
-    const engagementScore = Math.min(100, Math.round((hours / 320) * 100));
-
-    // 2. Kỹ năng thực hành (điểm Lab/thực hành)
-    const avgGrade = kpis.averageGrade != null ? parseFloat(kpis.averageGrade) : 7.8;
-    const labScore = Math.min(100, Math.round(avgGrade * 10));
-
-    // 3. Tính kỷ luật (nộp bài đúng hạn)
-    const punctualityScore = kpis.punctualityScore != null ? kpis.punctualityScore : 85;
-
-    // 4. Tiến độ học tập (bài đã nộp / tổng bài)
-    const submitted = kpis.submittedAssignments != null ? kpis.submittedAssignments : 4;
-    const pending = kpis.pendingAssignments || 0;
-    const total = kpis.totalAssignments != null ? kpis.totalAssignments : (submitted + pending || 4);
-    const progressScore = Math.min(100, Math.round((submitted / (total || 1)) * 100));
-
-    // 5. Kết quả tích lũy (%)
-    const overallScore = kpis.averagePercentage != null ? kpis.averagePercentage : 78;
-
+    const kpis = summary?.kpis || {};
+    const percent = value => value == null ? null : Math.max(0, Math.min(100, Number(value)));
+    const submitted = Number(kpis.submittedAssignments || 0);
+    const total = Number(kpis.totalAssignments || 0);
+    const attendance = percent(kpis.attendanceRate);
+    const grade = kpis.averageGrade == null ? null : Number(kpis.averageGrade);
+    const punctuality = percent(kpis.punctualityScore);
+    const progress = total ? percent(Math.round(submitted / total * 100)) : null;
+    const overall = percent(kpis.averagePercentage);
     return [
-      { label: "Chuyên cần", value: engagementScore, raw: `${hours} giờ` },
-      { label: "Kỹ năng thực hành", value: labScore, raw: `${avgGrade}/10` },
-      { label: "Kỷ luật nộp bài", value: punctualityScore, raw: `${punctualityScore}%` },
-      { label: "Tiến độ học tập", value: progressScore, raw: `${submitted}/${total} bài` },
-      { label: "Kết quả tích lũy", value: overallScore, raw: `${overallScore}%` },
+      {label:'Chuyên cần', value:attendance, raw:attendance == null ? 'Chưa có điểm danh' : `${attendance}%`},
+      {label:'Điểm trung bình', value:grade == null ? null : percent(grade*10), raw:grade == null ? 'Chưa có điểm' : `${grade}/10`},
+      {label:'Kỷ luật nộp bài', value:punctuality, raw:punctuality == null ? 'Chưa có dữ liệu' : `${punctuality}%`},
+      {label:'Tiến độ học tập', value:progress, raw:`${submitted}/${total} bài`},
+      {label:'Kết quả tích lũy', value:overall, raw:overall == null ? 'Chưa có điểm' : `${overall}%`},
     ];
-  }, [kpis]);
+  }, [summary?.kpis]);
 
   // Tính tọa độ SVG cho biểu đồ Radar 5 cạnh (rộng rãi, an toàn lề)
   const centerX = 220;
@@ -72,15 +58,14 @@ export default function StudentCompetencyRadar({ summary, onNavigateToAnalytics 
   const dataPolygon = angles
     .map((angle, idx) => {
       const val = metrics[idx].value / 100;
-      const pt = getCoordinates(angle, radius * Math.max(0.2, val));
+      const pt = getCoordinates(angle, radius * Math.max(0, val));
       return `${pt.x},${pt.y}`;
     })
     .join(" ");
 
   // Điểm số trung bình tổng hợp
-  const averageCompetency = Math.round(
-    metrics.reduce((acc, curr) => acc + curr.value, 0) / metrics.length
-  );
+  const availableMetrics = metrics.filter(metric => metric.value != null);
+  const averageCompetency = availableMetrics.length ? Math.round(availableMetrics.reduce((sum,metric) => sum+metric.value,0) / availableMetrics.length) : null;
 
   return (
     <section className="section competency-section">
@@ -106,13 +91,13 @@ export default function StudentCompetencyRadar({ summary, onNavigateToAnalytics 
         <div className="competency-top-split">
           {/* CỘT TRÁI: ĐIỂM TỔNG NĂNG LỰC TO, NỔI BẬT */}
           <div className="competency-hero">
-            <span className="competency-hero-tag">Chỉ số năng lực tổng hợp</span>
+            <span className="competency-hero-tag">Chỉ số học tập tham khảo</span>
             
             <div className="competency-score-row">
-              <span className="competency-score-number">{averageCompetency}</span>
+              <span className="competency-score-number">{averageCompetency ?? "—"}</span>
               <span className="competency-score-scale">/100 Điểm</span>
               <span className="competency-badge-rank">
-                {averageCompetency >= 80
+                {averageCompetency == null ? "Chưa đủ dữ liệu" : averageCompetency >= 80
                   ? "Xuất sắc"
                   : averageCompetency >= 70
                   ? "Khá Tốt"
@@ -121,11 +106,11 @@ export default function StudentCompetencyRadar({ summary, onNavigateToAnalytics 
             </div>
 
             <div className="competency-status-row">
-              <ShieldCheck size={16} /> Hồ sơ học tập an toàn
+              <ShieldCheck size={16} /> Tổng hợp từ dữ liệu được ghi nhận
             </div>
 
             <p className="competency-hero-desc">
-              Đánh giá toàn diện dựa trên 5 khía cạnh học tập thời gian thực từ LMS và Data Warehouse.
+              Các chỉ số lấy từ Data Warehouse. Giá trị chưa có dữ liệu được ghi rõ; chỉ số tổng hợp là trung bình các trục có dữ liệu.
             </p>
 
             <div className="competency-bar-track">
@@ -181,7 +166,7 @@ export default function StudentCompetencyRadar({ summary, onNavigateToAnalytics 
               {/* Các điểm mốc tròn trên 5 đỉnh */}
               {angles.map((angle, i) => {
                 const val = metrics[i].value / 100;
-                const pt = getCoordinates(angle, radius * Math.max(0.2, val));
+                const pt = getCoordinates(angle, radius * Math.max(0, val));
                 return (
                   <circle
                     key={i}
@@ -234,7 +219,7 @@ export default function StudentCompetencyRadar({ summary, onNavigateToAnalytics 
               <span className="competency-metric-label">{m.label}</span>
               <div className="competency-metric-value-row">
                 <span className="competency-metric-raw">{m.raw}</span>
-                <span className="competency-metric-pct">({m.value}%)</span>
+                <span className="competency-metric-pct">{m.value == null ? "(—)" : `(${m.value}%)`}</span>
               </div>
             </div>
           ))}
@@ -244,7 +229,7 @@ export default function StudentCompetencyRadar({ summary, onNavigateToAnalytics 
         <div className="competency-recommendation">
           <Sparkles size={18} className="competency-recommendation-icon" />
           <p className="competency-recommendation-text">
-            <strong>Khuyến nghị từ Learning Analytics:</strong> Bạn đang duy trì phong độ thực hành bài Lab rất tốt ({metrics[1].raw}). Hãy tiếp tục nộp đúng hạn các bài tập tiếp theo và phân bổ thời gian xem tài liệu đều đặn để tối ưu hóa điểm tổng kết cuối kỳ.
+            <strong>Gợi ý học tập:</strong> {metrics[3].value != null && metrics[3].value < 100 ? 'Bạn còn bài tập chưa ghi nhận nộp. Hãy kiểm tra danh sách bài tập và hạn nộp trên LMS.' : 'Theo dõi lịch học và bảng điểm trên LMS để cập nhật tiến độ của bạn.'}
           </p>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { Navigate } from "react-router-dom";
+import { isStudentAuthenticated, clearAuthStorage } from "../services/studentAuth";
 
 /**
  * Route Guard cho phân hệ Sinh viên:
@@ -16,18 +17,15 @@ function StudentProtectedRoute({ children }) {
     localStorage.setItem("studentUsername", "sv2310002");
   }
 
-  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-  const userRole = localStorage.getItem("userRole");
+  const authenticated = isStudentAuthenticated();
 
-  if (!isLoggedIn || userRole !== "student") {
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("studentUserKey");
-    localStorage.removeItem("studentMoodleId");
-    localStorage.removeItem("userRole");
+  if (!authenticated) {
+    clearAuthStorage();
     return <Navigate to="/dang-nhap" replace />;
   }
 
   return children;
 }
+
 
 export default StudentProtectedRoute;

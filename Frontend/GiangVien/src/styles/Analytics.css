@@ -1,5 +1,7 @@
 /* ==============================================================================
    ANALYTICS.CSS - TRUNG TÂM PHÂN TÍCH HỌC TẬP POWER BI LMS
+   Thiết kế giao diện hài hòa theo phong cách LMS Đại học Đà Lạt (Sage / Emerald)
+   Namespace: .learning-analytics-*
    ============================================================================== */
 
 .analytics-layout {
@@ -14,7 +16,7 @@
   display: block !important;
 }
 
-.analytics-page {
+.analytics-page.learning-analytics-root {
   width: 100%;
   max-width: 1540px;
   margin: 0 auto;
@@ -22,219 +24,611 @@
   box-sizing: border-box;
 }
 
-/* 1. HEADER CARD */
-.analytics-header-card {
+/* ==============================================================================
+   1. HEADER & FILTER TOOLBAR CARD
+   ============================================================================== */
+.learning-analytics-header-card {
   background: #ffffff;
   border: 1px solid #e2ebe4;
   border-radius: 16px;
   padding: 24px 28px;
   margin-bottom: 20px;
-  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 18px rgba(10, 107, 80, 0.04);
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 24px;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.analytics-title-group {
+.learning-analytics-top-bar {
   display: flex;
-  align-items: center;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.learning-analytics-title-group {
+  display: flex;
+  align-items: flex-start;
   gap: 18px;
   flex: 1;
   min-width: 320px;
 }
 
-.analytics-icon-badge {
+.learning-analytics-icon-badge {
   width: 52px;
   height: 52px;
-  border-radius: 12px;
-  background: #eef6f0;
-  color: #2e7d32;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #eef7f2 0%, #e1efe6 100%);
+  color: #0a6b50;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  border: 1px solid #d0e4d7;
+  box-shadow: 0 2px 6px rgba(10, 107, 80, 0.08);
 }
 
-.analytics-title-group h1 {
-  margin: 0 0 5px 0;
-  font-size: 20px;
+.learning-analytics-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
   font-weight: 700;
-  color: #1a2e20;
+  color: #0a6b50;
+  background: #eaf5ee;
+  border: 1px solid #cbe5d4;
+  padding: 3px 9px;
+  border-radius: 20px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
 }
 
-.analytics-title-group p {
+.learning-analytics-title-group h1 {
+  margin: 0 0 6px 0;
+  font-size: 22px;
+  font-weight: 750;
+  color: #123020;
+  letter-spacing: -0.2px;
+}
+
+.learning-analytics-title-group p {
   margin: 0;
-  font-size: 13px;
-  color: #55695a;
-  line-height: 1.5;
+  font-size: 13.5px;
+  color: #4b6252;
+  line-height: 1.55;
+  max-width: 860px;
 }
 
-.analytics-title-group code {
-  background: #f0f4f1;
+.learning-analytics-title-group code {
+  background: #f0f6f2;
+  border: 1px solid #dbeae0;
   padding: 2px 6px;
-  border-radius: 4px;
-  color: #2e7d32;
+  border-radius: 5px;
+  color: #0a6b50;
   font-size: 12px;
+  font-weight: 600;
 }
 
-/* SELECTORS PANEL */
-.analytics-selectors-panel {
+.learning-analytics-center-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 15px;
+  background: #f5f9f6;
+  border: 1px solid #d4e5d9;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1b4d32;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.learning-analytics-center-toggle-btn:hover {
+  background: #e8f4ec;
+  border-color: #0a6b50;
+  color: #0a6b50;
+}
+
+.learning-analytics-center-toggle-btn.active {
+  background: #0a6b50;
+  border-color: #0a6b50;
+  color: #ffffff;
+  box-shadow: 0 3px 10px rgba(10, 107, 80, 0.25);
+}
+
+/* 2. FILTER TOOLBAR */
+.learning-analytics-filter-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #edf4ef;
+}
+
+.learning-analytics-filter-inputs {
   display: flex;
   align-items: center;
   gap: 14px;
   flex-wrap: wrap;
+  flex: 1;
 }
 
-.analytics-selector-box {
+.learning-analytics-control-group {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
 }
 
-.analytics-selector-box label {
-  font-size: 11px;
-  font-weight: 600;
-  color: #526657;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-.analytics-selector-box .selector-inner {
+.learning-analytics-control-group label {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #4a6652;
+  text-transform: uppercase;
+  letter-spacing: 0.35px;
+}
+
+.learning-analytics-select-wrapper {
   background: #f9fbf9;
-  border: 1px solid #d4e3d7;
-  border-radius: 8px;
-  padding: 8px 12px;
-  color: #2e7d32;
+  border: 1px solid #cfded3;
+  border-radius: 9px;
+  padding: 2px 8px;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
 }
 
-.analytics-selector-box .selector-inner:hover {
-  border-color: #2e7d32;
+.learning-analytics-select-wrapper:hover,
+.learning-analytics-select-wrapper:focus-within {
+  border-color: #0a6b50;
   background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(10, 107, 80, 0.1);
 }
 
-.analytics-selector-box select {
+.learning-analytics-select-wrapper select {
   border: none;
   background: transparent;
   font-size: 13px;
   font-weight: 600;
-  color: #1f3324;
+  color: #173322;
+  padding: 7px 4px;
   outline: none;
   cursor: pointer;
-  min-width: 140px;
+  min-width: 160px;
 }
 
-.student-selector-box select {
-  min-width: 220px;
+.student-control-group .learning-analytics-select-wrapper select {
+  min-width: 260px;
 }
 
-/* 2. TABS BAR (7 TABS) */
-.analytics-tabs-bar {
+.learning-analytics-filter-actions {
+  display: flex;
+  align-items: center;
+}
+
+.learning-analytics-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  background: #ffffff;
+  border: 1px dashed #c0d7c7;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #4d6855;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.learning-analytics-reset-btn:hover {
+  background: #f4f9f5;
+  border-color: #0a6b50;
+  color: #0a6b50;
+}
+
+/* 3. ACTIVE FILTERS SUMMARY PILL BAR */
+.learning-analytics-active-filters-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  background: #f4f8f5;
+  border-radius: 10px;
+  border: 1px solid #e1eee5;
+  font-size: 12px;
+}
+
+.summary-label {
+  font-weight: 700;
+  color: #3b5643;
+  text-transform: uppercase;
+  font-size: 10.5px;
+  letter-spacing: 0.3px;
+}
+
+.summary-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid #d0e4d7;
+  padding: 4px 10px;
+  border-radius: 6px;
+  color: #21432c;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.summary-pill strong {
+  color: #0a6b50;
+}
+
+.summary-pill .key-tag {
+  background: #eef6f1;
+  color: #0a6b50;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 10.5px;
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+/* ==============================================================================
+   TRUNG TÂM BÁO CÁO (7 DASHBOARDS CATALOG)
+   ============================================================================== */
+.learning-analytics-center-container {
+  background: #ffffff;
+  border: 1px solid #dce9df;
+  border-radius: 14px;
+  padding: 18px 22px;
+  margin-bottom: 20px;
+  box-shadow: 0 3px 12px rgba(10, 107, 80, 0.04);
+}
+
+.center-header {
+  margin-bottom: 14px;
+}
+
+.center-header h3 {
+  margin: 0 0 3px 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #123020;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.center-header small {
+  color: #617b69;
+  font-size: 12px;
+}
+
+.learning-analytics-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 12px;
+}
+
+.learning-analytics-card-item {
+  background: #fbfdfb;
+  border: 1px solid #e1ece4;
+  border-radius: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.learning-analytics-card-item:hover {
+  background: #f1f8f3;
+  border-color: #0a6b50;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(10, 107, 80, 0.08);
+}
+
+.learning-analytics-card-item.is-selected {
+  background: #eef7f1;
+  border-color: #0a6b50;
+  box-shadow: 0 0 0 2px #0a6b50;
+}
+
+.learning-analytics-card-item .card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.learning-analytics-card-item .card-icon-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #e5f2ea;
+  color: #0a6b50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.learning-analytics-card-item .card-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #e2ede5;
+  color: #275438;
+}
+
+.learning-analytics-card-item h4 {
+  margin: 0 0 4px 0;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #173824;
+}
+
+.learning-analytics-card-item p {
+  margin: 0 0 10px 0;
+  font-size: 11.5px;
+  color: #55725f;
+  line-height: 1.4;
+  flex-grow: 1;
+}
+
+.learning-analytics-card-item .card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #edf4ef;
+  padding-top: 8px;
+}
+
+.learning-analytics-card-item .card-footer code {
+  font-size: 10px;
+  color: #6d8675;
+  background: #f0f6f2;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.learning-analytics-card-item .card-footer .status-active {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #0a6b50;
+}
+
+/* ==============================================================================
+   4. TABS ĐIỀU HƯỚNG NỘI BỘ VÀ SUBTABS
+   ============================================================================== */
+.learning-analytics-nav-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.learning-analytics-main-tabs {
   display: flex;
   gap: 8px;
-  margin-bottom: 16px;
   overflow-x: auto;
   padding-bottom: 4px;
   scrollbar-width: thin;
 }
 
-.analytics-tab-btn {
+.learning-analytics-tab-btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
+  gap: 9px;
+  padding: 11px 18px;
   background: #ffffff;
-  border: 1px solid #e1e9e2;
-  border-radius: 9px;
-  font-size: 13px;
+  border: 1px solid #dbe6dd;
+  border-radius: 10px;
+  font-size: 13.5px;
   font-weight: 600;
-  color: #4b5e50;
+  color: #3b5443;
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.2s ease;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
 }
 
-.analytics-tab-btn:hover {
-  background: #f4f8f5;
-  border-color: #bcd4c1;
-  color: #23522a;
+.learning-analytics-tab-btn:hover {
+  background: #f3f8f5;
+  border-color: #b8d4c0;
+  color: #0a6b50;
 }
 
-.analytics-tab-btn.active {
-  background: #2e7d32;
-  border-color: #2e7d32;
+.learning-analytics-tab-btn.active {
+  background: #0a6b50;
+  border-color: #0a6b50;
   color: #ffffff;
-  box-shadow: 0 3px 8px rgba(46, 125, 50, 0.25);
+  box-shadow: 0 3px 10px rgba(10, 107, 80, 0.28);
 }
 
-.analytics-tab-btn .tab-badge {
-  font-size: 10px;
+.learning-analytics-tab-btn .tab-badge {
+  font-size: 10.5px;
   font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: #edf5ef;
-  color: #2e7d32;
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: #ebf5ee;
+  color: #0a6b50;
   text-transform: uppercase;
+  letter-spacing: 0.2px;
 }
 
-.analytics-tab-btn.active .tab-badge {
-  background: rgba(255, 255, 255, 0.25);
+.learning-analytics-tab-btn.active .tab-badge {
+  background: rgba(255, 255, 255, 0.22);
   color: #ffffff;
 }
 
-/* 3. CONTEXT BANNER */
-.analytics-context-banner {
-  background: #ffffff;
-  border: 1px solid #e2ebe4;
-  border-left: 4px solid #2e7d32;
-  border-radius: 10px;
-  padding: 12px 18px;
-  margin-bottom: 18px;
+/* SUBTABS BAR DÀNH CHO NHÓM ĐÁNH GIÁ (ASSESSMENT) */
+.learning-analytics-subtabs-bar {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
+  background: #ffffff;
+  border: 1px solid #dce8df;
+  border-radius: 10px;
+  padding: 8px 14px;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.02);
 }
 
+.subtabs-prefix {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #0a6b50;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border-right: 1px solid #e1ebe3;
+  padding-right: 12px;
+}
+
+.subtabs-list {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.learning-analytics-subtab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  background: #f7faf8;
+  border: 1px solid #dce8df;
+  border-radius: 7px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #415948;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.learning-analytics-subtab-btn:hover {
+  background: #eef6f0;
+  border-color: #0a6b50;
+  color: #0a6b50;
+}
+
+.learning-analytics-subtab-btn.active {
+  background: #e1f0e6;
+  border-color: #0a6b50;
+  color: #0a6b50;
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1px #0a6b50;
+}
+
+/* ==============================================================================
+   5. CONTEXT BANNER
+   ============================================================================== */
+.learning-analytics-context-banner {
+  background: #ffffff;
+  border: 1px solid #e1eee4;
+  border-left: 4px solid #0a6b50;
+  border-radius: 10px;
+  padding: 14px 20px;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
 .context-banner-icon {
-  color: #2e7d32;
+  color: #0a6b50;
   margin-top: 2px;
   flex-shrink: 0;
 }
 
-.context-banner-text strong {
-  color: #1a2e20;
-  font-size: 13px;
-  display: block;
-  margin-bottom: 3px;
+.context-banner-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 5px;
+}
+
+.context-banner-heading strong {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #153723;
+}
+
+.page-guid-tag {
+  font-size: 11px;
+  color: #55725e;
+}
+
+.page-guid-tag code {
+  background: #eef6f1;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #0a6b50;
+  font-size: 11px;
+  font-weight: 600;
 }
 
 .context-banner-text p {
   margin: 0;
-  font-size: 12.5px;
-  color: #4d5e52;
-  line-height: 1.5;
+  font-size: 13px;
+  color: #4b6352;
+  line-height: 1.55;
 }
 
-.context-banner-text code {
-  background: #eef5f0;
-  padding: 1px 5px;
-  border-radius: 4px;
-  color: #23592a;
-  font-size: 11.5px;
-}
-
-/* 4. REPORT WRAPPER */
-.analytics-report-wrapper {
+/* ==============================================================================
+   6. KHUNG NHÚNG BẢO MẬT POWER BI
+   ============================================================================== */
+.learning-analytics-report-wrapper {
   background: #ffffff;
-  border: 1px solid #e2ebe4;
+  border: 1px solid #dce8df;
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+}
+
+/* ==============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================== */
+@media (max-width: 992px) {
+  .analytics-layout {
+    padding: 78px 18px 40px;
+  }
+
+  .learning-analytics-top-bar {
+    flex-direction: column;
+  }
+
+  .learning-analytics-filter-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .learning-analytics-filter-inputs {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .learning-analytics-select-wrapper select,
+  .student-control-group .learning-analytics-select-wrapper select {
+    min-width: 100%;
+    width: 100%;
+  }
+
+  .learning-analytics-main-tabs {
+    flex-wrap: nowrap;
+  }
 }

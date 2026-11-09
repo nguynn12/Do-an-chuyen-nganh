@@ -188,9 +188,22 @@ function StudentTable({
         ============================================== */}
 
         <tbody>
-
-          {students.map(
-            (student) => {
+          {students.length === 0 ? (
+            <tr>
+              <td
+                colSpan={7}
+                style={{
+                  textAlign: "center",
+                  padding: "36px 16px",
+                  color: "#66736b",
+                  fontSize: "14px",
+                }}
+              >
+                Không có dữ liệu sinh viên cho môn học và khóa này.
+              </td>
+            </tr>
+          ) : (
+            students.map((student) => {
 
               const status =
                 getStudentStatus(
@@ -468,7 +481,7 @@ function StudentTable({
 
                 </tr>
               );
-            }
+            })
           )}
 
         </tbody>

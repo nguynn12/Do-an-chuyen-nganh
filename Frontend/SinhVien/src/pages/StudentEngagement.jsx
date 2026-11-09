@@ -1,3 +1,4 @@
+import DataLoadError from '../components/DataLoadError';
 import React, { useEffect, useState, useMemo } from "react";
 import { studentGet } from "../services/apiClient";
 import {
@@ -52,19 +53,24 @@ export default function StudentEngagement() {
     courseEngagement: [],
   });
   const [loading, setLoading] = useState(true);
+  const [loadError,setLoadError]=useState("");
+  const [reload,setReload]=useState(0);
   const [showAllWeeks, setShowAllWeeks] = useState(false);
   const [hoveredCell, setHoveredCell] = useState(null);
 
   useEffect(() => {
+    let cancelled=false;setLoading(true);setLoadError("");
     studentGet("/engagement")
       .then((data) => {
+        if(cancelled)return;
         if (data.success) {
           setEngagementData(data);
         }
       })
-      .catch((err) => console.error("Lỗi getStudentEngagement:", err))
-      .finally(() => setLoading(false));
-  }, []);
+      .catch(() => {if(!cancelled)setLoadError("Không tải được dữ liệu mức độ tham gia. Vui lòng thử lại.");})
+      .finally(() => {if(!cancelled)setLoading(false);});
+    return()=>{cancelled=true;};
+  }, [reload]);
 
   const totalHours = Number(
     engagementData.courseEngagement
@@ -76,7 +82,7 @@ export default function StudentEngagement() {
     (d) => Number(d.totalHours || d.Hours || 0) > 0
   ).length;
 
-  const totalDays = engagementData.dailyTrend.length || 1;
+  const _totalDays = engagementData.dailyTrend.length || 1;
   const avgHoursPerDay =
     activeDays > 0 ? (totalHours / activeDays).toFixed(1) : 0;
 
@@ -178,6 +184,7 @@ export default function StudentEngagement() {
     };
   }, [engagementData.dailyTrend, showAllWeeks]);
 
+  if(loadError)return <DataLoadError message={loadError} onRetry={()=>setReload(n=>n+1)}/>;
   return (
     <main className="page-full">
       {/* 1. HERO BANNER */}

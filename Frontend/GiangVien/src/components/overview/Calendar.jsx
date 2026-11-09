@@ -1,3 +1,4 @@
+import { SCHEDULE_TYPES, getScheduleTypeLabel } from '../../config/scheduleTypes';
 import { useState } from "react";
 import {
   CalendarDays,
@@ -155,6 +156,8 @@ function normalizeEventType(type) {
     .trim()
     .toLowerCase();
 
+  if (SCHEDULE_TYPES.some(item => item.value === value)) return value;
+
   if (
     value === "class" ||
     value === "lesson" ||
@@ -242,26 +245,7 @@ function getPrimaryEventType(events) {
 // TÊN LOẠI EVENT
 // ======================================================
 
-function getEventTypeLabel(type) {
-  switch (
-    normalizeEventType(type)
-  ) {
-    case "exam":
-      return "Lịch thi";
-
-    case "deadline":
-      return "Deadline";
-
-    case "meeting":
-      return "Cuộc họp";
-
-    case "personal":
-      return "Cá nhân";
-
-    default:
-      return "Lịch dạy";
-  }
-}
+const getEventTypeLabel = type => getScheduleTypeLabel(normalizeEventType(type));
 
 
 // ======================================================

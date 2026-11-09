@@ -6,13 +6,17 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "test:audit": "node test_web_audit_http.mjs && node test_web_audit_notifications.mjs && node test_assignment_monitoring.mjs && node test_student_assignment_stats.mjs && node test_classroom_conversation.mjs && node test_classroom_concise.mjs && node test_schedule_planning.mjs && node test_remaining_fixes.mjs && node test_grade_persistence.mjs && node test_grade_ingestion.mjs && node test_grade_export.mjs --http"
   },
   "dependencies": {
+    "@google/genai": "^2.31.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
+    "exceljs": "^4.4.0",
     "express": "^5.1.0",
+    "multer": "^2.5.0",
     "mysql2": "^3.14.0",
     "nodemailer": "^10.0.10"
   },

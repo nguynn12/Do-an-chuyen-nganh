@@ -1,3 +1,4 @@
+import DataLoadError from '../components/DataLoadError';
 import { useEffect, useState } from "react";
 import {
   Compass,
@@ -60,7 +61,7 @@ export default function StudentBehavior() {
         setSelectedCourseId(String(res.currentCourse.courseKey));
       }
     } catch (err) {
-      console.error("Lỗi nạp hồ sơ hành vi sinh viên:", err);
+      console.warn("Không tải được hồ sơ hành vi sinh viên.");
       setError(err.message || "Không thể tải hồ sơ hành vi học tập.");
     } finally {
       setLoading(false);
@@ -86,20 +87,9 @@ export default function StudentBehavior() {
     );
   }
 
-  if (error && !data) {
-    return (
-      <main className="page-full">
-        <div className="card" style={{ padding: "30px", background: "#fef2f2", color: "#991b1b" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", fontWeight: "700" }}>
-            <AlertCircle size={20} /> Không thể hiển thị hồ sơ hành vi
-          </div>
-          <div style={{ fontSize: "13px", marginTop: "6px" }}>{error}</div>
-        </div>
-      </main>
-    );
-  }
+  if(error)return <DataLoadError message={error} onRetry={()=>fetchData(selectedCourseId)}/>;
 
-  const { student, currentCourse, courses, referenceDate, behavior } = data || {};
+  const { student, currentCourse, courses, referenceDate: _referenceDate, behavior } = data || {};
   const { mySegment, myCoords, myScores, thresholds, anonymousScatter, attention, submitProfile, factorCorrelation } = behavior || {};
 
   const pThresh = thresholds?.participation ?? 50;

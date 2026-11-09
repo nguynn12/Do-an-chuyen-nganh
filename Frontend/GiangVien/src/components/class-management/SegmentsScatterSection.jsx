@@ -53,7 +53,7 @@ const SEGMENT_THEMES = {
   },
 };
 
-export default function SegmentsScatterSection({ courseId, onSelectStudent }) {
+export default function SegmentsScatterSection({ courseId, cohort, onSelectStudent }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -71,7 +71,7 @@ export default function SegmentsScatterSection({ courseId, onSelectStudent }) {
       try {
         setLoading(true);
         setError(null);
-        const res = await getCourseSegments(courseId);
+        const res = await getCourseSegments(courseId, cohort);
         if (!isCancelled) {
           setData(res);
         }
@@ -89,7 +89,7 @@ export default function SegmentsScatterSection({ courseId, onSelectStudent }) {
     return () => {
       isCancelled = true;
     };
-  }, [courseId]);
+  }, [courseId, cohort]);
 
   // Sinh viên sau lọc
   const filteredStudents = useMemo(() => {

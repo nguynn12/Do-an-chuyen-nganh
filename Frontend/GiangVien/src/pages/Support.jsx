@@ -22,6 +22,7 @@ import ErrorScreen from "../components/common/ErrorScreen";
 import useTeacherDashboard from "../hooks/useTeacherDashboard";
 
 import "../styles/TeacherOverview.css";
+import '../styles/Support.css';
 
 
 function Support() {
@@ -89,7 +90,7 @@ function Support() {
           SUPPORT CONTENT
       ================================================== */}
 
-      <main className="support-main">
+      <main className="page support-main">
 
         <button
           className="support-back"

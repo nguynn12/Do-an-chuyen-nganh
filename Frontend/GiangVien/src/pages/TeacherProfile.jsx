@@ -1,23 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
-  BookOpen,
-  Building2,
-  ChevronRight,
-  GraduationCap,
-  LockKeyhole,
-  Mail,
-  Pencil,
-  Plus,
-  ShieldCheck,
-  UserRound,
-  UsersRound,
-  Bell,
-  Link2,
-  LogOut,
-  Phone,
-  BarChart3,
+  BookOpen, Building2, ChevronRight, GraduationCap, Mail, ShieldCheck,
+  UserRound, UsersRound, Bell, LogOut, Phone, BarChart3, ArrowUpRight,
+  CalendarDays, LifeBuoy, ArrowRight, Layers3,
 } from "lucide-react";
 
 import Header from "../components/Header";
@@ -31,6 +18,10 @@ import {
   getTeacherDashboard,
   getCourseStudents,
 } from "../services/teacherApi";
+import {
+  getTeacherSession,
+  clearTeacherSession,
+} from "../services/authService";
 
 import "../styles/TeacherOverview.css";
 import "../styles/TeacherProfile.css";
@@ -139,11 +130,8 @@ function TeacherProfile() {
         setLoading(true);
         setError("");
 
-        const teacherId = Number(
-          localStorage.getItem(
-            "currentTeacherId"
-          )
-        );
+        const session = getTeacherSession();
+        const teacherId = session?.teacherId ? Number(session.teacherId) : null;
 
         if (!teacherId) {
           throw new Error(
@@ -333,22 +321,6 @@ function TeacherProfile() {
       stats?.pendingGrading || 0
     );
 
-  const submissionRate =
-    Number(
-      stats?.submissionRate ??
-        stats?.averageSubmissionRate ??
-        0
-    );
-
-
-  // Chỉ preview tối đa 3 môn
-  const courseRows =
-    useMemo(
-      () => courses.slice(0, 3),
-      [courses]
-    );
-
-
   // ====================================================
   // LOADING / ERROR
   // ====================================================
@@ -374,13 +346,7 @@ function TeacherProfile() {
   // ====================================================
 
   const logout = () => {
-    localStorage.removeItem(
-      "isLoggedIn"
-    );
-
-    localStorage.removeItem(
-      "currentTeacherId"
-    );
+    clearTeacherSession();
 
     navigate(
       "/dang-nhap",
@@ -395,532 +361,98 @@ function TeacherProfile() {
   // RENDER
   // ====================================================
 
+  const initials = teacher.fullName.trim().split(/\s+/).slice(-2).map(part => part[0]).join('').toUpperCase();
+  const shortcuts = [
+    {icon:CalendarDays, title:'Lịch giảng dạy', description:'Sắp xếp lịch và công việc', path:'/lich'},
+    {icon:Bell, title:'Thông báo học tập', description:'Theo dõi nhắc nhở và cảnh báo', path:'/tin-nhan'},
+    {icon:BarChart3, title:'Phân tích học tập', description:'Khám phá dữ liệu các lớp', path:'/phan-tich'},
+    {icon:LifeBuoy, title:'Trung tâm hỗ trợ', description:'Hỗ trợ tài khoản và thông tin', path:'/ho-tro'},
+  ];
+
   return (
     <div className="app profile-app">
-
-      {/* HEADER */}
       <Header teacher={teacher} />
-
-
-      {/* SIDEBAR */}
       <Sidebar />
+      <main className="faculty-page">
+        <nav className="faculty-breadcrumb" aria-label="Đường dẫn trang">
+          <button type="button" onClick={() => navigate('/')}>Trang chủ</button>
+          <ChevronRight size={13} /><span>Hồ sơ giảng viên</span>
+        </nav>
 
-
-      {/* =================================================
-          NỘI DUNG
-      ================================================= */}
-
-      <main className="profile-page">
-
-        {/* Breadcrumb */}
-        <div className="profile-breadcrumb">
-          Trang chủ
-          <span>›</span>
-          Hồ sơ giảng viên
-        </div>
-
-
-        {/* Heading */}
-        <div className="profile-heading">
-
-          <div>
-            <h1>
-              Hồ sơ giảng viên
-            </h1>
-
-            <p>
-              Quản lý thông tin cá nhân,
-              tài khoản và các khóa học
-              đang giảng dạy.
-            </p>
+        <div className="faculty-page-heading">
+          <div><span className="faculty-eyebrow">KHÔNG GIAN GIẢNG VIÊN</span>
+            <h1>Hồ sơ của bạn</h1>
+            <p>Thông tin cá nhân và hành trình giảng dạy, trong một không gian.</p>
           </div>
-
-
-          <button
-            className="profile-edit"
-            type="button"
-          >
-            <Pencil size={16} />
-
-            Chỉnh sửa thông tin
+          <button type="button" className="faculty-outline-button" onClick={() => navigate('/ho-tro')}>
+            <LifeBuoy size={16} /> Hỗ trợ cập nhật hồ sơ <ArrowUpRight size={15} />
           </button>
-
         </div>
 
-
-        {/* =================================================
-            THÔNG TIN GIẢNG VIÊN
-        ================================================= */}
-
-        <section className="profile-hero-card">
-
-          <div className="profile-avatar">
-            GV
+        <section className="faculty-identity-card" aria-labelledby="faculty-name">
+          <div className="faculty-cover">
+            <div className="faculty-cover-grid" aria-hidden="true" />
+            <span className="faculty-cover-label"><GraduationCap size={17} /> DALAT UNIVERSITY</span>
+            <div className="faculty-cover-wordmark" aria-hidden="true">Tri thức mở lối.<br/><span>Giảng dạy kết nối.</span></div>
+            <div className="faculty-cover-orbit" aria-hidden="true" />
           </div>
-
-
-          <div className="profile-identity">
-
-            <h2>
-              {teacher.fullName}
-            </h2>
-
-
-            <div className="profile-role">
-              {teacher.role}
+          <div className="faculty-identity-body">
+            <div className="faculty-avatar" aria-hidden="true">{initials}<span><GraduationCap size={15}/></span></div>
+            <div className="faculty-name-block">
+              <div className="faculty-name-line"><h2 id="faculty-name">{teacher.fullName}</h2><span className="faculty-role-badge">{teacher.role}</span></div>
+              <p><Building2 size={15}/> Trường Đại học Đà Lạt <span className="faculty-identity-dot">·</span><span>@{teacher.username}</span></p>
             </div>
-
-
-            <div className="profile-info-grid">
-
-              {/* Mã GV */}
-              <div>
-                <GraduationCap />
-
-                <span>
-                  Mã giảng viên
-                </span>
-
-                <strong>
-                  {teacher.teacherCode}
-                </strong>
-              </div>
-
-
-              {/* Đơn vị */}
-              <div>
-                <Building2 />
-
-                <span>
-                  Đơn vị
-                </span>
-
-                <strong>
-                  {teacher.department}
-                </strong>
-              </div>
-
-
-              {/* Email */}
-              <div>
-                <Mail />
-
-                <span>
-                  Email
-                </span>
-
-                <strong>
-                  {teacher.email}
-                </strong>
-              </div>
-
-
-              {/* Điện thoại */}
-              <div>
-                <Phone />
-
-                <span>
-                  Số điện thoại
-                </span>
-
-                <strong>
-                  {teacher.phone}
-                </strong>
-              </div>
-
-            </div>
+            <span className="faculty-source-label"><ShieldCheck size={15}/> Hồ sơ hệ thống LMS</span>
           </div>
-
-
-          {/* Branding */}
-          <div className="profile-brand-mark">
-
-            <strong>
-              TRƯỜNG ĐẠI HỌC
-              <br />
-              ĐÀ LẠT
-            </strong>
-
-            <span>
-              Tri thức tạo giá trị
-            </span>
-
+          <div className="faculty-details">
+            {[
+              {icon:GraduationCap,label:'Mã giảng viên',value:teacher.teacherCode},
+              {icon:Building2,label:'Đơn vị công tác',value:teacher.department},
+              {icon:Mail,label:'Email liên hệ',value:teacher.email,email:true},
+              {icon:Phone,label:'Số điện thoại',value:teacher.phone},
+            ].map(({icon:Icon,label,value,email}) => <div className="faculty-detail" key={label}>
+              <span className="faculty-detail-label"><Icon size={15}/>{label}</span>
+              {email && value !== 'Chưa cập nhật' ? <a href={`mailto:${value}`}>{value}</a> : <strong className={value==='Chưa cập nhật' ? 'faculty-missing-value' : ''}>{value}</strong>}
+            </div>)}
           </div>
-
         </section>
 
-
-        {/* =================================================
-            THỐNG KÊ
-        ================================================= */}
-
-        <section className="profile-stats">
-
-          {/* KHÓA HỌC */}
-          <div className="profile-stat green">
-
-            <BookOpen />
-
-            <div>
-              <strong>
-                {courses.length}
-              </strong>
-
-              <span>
-                Khóa học
-              </span>
-
-              <small>
-                Đang phụ trách
-              </small>
-            </div>
-
-          </div>
-
-
-          {/* SINH VIÊN */}
-          <div className="profile-stat orange student-stat">
-
-            <UsersRound />
-
-            <div className="student-stat-content">
-
-              <strong>
-                {totalStudents}
-              </strong>
-
-              <span>
-                Sinh viên phụ trách
-              </span>
-
-
-              {/* K45 / K46 / K47 */}
-              <div className="cohort-list">
-
-                {cohortStats.map(
-                  (item) => (
-                    <small
-                      key={
-                        item.cohort
-                      }
-                    >
-                      {item.cohort}
-
-                      <b>
-                        {item.count}
-                      </b>
-                    </small>
-                  )
-                )}
-
-              </div>
-
-            </div>
-
-          </div>
-
-
-          {/* BÀI CHỜ CHẤM */}
-          <div className="profile-stat amber">
-
-            <BarChart3 />
-
-            <div>
-              <strong>
-                {pendingGrading}
-              </strong>
-
-              <span>
-                Bài chờ chấm
-              </span>
-
-              <small>
-                Cần xử lý
-              </small>
-            </div>
-
-          </div>
-
-
-          {/* TỶ LỆ NỘP */}
-          <div className="profile-stat green">
-
-            <ShieldCheck />
-
-            <div>
-
-              <strong>
-                {submissionRate
-                  ? `${Math.round(
-                      submissionRate
-                    )}%`
-                  : "—"}
-              </strong>
-
-              <span>
-                Tỷ lệ nộp bài
-              </span>
-
-              <small>
-                Dữ liệu tổng quan
-              </small>
-
-            </div>
-
-          </div>
-
+        <section className="faculty-stats" aria-label="Tổng quan giảng dạy">
+          {[
+            {icon:BookOpen,value:courses.length,label:'Môn học phụ trách',detail:'Các môn được phân công',tone:'green',path:'/khoa-hoc'},
+            {icon:UsersRound,value:totalStudents,label:'Sinh viên đồng hành',detail:'Đã loại trùng giữa các môn',tone:'blue',path:'/khoa-hoc'},
+            {icon:BarChart3,value:pendingGrading,label:'Bài đang chờ chấm',detail:'Theo dõi tiến độ bài nộp',tone:'orange',path:'/quan-ly-bai-tap'},
+            {icon:Layers3,value:cohortStats.filter(item=>item.count>0).length,label:'Khóa sinh viên',detail:cohortStats.filter(item=>item.count>0).map(item=>item.cohort).join(' · ') || 'Chưa có dữ liệu',tone:'violet',path:'/khoa-hoc'},
+          ].map(({icon:Icon,value,label,detail,tone,path}) => <button type="button" className={`faculty-stat faculty-stat-${tone}`} key={label} onClick={()=>navigate(path)}>
+            <span className="faculty-stat-icon"><Icon size={21}/></span><ArrowUpRight size={16} className="faculty-stat-arrow"/>
+            <strong>{value}</strong><span className="faculty-stat-label">{label}</span><small>{detail}</small>
+          </button>)}
         </section>
 
-
-        {/* =================================================
-            PHẦN DƯỚI
-        ================================================= */}
-
-        <div className="profile-grid">
-
-
-          {/* ===============================================
-              KHÓA HỌC
-          =============================================== */}
-
-          <section className="profile-card courses-profile-card">
-
-            <div className="profile-card-title">
-
-              <div>
-                <BookOpen size={20} />
-
-                <strong>
-                  Khóa học đang giảng dạy
-                </strong>
-              </div>
-
-
-              <button
-                className="add-course"
-                type="button"
-              >
-                <Plus size={17} />
-
-                Thêm khóa học
-              </button>
-
+        <div className="faculty-bottom-grid">
+          <section className="faculty-panel faculty-courses">
+            <div className="faculty-panel-heading"><div><span className="faculty-eyebrow">GIẢNG DẠY</span><h2>Các môn học của bạn <span>{courses.length}</span></h2></div>
+              <button type="button" className="faculty-text-button" onClick={()=>navigate('/khoa-hoc')}>Xem tất cả <ArrowRight size={16}/></button>
             </div>
-
-
-            {/* Không có môn */}
-            {courseRows.length === 0 ? (
-
-              <div className="profile-empty">
-                Chưa có khóa học trong hệ thống.
-              </div>
-
-            ) : (
-
-              courseRows.map(
-                (course) => (
-
-                  <div
-                    className="profile-course-row"
-                    key={
-                      course.Moodle_Course_ID
-                    }
-                  >
-
-                    {/* Icon môn */}
-                    <div className="course-monogram">
-
-                      {(
-                        course.Course_Code ||
-                        "MH"
-                      ).slice(0, 2)}
-
-                    </div>
-
-
-                    {/* Thông tin môn */}
-                    <div className="profile-course-main">
-
-                      <strong>
-
-                        {course.Course_Code
-                          ? `${course.Course_Code} - `
-                          : ""}
-
-                        {course.Course_Name}
-
-                      </strong>
-
-
-                      <span>
-                        {course.Category_Name ||
-                          "Khóa học DLU"}
-                      </span>
-
-                    </div>
-
-
-                    {/* Quản lý lớp */}
-                    <button
-                      type="button"
-                      onClick={() =>
-                        navigate(
-                          `/quan-ly-lop/${course.Moodle_Course_ID}`
-                        )
-                      }
-                    >
-                      Xem chi tiết
-                    </button>
-
-                  </div>
-                )
-              )
-            )}
-
-
-            {/* Xem tất cả */}
-            <button
-              className="all-courses-link"
-              type="button"
-              onClick={() =>
-                navigate("/khoa-hoc")
-              }
-            >
-
-              Xem tất cả khóa học
-
-              <ChevronRight
-                size={15}
-              />
-
-            </button>
-
+            {courses.length ? <div className="faculty-course-list">{courses.map((course,index)=><button type="button" className="faculty-course" key={course.Moodle_Course_ID} onClick={()=>navigate(`/quan-ly-lop/${course.Moodle_Course_ID}`)}>
+              <span className={`faculty-course-icon faculty-course-icon-${index%4}`}><BookOpen size={22}/></span>
+              <span className="faculty-course-content"><span className="faculty-course-code">{course.Course_Code || 'MÔN HỌC'}</span><strong>{course.Course_Name}</strong><small>{course.Category_Name || 'Khóa học DLU'}</small></span>
+              <span className="faculty-course-action">Quản lý lớp <ArrowUpRight size={15}/></span>
+            </button>)}</div> : <div className="faculty-empty"><BookOpen size={28}/><p>Bạn chưa được phân công môn học.</p></div>}
+            <div className="faculty-course-footer"><UsersRound size={16}/><span>Đồng hành cùng sinh viên</span><div>{cohortStats.map(item=><span key={item.cohort}>{item.cohort}<b>{item.count}</b></span>)}</div></div>
           </section>
 
-
-          {/* ===============================================
-              TÀI KHOẢN
-          =============================================== */}
-
-          <section className="profile-card account-card">
-
-            <div className="profile-card-title">
-
-              <div>
-                <UserRound size={20} />
-
-                <strong>
-                  Tài khoản & Hệ thống
-                </strong>
-              </div>
-
-            </div>
-
-
-            {/* Thông tin cá nhân */}
-            <button type="button">
-
-              <UserRound />
-
-              <span>
-                <strong>
-                  Thông tin cá nhân
-                </strong>
-
-                <small>
-                  Cập nhật thông tin hồ sơ
-                </small>
-              </span>
-
-              <ChevronRight />
-
-            </button>
-
-
-            {/* Password */}
-            <button type="button">
-
-              <LockKeyhole />
-
-              <span>
-                <strong>
-                  Đổi mật khẩu
-                </strong>
-
-                <small>
-                  Bảo mật tài khoản
-                </small>
-              </span>
-
-              <ChevronRight />
-
-            </button>
-
-
-            {/* LMS */}
-            <button type="button">
-
-              <Link2 />
-
-              <span>
-                <strong>
-                  Kết nối LMS DLU
-                </strong>
-
-                <small>
-                  Đồng bộ khóa học ở chế độ
-                  chỉ đọc
-                </small>
-              </span>
-
-              <ChevronRight />
-
-            </button>
-
-
-            {/* Notification */}
-            <button type="button">
-
-              <Bell />
-
-              <span>
-                <strong>
-                  Cài đặt thông báo
-                </strong>
-
-                <small>
-                  Quản lý thông báo của tài khoản
-                </small>
-              </span>
-
-              <ChevronRight />
-
-            </button>
-
-
-            {/* Logout */}
-            <button
-              type="button"
-              className="profile-logout"
-              onClick={logout}
-            >
-
-              <LogOut />
-
-              <span>
-                <strong>
-                  Đăng xuất
-                </strong>
-              </span>
-
-            </button>
-
-          </section>
-
+          <aside className="faculty-side-column">
+            <section className="faculty-panel faculty-shortcuts">
+              <div className="faculty-panel-heading"><div><span className="faculty-eyebrow">DÀNH CHO BẠN</span><h2>Truy cập nhanh</h2></div><UserRound size={19}/></div>
+              {shortcuts.map(({icon:Icon,title,description,path})=><button type="button" className="faculty-shortcut" key={title} onClick={()=>navigate(path)}><span className="faculty-shortcut-icon"><Icon size={18}/></span><span><strong>{title}</strong><small>{description}</small></span><ChevronRight size={16}/></button>)}
+              <button type="button" className="faculty-logout" onClick={logout}><LogOut size={16}/> Đăng xuất tài khoản <ArrowUpRight size={15}/></button>
+            </section>
+            <div className="faculty-support-note"><span><LifeBuoy size={20}/></span><div><strong>Thông tin cần cập nhật?</strong><p>Liên hệ bộ phận hỗ trợ để điều chỉnh hồ sơ trên hệ thống.</p><button type="button" onClick={()=>navigate('/ho-tro')}>Đến trung tâm hỗ trợ <ArrowRight size={14}/></button></div></div>
+          </aside>
         </div>
-
+        <footer className="faculty-page-footer"><GraduationCap size={15}/> DLU LMS <span>·</span> Kết nối giảng dạy, lan tỏa tri thức.</footer>
       </main>
-
     </div>
   );
 }

@@ -140,6 +140,8 @@ function Notifications({
   teacherId,
 }) {
 
+  const [actionError, setActionError] = useState('');
+
   // ====================================================
   // XEM TẤT CẢ / THU GỌN
   // ====================================================
@@ -296,6 +298,7 @@ function Notifications({
         }
 
       } catch (error) {
+        setActionError(error.message || "Không thể lưu trạng thái thông báo.");
 
         console.error(
           "Lỗi đánh dấu thông báo đã đọc:",
@@ -369,6 +372,7 @@ function Notifications({
         }
 
       } catch (error) {
+        setActionError(error.message || "Không thể lưu trạng thái thông báo.");
 
         console.error(
           "Lỗi đánh dấu tất cả đã đọc:",
@@ -407,6 +411,7 @@ function Notifications({
 
   return (
     <div className="right-card">
+      {actionError && <p role="alert">{actionError}</p>}
 
       {/* =================================================
           HEADER

@@ -1,3 +1,4 @@
+import DataLoadError from '../components/DataLoadError';
 import React, { useState, useEffect } from "react";
 import { studentGet } from "../services/apiClient";
 import {
@@ -38,15 +39,20 @@ export default function StudentGrades() {
   const [grades, setGrades] = useState([]);
   const [benchmarks, setBenchmarks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError,setLoadError]=useState("");
+  const [benchmarkError,setBenchmarkError]=useState(false);
+  const [reload,setReload]=useState(0);
   const [selectedCourse, setSelectedCourse] = useState("ALL");
   const [hoveredPoint, setHoveredPoint] = useState(null);
 
   useEffect(() => {
+    let cancelled=false;setLoading(true);setLoadError("");setBenchmarkError(false);
     Promise.all([
       studentGet("/grades"),
-      studentGet("/benchmark").catch(() => ({ data: [] })),
+      studentGet("/benchmark").catch(() => {if(!cancelled)setBenchmarkError(true);return {data:[]};}),
     ])
       .then(([gradesData, benchmarkData]) => {
+        if(cancelled)return;
         if (gradesData?.data) {
           setGrades(gradesData.data);
         }
@@ -54,9 +60,10 @@ export default function StudentGrades() {
           setBenchmarks(benchmarkData.data);
         }
       })
-      .catch((err) => console.error("Lỗi getStudentGrades & benchmark:", err))
-      .finally(() => setLoading(false));
-  }, []);
+      .catch(() => {if(!cancelled)setLoadError("Không tải được kết quả học tập từ hệ thống. Vui lòng thử lại.");})
+      .finally(() => {if(!cancelled)setLoading(false);});
+    return()=>{cancelled=true;};
+  }, [reload]);
 
   const total = grades.length;
   const gradeValues = grades.map((g) => Number(g.Grade || 0));
@@ -66,7 +73,7 @@ export default function StudentGrades() {
   const passedCount = grades.filter(
     (g) => g.Is_Passed === 1 || Number(g.Grade) >= 5
   ).length;
-  const passRate = total > 0 ? Math.round((passedCount / total) * 100) : 100;
+  const passRate = total > 0 ? Math.round((passedCount / total) * 100) : null;
 
   // Danh sách các môn học duy nhất
   const uniqueCourses = Array.from(
@@ -168,8 +175,10 @@ export default function StudentGrades() {
     };
   });
 
+  if(loadError)return <DataLoadError message={loadError} onRetry={()=>setReload(n=>n+1)}/>;
   return (
     <main className="page-full">
+      {benchmarkError && <div role="status" style={{padding:14,background:'#fffbeb',color:'#92400e',borderRadius:9,marginBottom:16}}>Điểm cá nhân vẫn hiển thị; dữ liệu đối chiếu với lớp chưa tải được. <button onClick={()=>setReload(n=>n+1)}>Thử lại dữ liệu đối chiếu</button></div>}
       {/* 1. HERO BANNER */}
       <section className="courses-hero">
         <div className="courses-hero-main">
@@ -219,7 +228,7 @@ export default function StudentGrades() {
           </div>
           <div className="summary-content">
             <span>Tỷ lệ đạt chuẩn (Pass)</span>
-            <strong>{passRate}%</strong>
+            <strong>{passRate===null?"—":`${passRate}%`}</strong>
             <small>
               {passedCount}/{total} bài đạt yêu cầu
             </small>

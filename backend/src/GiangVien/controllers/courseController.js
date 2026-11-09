@@ -14,7 +14,9 @@ function normalizeCohort(value) {
   if (
     cohort === "K45" ||
     cohort === "K46" ||
-    cohort === "K47"
+    cohort === "K47" ||
+    cohort === "K48" ||
+    cohort === "ALL"
   ) {
     return cohort;
   }
@@ -25,9 +27,11 @@ function normalizeCohort(value) {
 
 function getCohortPattern(cohort) {
   const mapping = {
+    ALL: "%",
     K45: "sv21%",
     K46: "sv22%",
     K47: "sv23%",
+    K48: "sv24%",
   };
 
   return mapping[cohort] || "sv23%";
@@ -289,9 +293,28 @@ export async function getCourseStudentAnalytics(
 
 
           /* ===========================
-             ATTENDANCE / CHUYÊN CẦN
+             ATTENDANCE / CHUYÊN CẦN (ĐIỂM DANH LỚP HỌC)
           =========================== */
+          attendance_stats.Total_Attendance_Sessions,
+          attendance_stats.Attended_Sessions,
 
+          CASE
+            WHEN COALESCE(attendance_stats.Total_Attendance_Sessions, 0) = 0
+            THEN NULL
+            ELSE ROUND(
+              (
+                attendance_stats.Attended_Sessions
+                /
+                attendance_stats.Total_Attendance_Sessions
+              ) * 100,
+              2
+            )
+          END AS Attendance_Rate,
+
+
+          /* ===========================
+             ENGAGEMENT (TƯƠNG TÁC HỌC TẬP ONLINE)
+          =========================== */
           COALESCE(
             engagement_stats.Active_Days,
             0
@@ -302,33 +325,6 @@ export async function getCourseStudentAnalytics(
             engagement_stats.Total_Tracked_Days,
             0
           ) AS Total_Tracked_Days,
-
-
-          CASE
-
-            WHEN COALESCE(
-              engagement_stats.Total_Tracked_Days,
-              0
-            ) = 0
-
-            THEN NULL
-
-            ELSE LEAST(
-              100,
-              ROUND(
-                (
-                  COALESCE(
-                    engagement_stats.Active_Days,
-                    0
-                  )
-                  /
-                  engagement_stats.Total_Tracked_Days
-                ) * 100,
-                2
-              )
-            )
-
-          END AS Attendance_Rate,
 
 
           /* ===========================
@@ -585,6 +581,42 @@ export async function getCourseStudentAnalytics(
             du.User_Key
 
           AND engagement_stats.Course_Key =
+            dc.Course_Key
+
+
+        /* ===========================
+           ATTENDANCE STATS (ĐIỂM DANH LỚP HỌC)
+        =========================== */
+
+        LEFT JOIN (
+
+          SELECT
+
+            fa.User_Key,
+            fa.Course_Key,
+
+            COUNT(fa.Attendance_Key) AS Total_Attendance_Sessions,
+
+            SUM(
+              CASE
+                WHEN LOWER(fa.Attendance_Status) IN ('present', 'p', 'late', 'l')
+                THEN 1
+                ELSE 0
+              END
+            ) AS Attended_Sessions
+
+          FROM Fact_Attendance fa
+
+          GROUP BY
+            fa.User_Key,
+            fa.Course_Key
+
+        ) attendance_stats
+
+          ON attendance_stats.User_Key =
+            du.User_Key
+
+          AND attendance_stats.Course_Key =
             dc.Course_Key
 
 
@@ -1455,7 +1487,8 @@ export async function getCourseSubmissionBehavior(req, res) {
       });
     }
 
-    const metrics = await calculateCourseBehaviorMetrics(pool, courseId);
+    const cohort = req.query.cohort;
+    const metrics = await calculateCourseBehaviorMetrics(pool, courseId, { cohort });
 
     const submissionSummary = {
       totalStudents: metrics.summary.totalStudents,
@@ -1486,6 +1519,7 @@ export async function getCourseSubmissionBehavior(req, res) {
     return res.json({
       success: true,
       course: metrics.course,
+      cohort: cohort || null,
       referenceDate: metrics.referenceDate,
       summary: submissionSummary,
       students,
@@ -1506,7 +1540,7 @@ export async function getCourseSubmissionBehavior(req, res) {
 // PHÂN KHÚC SINH VIÊN 2x2
 //
 // GET:
-// /api/courses/:courseId/segments
+// /api/courses/:courseId/segments?cohort=K47
 // ======================================================
 
 export async function getCourseSegments(req, res) {
@@ -1520,7 +1554,8 @@ export async function getCourseSegments(req, res) {
       });
     }
 
-    const metrics = await calculateCourseBehaviorMetrics(pool, courseId);
+    const cohort = req.query.cohort;
+    const metrics = await calculateCourseBehaviorMetrics(pool, courseId, { cohort });
 
     const students = metrics.students.map((s) => ({
       userKey: s.userKey,
@@ -1544,6 +1579,7 @@ export async function getCourseSegments(req, res) {
     return res.json({
       success: true,
       course: metrics.course,
+      cohort: cohort || null,
       referenceDate: metrics.referenceDate,
       thresholds: metrics.summary.thresholds,
       counts: metrics.summary.segmentCounts,
@@ -1567,7 +1603,7 @@ export async function getCourseSegments(req, res) {
 // CẢNH BÁO SỚM & ĐÁNH GIÁ RỦI RO HỌC TẬP
 //
 // GET:
-// /api/courses/:courseId/risk
+// /api/courses/:courseId/risk?cohort=K47
 // ======================================================
 
 export async function getCourseRisk(req, res) {
@@ -1581,7 +1617,8 @@ export async function getCourseRisk(req, res) {
       });
     }
 
-    const metrics = await calculateCourseBehaviorMetrics(pool, courseId);
+    const cohort = req.query.cohort;
+    const metrics = await calculateCourseBehaviorMetrics(pool, courseId, { cohort });
 
     // Sắp xếp giảm dần theo riskScore
     const sortedStudents = [...metrics.students].sort(
@@ -1618,6 +1655,7 @@ export async function getCourseRisk(req, res) {
     return res.json({
       success: true,
       course: metrics.course,
+      cohort: cohort || null,
       referenceDate: metrics.referenceDate,
       summary: {
         totalStudents: metrics.summary.totalStudents,
@@ -1638,4 +1676,415 @@ export async function getCourseRisk(req, res) {
   }
 }
 
-
+
+// ======================================================
+// DANH SÁCH COHORT THỰC TẾ CỦA MÔN HỌC
+//
+// GET:
+// /api/courses/:courseId/cohorts
+// ======================================================
+
+export async function getCourseCohorts(req, res) {
+  try {
+    const { courseId } = req.params;
+
+    if (!courseId) {
+      return res.status(400).json({
+        success: false,
+        message: "Mã khóa học là bắt buộc.",
+      });
+    }
+
+    const [courseRows] = await pool.query(
+      `SELECT Course_Key, Moodle_Course_ID 
+       FROM Dim_Course 
+       WHERE Moodle_Course_ID = ? OR Course_Key = ? 
+       LIMIT 1`,
+      [courseId, courseId]
+    );
+
+    if (courseRows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy môn học.",
+      });
+    }
+
+    const courseKey = courseRows[0].Course_Key;
+    const moodleCourseId = courseRows[0].Moodle_Course_ID;
+
+    const [rows] = await pool.query(
+      `SELECT 
+         CASE 
+           WHEN du.Username LIKE 'sv21%' THEN 'K45'
+           WHEN du.Username LIKE 'sv22%' THEN 'K46'
+           WHEN du.Username LIKE 'sv23%' THEN 'K47'
+           WHEN du.Username LIKE 'sv24%' THEN 'K48'
+           ELSE 'Other'
+         END AS cohort,
+         COUNT(DISTINCT fe.User_Key) AS studentCount
+       FROM Fact_Enrolment fe
+       JOIN Dim_User du ON du.User_Key = fe.User_Key
+       WHERE fe.Course_Key = ? AND du.Primary_Role = 'Student'
+       GROUP BY cohort
+       HAVING cohort != 'Other' AND studentCount > 0
+       ORDER BY cohort DESC`,
+      [courseKey]
+    );
+
+    return res.json({
+      success: true,
+      courseId: moodleCourseId,
+      courseKey,
+      data: rows.map((r) => ({
+        cohort: r.cohort || r.Cohort,
+        studentCount: Number(r.studentCount ?? r.StudentCount ?? r.student_count ?? 0),
+      })),
+    });
+  } catch (error) {
+    console.error("Lỗi getCourseCohorts:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Không thể lấy danh sách khóa của môn học.",
+      error: error.message,
+    });
+  }
+}
+
+
+// ======================================================
+// THÔNG TIN CHI TIẾT MÔN HỌC
+//
+// GET:
+// /api/courses/:courseId
+// ======================================================
+
+export async function getCourseDetails(req, res) {
+  try {
+    const { courseId } = req.params;
+
+    if (!courseId) {
+      return res.status(400).json({
+        success: false,
+        message: "Mã khóa học là bắt buộc.",
+      });
+    }
+
+    const [rows] = await pool.query(
+      `SELECT 
+         dc.Course_Key,
+         dc.Moodle_Course_ID,
+         dc.Course_Code,
+         dc.Course_Name,
+         dc.Category_ID,
+         dc.Category_Name,
+         dc.Start_Date,
+         dc.End_Date,
+         dc.Is_Visible
+       FROM Dim_Course dc
+       WHERE dc.Moodle_Course_ID = ? OR dc.Course_Key = ?
+       LIMIT 1`,
+      [courseId, courseId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy môn học.",
+      });
+    }
+
+    return res.json({
+      success: true,
+      data: rows[0],
+    });
+  } catch (error) {
+    console.error("Lỗi getCourseDetails:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Không thể lấy thông tin môn học.",
+      error: error.message,
+    });
+  }
+}
+
+
+// ======================================================
+// ĐỌC TOÀN BỘ ĐIỂM ĐÃ CÓ CỦA MỘT SINH VIÊN (READ-ONLY)
+// GET /api/courses/:courseId/students/:studentId/grades
+// ======================================================
+
+export async function getStudentCourseGrades(req, res) {
+  try {
+    const { courseId, studentId } = req.params;
+
+    // 1. Xác định môn học (theo Moodle_Course_ID hoặc Course_Key)
+    const [courses] = await pool.query(
+      `SELECT Course_Key, Moodle_Course_ID, Course_Code, Course_Name
+       FROM Dim_Course
+       WHERE Moodle_Course_ID = ? OR Course_Key = ?
+       LIMIT 1`,
+      [courseId, courseId]
+    );
+
+    if (!courses || courses.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: `Không tìm thấy môn học có ID: ${courseId}`,
+      });
+    }
+    const course = courses[0];
+
+    // 2. Xác định sinh viên (theo User_Key, Moodle_User_ID, hoặc Username)
+    const [users] = await pool.query(
+      `SELECT User_Key, Moodle_User_ID, Username, First_Name, Last_Name, Full_Name, Email, Primary_Role
+       FROM Dim_User
+       WHERE User_Key = ? OR Moodle_User_ID = ? OR Username = ?
+       LIMIT 1`,
+      [studentId, studentId, studentId]
+    );
+
+    if (!users || users.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: `Không tìm thấy sinh viên có ID: ${studentId}`,
+      });
+    }
+    const student = users[0];
+
+    // 3. Kiểm tra tính hợp lệ về phân quyền & ghi danh (Enrollment validation)
+    const [enrolments] = await pool.query(
+      `SELECT Enrolment_Key, Status
+       FROM Fact_Enrolment
+       WHERE User_Key = ? AND Course_Key = ?
+       LIMIT 1`,
+      [student.User_Key, course.Course_Key]
+    );
+
+    const isEnrolled = enrolments.length > 0;
+    const enrolmentStatus = isEnrolled ? enrolments[0].Status : "Not_Enrolled";
+
+    // 4. Lấy danh sách đầu điểm cấu hình trong Data Warehouse (dim_teacher_grade_item)
+    const [items] = await pool.query(
+      `SELECT
+        i.Item_Key,
+        i.Component_Key,
+        c.Component_Name,
+        c.Overall_Weight,
+        i.Item_Name,
+        i.Source_Type,
+        i.LMS_Grade_Item_ID,
+        i.Internal_Weight,
+        i.Max_Score,
+        i.Display_Order
+      FROM dim_teacher_grade_item i
+      LEFT JOIN dim_teacher_grade_component c
+        ON i.Component_Key = c.Component_Key
+      WHERE i.Course_Key = ? AND (i.Is_Active = 1 OR i.Is_Active IS NULL)
+      ORDER BY i.Display_Order ASC, i.Item_Key ASC`,
+      [course.Course_Key]
+    );
+
+    const criteriaResults = [];
+    let totalWeight = 0;
+    let allScored = true;
+    let weightedScoreSum = 0;
+    const mappedLmsItemIds = new Set();
+
+    for (const item of items) {
+      const weight = Number(item.Internal_Weight) || 0;
+      totalWeight += weight;
+      let maxScore = Number(item.Max_Score) || 10;
+
+      let score = null;
+      let status = "ungraded";
+      let provenance = "";
+      let reason = "";
+      let attendanceDetails = null;
+
+      if (item.Source_Type === "LMS_GRADE") {
+        if (!item.LMS_Grade_Item_ID) {
+          status = "missing_mapping";
+          reason = "Chưa ánh xạ LMS_Grade_Item_ID trong CSDL (Dim_Teacher_Grade_Item.LMS_Grade_Item_ID = NULL)";
+          provenance = "Dim_Teacher_Grade_Item (Thiếu LMS ID)";
+        } else {
+          mappedLmsItemIds.add(Number(item.LMS_Grade_Item_ID));
+          const [grades] = await pool.query(
+            `SELECT Grade, Max_Grade, Grade_Percentage, Is_Passed
+             FROM Fact_Course_Grade
+             WHERE User_Key = ? AND Course_Key = ? AND Grade_Item_ID = ?
+             LIMIT 1`,
+            [student.User_Key, course.Course_Key, item.LMS_Grade_Item_ID]
+          );
+
+          if (grades.length > 0 && grades[0].Grade !== null && grades[0].Grade !== undefined) {
+            maxScore = Number(grades[0].Max_Grade) || maxScore;
+            score = Math.round(Number(grades[0].Grade) * 100) / 100;
+            status = "graded";
+            provenance = `Fact_Course_Grade (Moodle LMS Item #${item.LMS_Grade_Item_ID})`;
+          } else {
+            status = "ungraded";
+            reason = "Chưa có điểm bài tập trong LMS (Chưa nộp bài hoặc chưa chấm)";
+            provenance = `Fact_Course_Grade (Moodle LMS Item #${item.LMS_Grade_Item_ID})`;
+          }
+        }
+      } else if (item.Source_Type === "ATTENDANCE") {
+        const [attRows] = await pool.query(
+          `SELECT Attendance_Status, COUNT(*) as cnt
+           FROM fact_attendance
+           WHERE User_Key = ? AND Course_Key = ?
+           GROUP BY Attendance_Status`,
+          [student.User_Key, course.Course_Key]
+        );
+
+        let present = 0;
+        let late = 0;
+        let absent = 0;
+
+        attRows.forEach((r) => {
+          const st = String(r.Attendance_Status).toLowerCase();
+          if (st === "present") present = Number(r.cnt);
+          else if (st === "late") late = Number(r.cnt);
+          else if (st === "absent") absent = Number(r.cnt);
+        });
+
+        const totalSessions = present + late + absent;
+        if (totalSessions > 0) {
+          score = Math.round(((present * 1.0 + late * 0.5) / totalSessions) * maxScore * 100) / 100;
+          status = "graded";
+          provenance = `fact_attendance (${present} có mặt, ${late} muộn, ${absent} vắng / ${totalSessions} buổi)`;
+          attendanceDetails = {
+            total: totalSessions,
+            present,
+            late,
+            absent,
+            rate: Math.round(((present + late * 0.5) / totalSessions) * 100),
+          };
+        } else {
+          status = "ungraded";
+          reason = "Chưa có dữ liệu điểm danh trong fact_attendance";
+          provenance = "fact_attendance";
+        }
+      } else {
+        // EXTERNAL / ASSIGNMENT (Đầu điểm ngoài LMS hoặc bài tập tự do)
+        const [scores] = await pool.query(
+          `SELECT Score, Max_Score
+           FROM fact_teacher_grade_score
+           WHERE Item_Key = ? AND User_Key = ? AND Course_Key = ?
+           LIMIT 1`,
+          [item.Item_Key, student.User_Key, course.Course_Key]
+        );
+
+        if (scores.length > 0 && scores[0].Score !== null && scores[0].Score !== undefined) {
+          score = Math.round(Number(scores[0].Score) * 100) / 100;
+          status = "graded";
+          provenance = "fact_teacher_grade_score (Điểm giảng viên nhập ngoài LMS)";
+        } else {
+          status = "ungraded";
+          reason = "Chưa chấm (Chưa có bản ghi điểm trong fact_teacher_grade_score)";
+          provenance = "fact_teacher_grade_score";
+        }
+      }
+
+      if (score === null) {
+        allScored = false;
+      } else {
+        weightedScoreSum += score * (weight / 100);
+      }
+
+      criteriaResults.push({
+        id: `item_${item.Item_Key}`,
+        itemKey: item.Item_Key,
+        componentKey: item.Component_Key,
+        componentName: item.Component_Name || "Chuyên cần",
+        name: item.Item_Name,
+        sourceType: item.Source_Type,
+        lmsGradeItemId: item.LMS_Grade_Item_ID,
+        weight,
+        maxScore,
+        score, // Giá trị số hoặc null (TUYỆT ĐỐI KHÔNG BIẾN NULL THÀNH 0)
+        status, // 'graded' | 'ungraded' | 'missing_mapping'
+        provenance,
+        reason,
+        attendanceDetails,
+      });
+    }
+
+    // 5. Tìm thêm các đầu điểm LMS khác có trong Fact_Course_Grade chưa được map vào criteria
+    const [otherGradesRows] = await pool.query(
+      `SELECT
+        Grade_Item_ID,
+        Grade_Item_Name,
+        Grade_Item_Type,
+        Grade,
+        Max_Grade,
+        Grade_Percentage,
+        Is_Passed
+       FROM Fact_Course_Grade
+       WHERE User_Key = ? AND Course_Key = ?`,
+      [student.User_Key, course.Course_Key]
+    );
+
+    const otherLmsGrades = otherGradesRows
+      .filter((g) => !mappedLmsItemIds.has(Number(g.Grade_Item_ID)))
+      .map((g) => ({
+        gradeItemId: g.Grade_Item_ID,
+        name: g.Grade_Item_Name,
+        type: g.Grade_Item_Type,
+        score: g.Grade !== null ? Math.round(Number(g.Grade) * 100) / 100 : null,
+        maxScore: Number(g.Max_Grade) || 10,
+        status: g.Grade !== null ? "graded" : "ungraded",
+        provenance: `Fact_Course_Grade (LMS ID: ${g.Grade_Item_ID})`,
+      }));
+
+    // 6. Tính toán điểm chuyên cần tổng hợp
+    const isWeightValid = Math.abs(totalWeight - 100) < 0.01;
+    const calculatedFinalScore =
+      isWeightValid && allScored && criteriaResults.length > 0
+        ? Math.round(weightedScoreSum * 100) / 100
+        : null;
+
+    return res.json({
+      success: true,
+      student: {
+        userKey: student.User_Key,
+        moodleUserId: student.Moodle_User_ID,
+        username: student.Username,
+        fullName: student.Full_Name,
+        email: student.Email,
+        role: student.Primary_Role,
+      },
+      course: {
+        courseKey: course.Course_Key,
+        moodleCourseId: course.Moodle_Course_ID,
+        courseCode: course.Course_Code,
+        courseName: course.Course_Name,
+      },
+      isEnrolled,
+      enrolmentStatus,
+      criteria: criteriaResults,
+      otherLmsGrades,
+      totalWeight,
+      isWeightValid,
+      calculatedFinalScore,
+      allScored,
+      summary: {
+        totalItems: criteriaResults.length,
+        gradedItems: criteriaResults.filter((c) => c.status === "graded").length,
+        ungradedItems: criteriaResults.filter((c) => c.status === "ungraded").length,
+        missingMappingItems: criteriaResults.filter((c) => c.status === "missing_mapping").length,
+      },
+    });
+  } catch (error) {
+    console.error("Lỗi getStudentCourseGrades:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Không thể lấy dữ liệu điểm sinh viên.",
+      error: error.message,
+    });
+  }
+}
+
+
+

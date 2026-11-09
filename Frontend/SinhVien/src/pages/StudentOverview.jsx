@@ -23,9 +23,9 @@ export default function StudentOverview({
 }) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
-  const kpis = summary?.kpis || {};
+  const _kpis = summary?.kpis || {};
   const student = summary?.student || {};
-  const recentActivities = summary?.recentActivities || [];
+  const _recentActivities = summary?.recentActivities || [];
   const events = summary?.events || [];
 
   // Initials
@@ -96,11 +96,11 @@ export default function StudentOverview({
           <div className="welcome-user">
             <div className="big-avatar">{initials}</div>
             <div>
-              <h2>Xin chào, {student.fullName || "Nguyễn Văn An"}!</h2>
+              <h2>Xin chào, {student.fullName || "Sinh viên"}!</h2>
               <p>
-                Khoa Công nghệ Thông tin | Lớp: {student.cohort || "CTK47B"} | MSSV:{" "}
-                {student.studentCode || student.username || "2310001"} | Học kỳ:{" "}
-                {student.currentSemester || "Học kỳ 1 (2026-2027)"}
+                Khoa Công nghệ Thông tin | Lớp: {student.cohort || "Chưa có dữ liệu"} | MSSV:{" "}
+                {student.studentCode || student.username || "—"} | Học kỳ:{" "}
+                {student.currentSemester || "Chưa có dữ liệu"}
               </p>
             </div>
           </div>
@@ -145,12 +145,12 @@ export default function StudentOverview({
                   <p>
                     <Award size={14} />
                     Điểm trung bình:{" "}
-                    <strong>{c.averageGrade ? `${c.averageGrade}/10` : "7.0/10"}</strong>
+                    <strong>{c.averageGrade != null ? `${c.averageGrade}/10` : "Chưa có điểm"}</strong>
                   </p>
 
                   <p>
                     <ClipboardCheck size={14} />
-                    Tiến độ hoàn thành: <strong>{c.progress || 100}%</strong>
+                    Tiến độ hoàn thành: <strong>{c.progress ?? 0}%</strong>
                   </p>
 
                   <p>
@@ -206,14 +206,14 @@ export default function StudentOverview({
               </div>
 
               {courses.map((c) => {
-                const grade = c.averageGrade || 7.0;
-                const percent = (grade / 10) * 100;
+                const grade = c.averageGrade;
+                const percent = grade == null ? 0 : Math.max(0, Math.min(100, (grade / 10) * 100));
                 return (
                   <div key={c.id} className="analytics-bar-item">
                     <div className="analytics-bar-meta">
                       <span>{c.name} ({c.shortName})</span>
                       <span style={{ color: "#37883e", fontWeight: "700" }}>
-                        {grade}/10
+                        {grade == null ? "Chưa có điểm" : `${grade}/10`}
                       </span>
                     </div>
                     <div className="analytics-track">
@@ -249,13 +249,13 @@ export default function StudentOverview({
                   <div className="analytics-bar-meta">
                     <span>{c.name}</span>
                     <span style={{ color: "#37883e", fontWeight: "700" }}>
-                      {c.progress || 100}%
+                      {c.progress ?? 0}%
                     </span>
                   </div>
                   <div className="analytics-track">
                     <div
                       className="analytics-fill"
-                      style={{ width: `${c.progress || 100}%` }}
+                      style={{ width: `${c.progress ?? 0}%` }}
                     />
                   </div>
                 </div>
@@ -318,7 +318,7 @@ export default function StudentOverview({
               <Bell size={16} style={{ color: "#37883e" }} />
               <strong>Hạn nộp & Nhắc nhở</strong>
             </div>
-            <span className="badge">{events.length || 2}</span>
+            <span className="badge">{events.length}</span>
           </div>
 
           {events.length > 0 ? (
@@ -335,11 +335,18 @@ export default function StudentOverview({
             <div className="notification-item">
               <div className="notification-dot" />
               <div className="notification-info">
-                <strong>Đã hoàn thành toàn bộ bài tập</strong>
+                <strong>Chưa có hạn nộp sắp tới</strong>
                 <span>Không có bài tập nào sắp đến hạn</span>
               </div>
             </div>
           )}
+        </div>
+
+        <div className="right-card">
+          <h3>Thông báo lớp học</h3>
+          {(summary?.notifications || []).length === 0 ? <p>Chưa có thông báo.</p> : summary.notifications.map(item => <div className="notification-item" key={item.id}>
+            <div className="notification-info"><strong>{item.title}</strong><p style={{whiteSpace:'pre-wrap'}}>{item.message}</p><span>{new Date(item.createdAt).toLocaleString('vi-VN')}</span></div>
+          </div>)}
         </div>
 
         {/* 3. LIÊN KẾT NHANH (QUICK LINKS) */}

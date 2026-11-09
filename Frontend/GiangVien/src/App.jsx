@@ -1,9 +1,14 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import { clearTeacherSession } from "./services/authService";
 
 import ProtectedRoute from "./components/ProtectedRoute";
+import "./styles/TeacherPageBackground.css";
 
 import Login from "./pages/Login";
 import TeacherOverview from "./pages/TeacherOverview";
+import TeachingSchedule from "./pages/TeachingSchedule";
+import FloatingClassroomChat from './components/ai-assistant/FloatingClassroomChat';
 import Courses from "./pages/Courses";
 import Grading from "./pages/Grading";
 import ClassManagement from "./pages/ClassManagement";
@@ -18,14 +23,32 @@ import AssignmentManagement from "./pages/AssignmentManagement";
 // THÊM - TRANG SO SÁNH LỚP HỌC
 // ============================================================
 import ClassComparison from "./pages/ClassComparison/ClassComparison";
+import './styles/TeacherDesignSystem.css';
 
 
 function PrivatePage({ children }) {
-  return <ProtectedRoute>{children}</ProtectedRoute>;
+  return <ProtectedRoute><div className="teacher-page-background">{children}<FloatingClassroomChat /></div></ProtectedRoute>;
 }
 
 
 function App() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Khi nhận thông báo phiên đăng nhập LMS hết hạn (401)
+    // Tự động dọn dẹp phiên LMS nội bộ và điều hướng về trang đăng nhập
+    // TUÂN THỦ: Bảo toàn nguyên vẹn token Microsoft MSAL trong sessionStorage
+    const handleAuthExpired = () => {
+      clearTeacherSession();
+      navigate("/dang-nhap", { replace: true });
+    };
+
+    window.addEventListener("lms-teacher-auth-expired", handleAuthExpired);
+    return () => {
+      window.removeEventListener("lms-teacher-auth-expired", handleAuthExpired);
+    };
+  }, [navigate]);
+
   return (
     <Routes>
 
@@ -181,7 +204,7 @@ function App() {
         path="/lich"
         element={
           <PrivatePage>
-            <TeacherOverview />
+            <TeachingSchedule />
           </PrivatePage>
         }
       />
@@ -196,6 +219,19 @@ function App() {
         element={
           <PrivatePage>
             <Analytics />
+          </PrivatePage>
+        }
+      />
+
+      {/* =====================================================
+          AI DASHBOARD STUDIO
+      ===================================================== */}
+
+      <Route
+        path="/ai-studio"
+        element={
+          <PrivatePage>
+            <Analytics defaultStudioOpen={true} />
           </PrivatePage>
         }
       />

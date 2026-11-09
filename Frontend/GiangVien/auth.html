@@ -4,6 +4,39 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Microsoft Authentication - LMS</title>
+    <script>
+      (function() {
+        try {
+          var h = window.location.hash || '';
+          var s = window.location.search || '';
+          var hasCode = h.includes('code=') || s.includes('code=');
+          var hasState = h.includes('state=') || s.includes('state=');
+          var hasError = h.includes('error=') || s.includes('error=');
+          var errMatch = (h + '&' + s).match(/[?&#]error=([^&]+)/);
+          var errDescMatch = (h + '&' + s).match(/[?&#]error_description=([^&]+)/);
+          var errName = errMatch ? decodeURIComponent(errMatch[1]) : null;
+          var errDesc = errDescMatch ? decodeURIComponent(errDescMatch[1]).slice(0, 150) : null;
+          var info = {
+            timestamp: new Date().toISOString(),
+            origin: window.location.origin,
+            pathname: window.location.pathname,
+            hasCode: hasCode,
+            hasState: hasState,
+            hasError: hasError,
+            errorName: errName,
+            errorDesc: errDesc,
+            hasOpener: Boolean(window.opener && window.opener !== window),
+            visibilityState: document.visibilityState
+          };
+          localStorage.setItem('__msal_popup_arrival', JSON.stringify(info));
+          try {
+            var bc = new BroadcastChannel('msal_popup_diagnostics');
+            bc.postMessage({ type: 'POPUP_ARRIVED', info: info });
+            bc.close();
+          } catch (e) {}
+        } catch (e) {}
+      })();
+    </script>
     <style>
       body {
         margin: 0;

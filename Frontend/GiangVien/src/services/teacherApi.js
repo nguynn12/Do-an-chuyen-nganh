@@ -1,16 +1,103 @@
+import { getTeacherToken, ensureTeacherToken } from "./authService";
+
 const API_URL = "http://localhost:3000/api";
 
+// ======================================================
+// AUTHENTICATED FETCH WRAPPER
+// Tự động đính kèm Authorization: Bearer <token> cho mọi API request của giảng viên
+// ======================================================
+
+const nativeFetch =
+  typeof window !== "undefined" && window.fetch
+    ? window.fetch.bind(window)
+    : globalThis.fetch;
+
+async function authFetch(url, options = {}) {
+  const token = getTeacherToken();
+  const headers = {
+    ...(options.headers || {}),
+  };
+  if (token && !headers["Authorization"] && !headers["authorization"]) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  return nativeFetch(url, { ...options, headers });
+}
+
+// Ghi đè fetch ở phạm vi module để tự động bảo vệ tất cả 28 endpoint trong service này
+const fetch = authFetch;
+
+export async function chatWithClassroomAssistant(courseId, prompt, period, conversationId, signal) {
+  const response = await fetch(`${API_URL}/ai/assistant/chat`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, signal,
+    body: JSON.stringify({ courseId, prompt, period, conversationId }),
+  });
+  return (await parseResponse(response)).data;
+}
+
+export async function getLmsGradeItems(courseId) {
+  return parseResponse(await fetch(`${API_URL}/courses/${encodeURIComponent(courseId)}/grade-sources/lms-items`));
+}
+export async function syncLmsGrades(courseId) {
+  return parseResponse(await fetch(`${API_URL}/courses/${encodeURIComponent(courseId)}/grade-sources/sync`,{method:'POST'}));
+}
+export async function linkLmsGradeItem(courseId,itemKey,lmsItemId) {
+  return parseResponse(await fetch(`${API_URL}/courses/${encodeURIComponent(courseId)}/grade-items/${encodeURIComponent(itemKey)}/lms-source`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({lmsItemId})}));
+}
+export async function createIngestGradeItem(courseId,groupKey,name) {
+  return parseResponse(await fetch(`${API_URL}/courses/${encodeURIComponent(courseId)}/grade-sources/items`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({groupKey,name})}));
+}
+export async function downloadGradeTemplate(courseId,itemKey) {
+  const response=await fetch(`${API_URL}/courses/${encodeURIComponent(courseId)}/grade-items/${encodeURIComponent(itemKey)}/import-template`);
+  if(!response.ok) return parseResponse(response);
+  return response.blob();
+}
+export async function importGradeFile(courseId,itemKey,file,mode,digest='') {
+  const body=new FormData();body.append('file',file);body.append('mode',mode);body.append('digest',digest);
+  return parseResponse(await fetch(`${API_URL}/courses/${encodeURIComponent(courseId)}/grade-items/${encodeURIComponent(itemKey)}/import`,{method:'POST',body}));
+}
+
+export async function getSavedGrades(courseId, studentId) {
+  return parseResponse(await fetch(`${API_URL}/courses/${encodeURIComponent(courseId)}/students/${encodeURIComponent(studentId)}/saved-grades`));
+}
+
+export async function saveGradeGroup(courseId, studentId, group, scores) {
+  return parseResponse(await fetch(`${API_URL}/courses/${encodeURIComponent(courseId)}/students/${encodeURIComponent(studentId)}/grade-groups/${encodeURIComponent(group.key)}`, {
+    method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({group, scores}),
+  }));
+}
+
+export async function saveFinalGrade(courseId, studentId) {
+  return parseResponse(await fetch(`${API_URL}/courses/${encodeURIComponent(courseId)}/students/${encodeURIComponent(studentId)}/final-grade`, {method:'PUT'}));
+}
+
+export async function saveGradeAdjustment(courseId, studentId, itemKey, adjustment) {
+  return parseResponse(await fetch(`${API_URL}/courses/${encodeURIComponent(courseId)}/students/${encodeURIComponent(studentId)}/grade-items/${encodeURIComponent(itemKey)}/adjustment`, {
+    method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify(adjustment),
+  }));
+}
 
 // ======================================================
 // HELPER
 // ======================================================
 
 async function parseResponse(response) {
-  const result = await response.json();
+  let result;
+  try {
+    result = await response.json();
+  } catch {
+    result = null;
+  }
 
   if (!response.ok) {
+    if (response.status === 401 && typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("lms-teacher-auth-expired", {
+          detail: { message: result?.message || "Phiên đăng nhập LMS đã hết hạn." },
+        })
+      );
+    }
     throw new Error(
-      result.message ||
+      result?.message ||
         "Có lỗi xảy ra khi gọi API."
     );
   }
@@ -139,6 +226,33 @@ export async function getCourseStudents(
 
   return result.data;
 }
+
+
+// ======================================================
+// ĐỌC TOÀN BỘ ĐIỂM ĐÃ CÓ CỦA MỘT SINH VIÊN (READ-ONLY)
+//
+// GET /api/courses/:courseId/students/:studentId/grades
+// ======================================================
+
+export async function getStudentCourseGrades(
+  courseId,
+  studentId
+) {
+  const response = await fetch(
+    `${API_URL}/courses/${encodeURIComponent(
+      courseId
+    )}/students/${encodeURIComponent(
+      studentId
+    )}/grades`
+  );
+
+  const result = await parseResponse(
+    response
+  );
+
+  return result;
+}
+
 
 
 // ======================================================
@@ -305,6 +419,12 @@ export async function createTeacherScheduleApi(
         },
 
         body: JSON.stringify({
+          endTime: scheduleData.endTime,
+          location: scheduleData.location,
+          meetingUrl: scheduleData.meetingUrl,
+          repeatWeekly: scheduleData.repeatWeekly,
+          repeatUntil: scheduleData.repeatUntil,
+          allowConflicts: scheduleData.allowConflicts,
           date:
             scheduleData.date,
 
@@ -331,7 +451,7 @@ export async function createTeacherScheduleApi(
       response
     );
 
-  return result.data;
+  return result.events || [result.data];
 }
 
 
@@ -359,6 +479,12 @@ export async function updateTeacherScheduleApi(
         },
 
         body: JSON.stringify({
+          endTime: scheduleData.endTime,
+          location: scheduleData.location,
+          meetingUrl: scheduleData.meetingUrl,
+          repeatWeekly: scheduleData.repeatWeekly,
+          repeatUntil: scheduleData.repeatUntil,
+          allowConflicts: scheduleData.allowConflicts,
           date:
             scheduleData.date,
 
@@ -432,16 +558,43 @@ export async function getTeacherLearningAlertsApi(teacherId) {
 
 
 // ======================================================
-// HÀNH VI NỘP BÀI (NƯỚC RÚT / TRÌ HOÃN)
+// DANH SÁCH KHÓA/COHORT THỰC TẾ CỦA MÔN HỌC
 //
-// GET /api/courses/:courseId/submission-behavior
+// GET /api/courses/:courseId/cohorts
 // ======================================================
 
-export async function getCourseSubmissionBehavior(courseId) {
-  const response = await fetch(
-    `${API_URL}/courses/${courseId}/submission-behavior`
-  );
+export async function getCourseCohorts(courseId) {
+  const response = await fetch(`${API_URL}/courses/${courseId}/cohorts`);
+  const result = await parseResponse(response);
+  return result?.data ?? result ?? [];
+}
 
+
+// ======================================================
+// THÔNG TIN CHI TIẾT MÔN HỌC
+//
+// GET /api/courses/:courseId
+// ======================================================
+
+export async function getCourseDetails(courseId) {
+  const response = await fetch(`${API_URL}/courses/${courseId}`);
+  const result = await parseResponse(response);
+  return result?.data ?? result;
+}
+
+
+// ======================================================
+// HÀNH VI NỘP BÀI (NƯỚC RÚT / TRÌ HOÃN)
+//
+// GET /api/courses/:courseId/submission-behavior?cohort=K47
+// ======================================================
+
+export async function getCourseSubmissionBehavior(courseId, cohort = null) {
+  let url = `${API_URL}/courses/${courseId}/submission-behavior`;
+  if (cohort) {
+    url += `?cohort=${encodeURIComponent(cohort)}`;
+  }
+  const response = await fetch(url);
   return await parseResponse(response);
 }
 
@@ -449,14 +602,15 @@ export async function getCourseSubmissionBehavior(courseId) {
 // ======================================================
 // PHÂN KHÚC SINH VIÊN 2x2
 //
-// GET /api/courses/:courseId/segments
+// GET /api/courses/:courseId/segments?cohort=K47
 // ======================================================
 
-export async function getCourseSegments(courseId) {
-  const response = await fetch(
-    `${API_URL}/courses/${courseId}/segments`
-  );
-
+export async function getCourseSegments(courseId, cohort = null) {
+  let url = `${API_URL}/courses/${courseId}/segments`;
+  if (cohort) {
+    url += `?cohort=${encodeURIComponent(cohort)}`;
+  }
+  const response = await fetch(url);
   return await parseResponse(response);
 }
 
@@ -464,14 +618,15 @@ export async function getCourseSegments(courseId) {
 // ======================================================
 // CẢNH BÁO SỚM & ĐÁNH GIÁ RỦI RO
 //
-// GET /api/courses/:courseId/risk
+// GET /api/courses/:courseId/risk?cohort=K47
 // ======================================================
 
-export async function getCourseRisk(courseId) {
-  const response = await fetch(
-    `${API_URL}/courses/${courseId}/risk`
-  );
-
+export async function getCourseRisk(courseId, cohort = null) {
+  let url = `${API_URL}/courses/${courseId}/risk`;
+  if (cohort) {
+    url += `?cohort=${encodeURIComponent(cohort)}`;
+  }
+  const response = await fetch(url);
   return await parseResponse(response);
 }
 
@@ -566,4 +721,64 @@ export async function submitGradingApi(teacherId, submissionId, payload) {
     }
   );
   return await parseResponse(response);
+}
+
+// ======================================================
+// TRỢ LÝ AI LMS (TASK 02)
+// POST /api/ai/assistant/query
+// ======================================================
+
+export async function queryAiAssistant(courseId, promptText) {
+  let token = getTeacherToken();
+  if (!token) {
+    token = await ensureTeacherToken();
+  }
+
+  const response = await fetch(`${API_URL}/ai/assistant/query`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({
+      courseId: Number(courseId),
+      promptText: String(promptText || "").trim(),
+    }),
+  });
+
+  return await parseResponse(response);
+}
+
+
+export async function getAssignmentMonitoringApi(teacherId,courseId,signal) {
+  const response=await fetch(`${API_URL}/teachers/${teacherId}/assignments/monitor?courseId=${encodeURIComponent(courseId)}`,{signal});
+  return parseResponse(response);
+}
+
+export async function updateLearningAlertApi(teacherId, alertId, read) {
+  return parseResponse(await fetch(`${API_URL}/teachers/${teacherId}/learning-alerts/${encodeURIComponent(alertId)}`, {
+    method: 'PATCH', headers: {'Content-Type':'application/json'}, body: JSON.stringify({read}),
+  }));
+}
+export async function markAllLearningAlertsApi(teacherId) {
+  return parseResponse(await fetch(`${API_URL}/teachers/${teacherId}/learning-alerts/read-all`, {
+    method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({read:true}),
+  }));
+}
+export async function deleteLearningAlertApi(teacherId, alertId) {
+  return parseResponse(await fetch(`${API_URL}/teachers/${teacherId}/learning-alerts/${encodeURIComponent(alertId)}`, {method:'DELETE'}));
+}
+export async function broadcastLearningAlertApi(teacherId, payload) {
+  return parseResponse(await fetch(`${API_URL}/teachers/${teacherId}/learning-alerts/broadcast`, {
+    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload),
+  }));
+}
+export async function getTeacherActivityApi(teacherId) {
+  return (await parseResponse(await fetch(`${API_URL}/teachers/${teacherId}/activity`))).data;
+}
+
+export async function exportClassGradesApi(courseId, cohort) {
+  const response = await fetch(`${API_URL}/courses/${encodeURIComponent(courseId)}/grades/export?cohort=${encodeURIComponent(cohort)}`);
+  if (!response.ok) await parseResponse(response);
+  return response.blob();
 }

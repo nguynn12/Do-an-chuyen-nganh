@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Clock,
   AlertTriangle,
@@ -81,7 +81,7 @@ const STYLE_BADGES = {
   },
 };
 
-export default function SubmissionBehaviorSection({ courseId }) {
+export default function SubmissionBehaviorSection({ courseId, cohort }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -99,7 +99,7 @@ export default function SubmissionBehaviorSection({ courseId }) {
       try {
         setLoading(true);
         setError(null);
-        const res = await getCourseSubmissionBehavior(courseId);
+        const res = await getCourseSubmissionBehavior(courseId, cohort);
         if (!isCancelled) {
           setData(res);
         }
@@ -117,7 +117,7 @@ export default function SubmissionBehaviorSection({ courseId }) {
     return () => {
       isCancelled = true;
     };
-  }, [courseId]);
+  }, [courseId, cohort]);
 
   // Danh sách sinh viên sau lọc
   const filteredStudents = useMemo(() => {
@@ -654,9 +654,8 @@ export default function SubmissionBehaviorSection({ courseId }) {
                     const isExpanded = expandedStudentKey === s.userKey;
 
                     return (
-                      <>
+                      <React.Fragment key={s.userKey}>
                         <tr
-                          key={s.userKey}
                           style={{
                             borderBottom: "1px solid #f3f4f6",
                             transition: "background 0.2s",
@@ -785,12 +784,12 @@ export default function SubmissionBehaviorSection({ courseId }) {
                                   gap: "10px",
                                 }}
                               >
-                                {s.submissions?.map((sub) => {
+                                {s.submissions?.map((sub, sIdx) => {
                                   const cfg =
                                     BUCKET_CONFIG[sub.bucket] || BUCKET_CONFIG["Chưa nộp"];
                                   return (
                                     <div
-                                      key={sub.activityKey}
+                                      key={`sub-${sub.activityKey || s.userKey}-${sIdx}`}
                                       style={{
                                         background: "#ffffff",
                                         border: `1px solid ${cfg.border}`,
@@ -835,7 +834,7 @@ export default function SubmissionBehaviorSection({ courseId }) {
                             </td>
                           </tr>
                         )}
-                      </>
+                      </React.Fragment>
                     );
                   })
                 )}

@@ -37,6 +37,18 @@
 }
 
 /* Con dấu DLU tròn viền cam */
+/* Logo chính thức Đại học Đà Lạt */
+.dlu-uh-logo-img {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(16, 76, 54, 0.12);
+}
+
 .dlu-uh-seal {
   width: 40px;
   height: 40px;
