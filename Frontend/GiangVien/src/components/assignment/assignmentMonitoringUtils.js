@@ -6,8 +6,17 @@ export function submissionTiming(row,assignment) {
   return submitted>due?'late':'ontime';
 }
 export function buildMonitoringView(data,cohort='ALL') {
-  const prefix={K45:'sv21',K46:'sv22',K47:'sv23'}[cohort];
-  const students=(data.students || []).filter(s=>!prefix || s.studentUsername?.toLowerCase().startsWith(prefix));
+  const prefixes = {
+    K45: ['sv21', '21'],
+    K46: ['sv22', '22'],
+    K47: ['sv23', '23'],
+    K48: ['sv24', '24'],
+  }[cohort];
+  const students = (data.students || []).filter(s => {
+    if (!prefixes) return true;
+    const u = s.studentUsername?.toLowerCase() || '';
+    return prefixes.some(p => u.startsWith(p));
+  });
   const ids=new Set(students.map(s=>String(s.studentId)));
   const submissions=(data.submissions || []).filter(s=>ids.has(String(s.studentId)));
   const assignments=(data.assignments || []).map(a=>{
