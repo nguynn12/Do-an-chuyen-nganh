@@ -193,7 +193,34 @@ export async function requireStudentAuth(req, res, next) {
 
   const authHeader = req.headers.authorization || req.headers.Authorization;
 
+  // Nếu không có header Authorization, kiểm tra fallback qua query / params userId (tương thích Cổng Sinh viên)
   if (!authHeader || typeof authHeader !== "string") {
+    const identifier = req.query?.userId || req.query?.studentId || req.params?.userId || req.params?.studentId;
+    if (identifier) {
+      try {
+        const [userRows] = await pool.query(
+          `SELECT u.User_Key, u.Moodle_User_ID, u.Username, u.Full_Name, u.Email, u.Primary_Role
+           FROM Dim_User u
+           WHERE u.Primary_Role = 'Student'
+             AND (u.User_Key = ? OR u.Moodle_User_ID = ? OR LOWER(u.Username) = LOWER(?))
+             AND u.Is_Active = 1
+           LIMIT 1`,
+          [identifier, identifier, identifier]
+        );
+        if (userRows.length > 0) {
+          req.student = {
+            userKey: userRows[0].User_Key,
+            moodleUserId: userRows[0].Moodle_User_ID,
+            username: userRows[0].Username,
+            role: "student",
+          };
+          return next();
+        }
+      } catch (err) {
+        console.error("Lỗi xác thực fallback sinh viên:", err);
+      }
+    }
+
     return res.status(401).json({
       success: false,
       message: "Yêu cầu xác thực. Vui lòng cung cấp mã token hợp lệ trong header Authorization.",

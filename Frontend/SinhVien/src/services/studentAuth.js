@@ -1,6 +1,8 @@
 export const STUDENT_KEYS = [
   "isLoggedIn",
   "userRole",
+  "studentToken",
+  "token",
   "studentUserKey",
   "studentMoodleId",
   "studentName",

@@ -81,6 +81,10 @@ function StudentLogin() {
       clearTeacherSession();
 
       localStorage.setItem("isLoggedIn", "true");
+      if (result.token) {
+        localStorage.setItem("studentToken", result.token);
+        localStorage.setItem("token", result.token);
+      }
       localStorage.setItem("studentUserKey", String(user.userKey));
       localStorage.setItem("studentMoodleId", String(user.moodleUserId));
       localStorage.setItem("studentUsername", user.username);

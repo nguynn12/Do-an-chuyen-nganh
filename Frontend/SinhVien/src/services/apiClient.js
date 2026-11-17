@@ -33,12 +33,15 @@ export async function studentGet(path, config = {}) {
 
   const finalUrl = `${urlObj.pathname}${urlObj.search}`;
 
+  const token = localStorage.getItem("studentToken") || localStorage.getItem("token");
+
   const response = await fetch(finalUrl, {
     method: "GET",
     credentials: "include",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(config.headers || {}),
     },
   });
