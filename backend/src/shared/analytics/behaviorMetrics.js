@@ -133,15 +133,17 @@ export async function calculateCourseBehaviorMetrics(
 
   if (cohort) {
     const normCohort = String(cohort).trim().toUpperCase();
-    const patternMap = {
-      K45: "sv21%",
-      K46: "sv22%",
-      K47: "sv23%",
-      K48: "sv24%",
-    };
-    const pattern = patternMap[normCohort] || `${normCohort.toLowerCase()}%`;
-    cohortCondition = "AND du.Username LIKE ?";
-    studentQueryParams.push(pattern);
+    if (normCohort !== "ALL") {
+      const patternMap = {
+        K45: ["sv21%", "21%"],
+        K46: ["sv22%", "22%"],
+        K47: ["sv23%", "23%"],
+        K48: ["sv24%", "24%"],
+      };
+      const patterns = patternMap[normCohort] || [`%${normCohort.toLowerCase()}%`];
+      cohortCondition = "AND (" + patterns.map(() => "du.Username LIKE ?").join(" OR ") + ")";
+      studentQueryParams.push(...patterns);
+    }
   }
 
   const [students] = await dbConnection.query(

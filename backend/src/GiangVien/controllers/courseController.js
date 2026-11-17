@@ -1716,10 +1716,10 @@ export async function getCourseCohorts(req, res) {
     const [rows] = await pool.query(
       `SELECT 
          CASE 
-           WHEN du.Username LIKE 'sv21%' THEN 'K45'
-           WHEN du.Username LIKE 'sv22%' THEN 'K46'
-           WHEN du.Username LIKE 'sv23%' THEN 'K47'
-           WHEN du.Username LIKE 'sv24%' THEN 'K48'
+           WHEN du.Username LIKE 'sv21%' OR du.Username LIKE '21%' THEN 'K45'
+           WHEN du.Username LIKE 'sv22%' OR du.Username LIKE '22%' THEN 'K46'
+           WHEN du.Username LIKE 'sv23%' OR du.Username LIKE '23%' THEN 'K47'
+           WHEN du.Username LIKE 'sv24%' OR du.Username LIKE '24%' THEN 'K48'
            ELSE 'Other'
          END AS cohort,
          COUNT(DISTINCT fe.User_Key) AS studentCount

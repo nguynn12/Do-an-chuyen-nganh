@@ -3,7 +3,7 @@ import ExcelJS from 'exceljs';
 const components = [
   ['chuyen_can', 'Chuyên cần'], ['giua_ky', 'Giữa kỳ'], ['cuoi_ky', 'Cuối kỳ'],
 ];
-const patterns = { K45:'sv21%', K46:'sv22%', K47:'sv23%', K48:'sv24%', ALL:'%' };
+const patterns = { K45:'%21%', K46:'%22%', K47:'%23%', K48:'%24%', ALL:'%' };
 
 export async function buildClassGradeWorkbook(db, course, cohort = 'K47') {
   cohort = String(cohort).trim().toUpperCase();

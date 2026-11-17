@@ -36,11 +36,13 @@ export async function checkAssignmentTablesExist() {
 
 export function getCohortPattern(cohort) {
   const mapping = {
-    K45: "sv21%",
-    K46: "sv22%",
-    K47: "sv23%",
+    ALL: "%",
+    K45: "%21%",
+    K46: "%22%",
+    K47: "%23%",
+    K48: "%24%",
   };
-  return mapping[cohort] || "sv23%";
+  return mapping[cohort] || "%";
 }
 
 // ============================================================
