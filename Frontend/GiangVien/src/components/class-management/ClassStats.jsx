@@ -34,7 +34,7 @@ function StatCard({
 // FORMAT PHẦN TRĂM
 // ======================================================
 
-function formatPercent(value) {
+function formatPercent(value, decimals = 1) {
   if (
     value === null ||
     value === undefined ||
@@ -43,7 +43,12 @@ function formatPercent(value) {
     return "—";
   }
 
-  return `${Math.round(Number(value))}%`;
+  const num = Number(value);
+  const formatted = Number.isInteger(num)
+    ? num.toString()
+    : num.toFixed(decimals).replace(".", ",");
+
+  return `${formatted}%`;
 }
 
 
@@ -60,7 +65,7 @@ function formatScore(value) {
     return "—";
   }
 
-  return Number(value).toFixed(1);
+  return Number(value).toFixed(1).replace(".", ",");
 }
 
 

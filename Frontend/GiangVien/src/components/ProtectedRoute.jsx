@@ -1,9 +1,14 @@
-import { Navigate } from "react-router-dom";
-import { clearTeacherSession } from "../services/teacherAuth.js";
+import { Navigate, useLocation } from "react-router-dom";
+import {
+  isTeacherAuthenticated,
+  clearTeacherSession,
+} from "../services/authService";
 
 function ProtectedRoute({ children }) {
-  const isDemoAllowed = import.meta.env.DEV === true;
+  const location = useLocation();
 
+  // Cho phép chế độ demo chỉ trong môi trường phát triển (DEV)
+  const isDemoAllowed = import.meta.env.DEV === true;
   const searchParams = new URLSearchParams(window.location.search);
   if (isDemoAllowed && searchParams.get("demo") === "1") {
     localStorage.setItem("isLoggedIn", "true");
@@ -12,33 +17,34 @@ function ProtectedRoute({ children }) {
     localStorage.setItem(
       "teacherUser",
       JSON.stringify({
-        fullName: "Trần Bình Trần",
+        fullName: "Trần Bình Trọng",
         degree: "ThS.",
         initials: "GV",
       })
     );
   }
 
-  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-  const userRole = localStorage.getItem("userRole");
+  const authenticated = isTeacherAuthenticated();
 
-  if (!isLoggedIn || userRole !== "teacher") {
+  if (!authenticated) {
+    const userRole = localStorage.getItem("userRole");
     const isStudent = userRole === "student";
+    // Dọn dẹp session rác/sai vai trò để tránh loop và lỗi dashboard
     clearTeacherSession();
-
     return (
       <Navigate
         to="/dang-nhap"
-        replace
-        state={
-          isStudent
+        state={{
+          from: location,
+          ...(isStudent
             ? {
                 error:
                   "Tài khoản này là Sinh viên, vui lòng đăng nhập tại Cổng Sinh viên",
                 targetPortal: "/sinhvien/dang-nhap",
               }
-            : undefined
-        }
+            : {}),
+        }}
+        replace
       />
     );
   }

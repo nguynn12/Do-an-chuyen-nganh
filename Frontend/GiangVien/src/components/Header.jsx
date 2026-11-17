@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import DluHeader from "../../../shared/components/DluHeader";
-import { clearTeacherSession } from "../services/teacherAuth.js";
+import { clearTeacherSession } from "../services/authService";
+import dluLogo from "../assets/logo_dlu_official.png";
 
 function Header({ teacher = {} }) {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ function Header({ teacher = {} }) {
   return (
     <DluHeader
       role="teacher"
+      logoSrc={dluLogo}
       user={{
         fullName: teacher?.fullName,
         degree: teacher?.degree,

@@ -32,16 +32,8 @@ function CourseStats({ courses }) {
     0
   );
 
-  const averageAttendance =
-    courses.length > 0
-      ? Math.round(
-          courses.reduce(
-            (total, course) =>
-              total + (course.attendance || 0),
-            0
-          ) / courses.length
-        )
-      : 0;
+  const rates = courses.filter(course => course.attendance != null && Number.isFinite(Number(course.attendance)));
+  const averageAttendance = rates.length ? Math.round(rates.reduce((total, course) => total + Number(course.attendance), 0) / rates.length) : null;
 
   const averageSubmission =
     courses.length > 0
@@ -73,7 +65,7 @@ function CourseStats({ courses }) {
       <StatItem
         icon={<UserCheck size={21} />}
         label="Chuyên cần TB"
-        value={`${averageAttendance}%`}
+        value={averageAttendance == null ? "—" : `${averageAttendance}%`}
         description="Trung bình các lớp"
       />
 

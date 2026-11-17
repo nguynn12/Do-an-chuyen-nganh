@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {GRADE_SLICERS,readSingleSlicerValue,setGradeSlicer,readGradeSliders,verifyGradeContext,queueGradeSwitch} from './src/services/gradeSlicerBridge.js';
+const basic=(t,value)=>({filters:[{target:{table:t.table,column:t.column},operator:'In',values:[value]}]});
+assert.equal(readSingleSlicerValue(basic(GRADE_SLICERS.score,6.5),GRADE_SLICERS.score),6.5);
+assert.equal(readSingleSlicerValue({filters:[{target:GRADE_SLICERS.score,conditions:[{operator:'Is',value:0}]}]},GRADE_SLICERS.score),0);
+for(const filters of [[],[{target:GRADE_SLICERS.score,operator:'In',values:[1,2]}],[{target:GRADE_SLICERS.score,conditions:[{operator:'GreaterThan',value:1}]}]]) assert.throws(()=>readSingleSlicerValue({filters},GRADE_SLICERS.score));
+let state=basic(GRADE_SLICERS.score,1);const visual={setSlicerState:async s=>{state=s;},getSlicerState:async()=>state};await setGradeSlicer(visual,GRADE_SLICERS.score,6.5);assert.equal(readSingleSlicerValue(state,GRADE_SLICERS.score),6.5);
+await assert.rejects(()=>setGradeSlicer({...visual,setSlicerState:async()=>{}},GRADE_SLICERS.score,8));
+const slicers=Object.fromEntries(Object.entries(GRADE_SLICERS).map(([key,t])=>[key,{getSlicerState:async()=>basic(t,({item:13,score:6.5,weight:20})[key])}]));assert.deepEqual(await readGradeSliders(slicers),{item:13,score:6.5,weight:20});
+const report={getFilters:async()=>[{target:{table:'lms_datawarehouse dim_course',column:'Course_Key'},operator:'In',values:[11]},{target:{table:'lms_datawarehouse dim_user',column:'User_Key'},operator:'In',values:[18]}]};await verifyGradeContext(report,11,18);await assert.rejects(()=>verifyGradeContext(report,11,19));
+const order=[];await Promise.all([queueGradeSwitch(report,async()=>{order.push(1);await Promise.resolve();order.push(2);}),queueGradeSwitch(report,async()=>order.push(3))]);assert.deepEqual(order,[1,2,3]);
+console.log('PASS: exact slicer values, zero score, ambiguous ranges rejected, write verification, context isolation and serialized switches');

@@ -21,13 +21,13 @@ import {
   updateAssignmentBankItemApi,
 } from "../../services/teacherApi";
 
-export default function AssignmentBankTab({ teacherId, selectedCourse, courses }) {
+export default function AssignmentBankTab({ teacherId, selectedCourse, courses: _courses }) {
   const [bankItems, setBankItems] = useState([]);
   const [stats, setStats] = useState({ total: 0, easy: 0, medium: 0, hard: 0, active: 0 });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [waitingMigration, setWaitingMigration] = useState(false);
-  const [migrationMessage, setMigrationMessage] = useState("");
+  const [_migrationMessage, setMigrationMessage] = useState("");
 
   // Filters
   const [difficultyFilter, setDifficultyFilter] = useState("ALL");

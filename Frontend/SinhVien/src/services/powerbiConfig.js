@@ -156,7 +156,7 @@ export function buildGradePredictionUrl(
   const uiFlags = `&filterPaneEnabled=${showFilterPane}&navContentPaneEnabled=${showNavPane}`;
   const encodedUser = escapeFilterValue(user);
 
-  let filterPart = "";
+  let filterPart;
   if (course && courseCol) {
     const encodedCourse = escapeFilterValue(course);
     filterPart = `${FILTER_PREFIX}${userCol} eq '${encodedUser}' and ${courseCol} eq '${encodedCourse}'`;

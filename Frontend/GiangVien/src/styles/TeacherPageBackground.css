@@ -1,0 +1,30 @@
+/* Shared course-page backdrop for every authenticated teacher route.
+   Limit overrides to page shells; cards, dialogs, charts and embeds keep their surfaces. */
+.teacher-page-background {
+  min-height: 100vh;
+  background-color: #eef3eb;
+  background-image:
+    linear-gradient(#455e4803 1px, transparent 1px),
+    linear-gradient(90deg, #455e4803 1px, transparent 1px),
+    radial-gradient(circle 195px at 245px 5px, #6f963814 99%, transparent 100%),
+    radial-gradient(circle 180px at calc(100% - 80px) 40px, #e7893b12 99%, transparent 100%),
+    radial-gradient(circle at 10% 8%, #6f963824, transparent 25%),
+    radial-gradient(circle at 92% 7%, #e7893b1a, transparent 23%),
+    linear-gradient(145deg, #f8faf6 0%, #eef3eb 48%, #f8f7f2 100%);
+  background-size: 44px 44px, 44px 44px, auto, auto, auto, auto, auto;
+  background-repeat: repeat, repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+}
+/* Existing route styles load in different orders and have varying specificity. */
+.teacher-page-background > *,
+.teacher-page-background > * > main,
+.teacher-page-background .grading-main-layout,
+.teacher-page-background .grading-content-container {
+  background: transparent !important;
+}
+/* The shared backdrop already includes the course page's decorative layers. */
+.teacher-page-background .courses-bg-grid,
+.teacher-page-background .courses-bg-orb,
+.teacher-page-background .class-bg-grid,
+.teacher-page-background .class-bg-orb {
+  display: none;
+}

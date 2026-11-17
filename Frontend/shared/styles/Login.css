@@ -1,0 +1,952 @@
+/* ==============================================================================
+   DLU ANALYTICS DASHBOARD - TRƯỜNG ĐẠI HỌC ĐÀ LẠT
+   Design System: Deep Forest Green (#135C48), Dark Moss (#0E493C), Sage (#E7F0E8), Ivory (#FAFBF7)
+   ============================================================================== */
+
+:root {
+  --dlu-forest: #135c48;
+  --dlu-forest-dark: #0e493c;
+  --dlu-forest-light: #1d7a61;
+  --dlu-sage: #e7f0e8;
+  --dlu-sage-light: #f3f7f4;
+  --dlu-ivory: #fafbf7;
+  --dlu-text-main: #1a2e26;
+  --dlu-text-muted: #556b60;
+  --dlu-text-light: #83978c;
+  --dlu-border: #dde6e0;
+  --dlu-border-hover: #b5c7ba;
+  --dlu-gold: #c89d35;
+  --dlu-danger: #c53030;
+  --dlu-danger-bg: #fff5f5;
+  --dlu-danger-border: #fed7d7;
+  --dlu-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+  --dlu-shadow-btn: 0 4px 14px rgba(19, 92, 72, 0.28);
+  --dlu-shadow-btn-hover: 0 6px 20px rgba(19, 92, 72, 0.35);
+}
+
+/* ==============================================================================
+   VIEWPORT & MAIN LAYOUT (Full Screen, High-End Dashboard Portal)
+   ============================================================================== */
+.dlu-login-viewport {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: var(--dlu-ivory);
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--dlu-text-main);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* 2 cột lớn: 56% Hero Dashboard / 44% Form đăng nhập */
+.dlu-login-wrapper {
+  width: 100%;
+  flex: 1;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: 56fr 44fr;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  background-color: var(--dlu-ivory);
+}
+
+/* ==============================================================================
+   CỘT TRÁI - HERO FLYCAM ĐẠI HỌC ĐÀ LẠT (ẢNH GỐC SẠCH + TYPOGRAPHY DASHBOARD)
+   ============================================================================== */
+.dlu-login-hero {
+  position: relative;
+  background-size: cover;
+  background-position: center 30%;
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 44px 52px;
+  overflow: hidden;
+  min-height: 100%;
+  box-sizing: border-box;
+  z-index: 1;
+}
+
+/* Lớp phủ gradient xanh rừng đa tầng: tôn vinh ảnh flycam, làm nổi bật typography */
+.dlu-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(14, 73, 60, 0.48) 0%,
+    rgba(14, 73, 60, 0.28) 25%,
+    rgba(14, 73, 60, 0.72) 65%,
+    rgba(14, 73, 60, 0.94) 100%
+  );
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Huy hiệu trường góc trên bên trái */
+.dlu-hero-top-badge {
+  position: relative;
+  z-index: 2;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 7px 18px 7px 9px;
+  border-radius: 50px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  user-select: none;
+}
+
+.dlu-hero-top-badge img {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  display: block;
+}
+
+.dlu-hero-top-badge span {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+/* KHỐI NỘI DUNG TYPOGRAPHY DASHBOARD TRUNG TÂM */
+.dlu-hero-main-content {
+  position: relative;
+  z-index: 2;
+  margin: auto 0;
+  padding: 24px 0;
+  max-width: 560px;
+}
+
+.dlu-hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 6px 14px;
+  border-radius: 30px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #e7f0e8;
+  letter-spacing: 0.8px;
+  margin-bottom: 16px;
+}
+
+.dlu-hero-tag svg {
+  color: #ffda79;
+}
+
+.dlu-hero-uni-name {
+  margin: 0 0 8px 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fafbf7;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.95;
+}
+
+.dlu-hero-system-title {
+  margin: 0 0 16px 0;
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  text-shadow: 0 3px 18px rgba(0, 0, 0, 0.35);
+}
+
+.dlu-hero-description {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 400;
+  max-width: 520px;
+}
+
+/* 3 Điểm nhấn tại chân ảnh (Phân tích / Quản lý / Hỗ trợ) */
+.dlu-hero-footer-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  margin-top: auto;
+  padding-right: 36px;
+  box-sizing: border-box;
+}
+
+.dlu-hero-highlights {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.dlu-highlight-card {
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 14px;
+  padding: 16px 14px;
+  color: #ffffff;
+  transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.dlu-highlight-card:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.24);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+.dlu-highlight-icon-wrap {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.24);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  color: #ffffff;
+}
+
+.dlu-highlight-card strong {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 700;
+  margin-bottom: 5px;
+  color: #ffffff;
+  letter-spacing: 0.2px;
+}
+
+.dlu-highlight-card p {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* ==============================================================================
+   MÉP ẢNH CONG LUXURY (Đường cong uốn mềm ngăn cách ảnh và form)
+   ============================================================================== */
+.dlu-hero-curve {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -1px;
+  width: 76px;
+  height: 100%;
+  pointer-events: none;
+  z-index: 3;
+  filter: drop-shadow(-6px 0 14px rgba(14, 73, 60, 0.08));
+}
+
+.dlu-hero-curve svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.dlu-curve-path {
+  fill: var(--dlu-ivory);
+}
+
+/* ==============================================================================
+   CỘT PHẢI - FORM ĐĂNG NHẬP (Căn giữa cột, bề ngang 420-460px dễ đọc)
+   ============================================================================== */
+.dlu-login-form-side {
+  padding: 48px 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--dlu-ivory);
+  position: relative;
+  z-index: 2;
+  box-sizing: border-box;
+  min-height: 100%;
+  overflow-y: auto;
+}
+
+.dlu-form-inner-wrap {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  margin: auto 0;
+  box-sizing: border-box;
+}
+
+/* Tiêu đề & Logo Form */
+.dlu-form-header {
+  margin-bottom: 24px;
+}
+
+.dlu-form-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+/* LOGO: Nền trong suốt hoàn toàn, không có ô trắng bao quanh */
+.dlu-form-logo {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  flex-shrink: 0;
+  display: block;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  filter: drop-shadow(0 2px 8px rgba(19, 92, 72, 0.16));
+}
+
+.dlu-form-brand-text h3 {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--dlu-forest-dark);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.dlu-form-brand-text p {
+  margin: 3px 0 0 0;
+  font-size: 12px;
+  color: var(--dlu-forest);
+  font-weight: 600;
+}
+
+.dlu-form-title {
+  margin: 0 0 6px 0;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--dlu-forest-dark);
+  letter-spacing: -0.4px;
+}
+
+.dlu-form-subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: var(--dlu-text-muted);
+  line-height: 1.5;
+}
+
+/* ==============================================================================
+   TABS PHÂN VAI TRÒ (GIẢNG VIÊN / SINH VIÊN)
+   ============================================================================== */
+.dlu-role-tabs {
+  display: flex;
+  background: var(--dlu-sage);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 24px;
+  border: 1px solid var(--dlu-border);
+}
+
+.dlu-tab-button {
+  flex: 1;
+  height: 40px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--dlu-text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.dlu-tab-button.is-active {
+  background: var(--dlu-forest);
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(19, 92, 72, 0.25);
+}
+
+.dlu-tab-button:not(.is-active):hover {
+  color: var(--dlu-forest);
+  background: rgba(19, 92, 72, 0.06);
+}
+
+/* Thông báo khi chọn tab Sinh viên */
+.dlu-student-tab-notice {
+  background: var(--dlu-sage);
+  border: 1px solid #c7d9ca;
+  border-radius: 14px;
+  padding: 20px 22px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.dlu-student-tab-notice h4 {
+  margin: 0 0 8px 0;
+  font-size: 15px;
+  color: var(--dlu-forest-dark);
+  font-weight: 700;
+}
+
+.dlu-student-tab-notice p {
+  margin: 0 0 16px 0;
+  font-size: 13px;
+  color: var(--dlu-text-muted);
+  line-height: 1.5;
+}
+
+.dlu-switch-student-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--dlu-forest);
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(19, 92, 72, 0.2);
+}
+
+.dlu-switch-student-btn:hover {
+  background: var(--dlu-forest-dark);
+  transform: translateY(-1px);
+}
+
+/* ==============================================================================
+   FORM INPUTS & CONTROLS (Chiều cao 48px, focus ring rõ nét)
+   ============================================================================== */
+.dlu-input-group {
+  margin-bottom: 18px;
+}
+
+.dlu-input-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dlu-text-main);
+  margin-bottom: 6px;
+}
+
+.dlu-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1.5px solid var(--dlu-border);
+  border-radius: 12px;
+  height: 48px;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+  box-shadow: var(--dlu-shadow-sm);
+}
+
+.dlu-input-container:focus-within {
+  border-color: var(--dlu-forest);
+  box-shadow: 0 0 0 3px rgba(19, 92, 72, 0.15), 0 1px 3px rgba(19, 92, 72, 0.08);
+}
+
+.dlu-input-icon {
+  position: absolute;
+  left: 15px;
+  color: var(--dlu-text-light);
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.dlu-text-input {
+  width: 100%;
+  height: 100%;
+  padding: 0 14px 0 44px;
+  border: none;
+  background: transparent;
+  font-size: 14.5px;
+  color: var(--dlu-text-main);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.dlu-text-input::placeholder {
+  color: #9cb0a4;
+  font-size: 14px;
+}
+
+.dlu-toggle-password-btn {
+  background: transparent;
+  border: none;
+  padding: 0 14px;
+  height: 100%;
+  color: var(--dlu-text-light);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+}
+
+.dlu-toggle-password-btn:hover {
+  color: var(--dlu-forest);
+}
+
+/* GHI NHỚ VÀ QUÊN MẬT KHẨU */
+.dlu-form-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  font-size: 13px;
+}
+
+.dlu-remember-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--dlu-text-muted);
+  cursor: pointer;
+  user-select: none;
+  font-size: 13.5px;
+}
+
+.dlu-remember-checkbox {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  accent-color: var(--dlu-forest);
+  cursor: pointer;
+}
+
+.dlu-forgot-link {
+  background: none;
+  border: none;
+  color: var(--dlu-forest);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  font-size: 13.5px;
+  transition: color 0.15s ease;
+}
+
+.dlu-forgot-link:hover {
+  color: var(--dlu-forest-dark);
+  text-decoration: underline;
+}
+
+/* THÔNG BÁO LỖI INLINE */
+.dlu-error-box {
+  background: var(--dlu-danger-bg);
+  border: 1px solid var(--dlu-danger-border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--dlu-danger);
+  font-size: 13px;
+  line-height: 1.45;
+  animation: dluFadeIn 0.25s ease;
+}
+
+.dlu-error-box svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* NÚT SUBMIT CHÍNH */
+.dlu-submit-button {
+  width: 100%;
+  height: 48px;
+  padding: 0 20px;
+  background: var(--dlu-forest);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+  box-shadow: var(--dlu-shadow-btn);
+  box-sizing: border-box;
+}
+
+.dlu-submit-button:hover:not(:disabled) {
+  background: var(--dlu-forest-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--dlu-shadow-btn-hover);
+}
+
+.dlu-submit-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* DIVIDER TIẾP TỤC VỚI */
+.dlu-auth-divider {
+  display: flex;
+  align-items: center;
+  margin: 22px 0 18px 0;
+  text-align: center;
+}
+
+.dlu-auth-divider::before,
+.dlu-auth-divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid var(--dlu-border);
+}
+
+.dlu-auth-divider span {
+  padding: 0 14px;
+  font-size: 11.5px;
+  color: var(--dlu-text-light);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+/* ==============================================================================
+   SSO BUTTONS (MICROSOFT & GOOGLE)
+   ============================================================================== */
+.dlu-sso-group {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.dlu-sso-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 14px;
+  background: #ffffff;
+  border: 1.5px solid var(--dlu-border);
+  border-radius: 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--dlu-text-main);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  box-shadow: var(--dlu-shadow-sm);
+}
+
+.dlu-sso-button:hover:not(:disabled) {
+  background: var(--dlu-sage-light);
+  border-color: var(--dlu-border-hover);
+  transform: translateY(-1px);
+}
+
+.dlu-sso-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #f8faf8;
+}
+
+.dlu-sso-button svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.dlu-sso-badge-help {
+  font-size: 10px;
+  color: #8c6d1f;
+  background: #fef7e0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: block;
+  margin-top: 2px;
+}
+
+/* FOOTER DƯỚI FORM */
+.dlu-form-footer {
+  text-align: center;
+  font-size: 12px;
+  color: var(--dlu-text-light);
+  border-top: 1px solid var(--dlu-border);
+  padding-top: 18px;
+}
+
+.dlu-form-footer p {
+  margin: 0;
+}
+
+/* ==============================================================================
+   MODAL HỖ TRỢ / QUÊN MẬT KHẨU
+   ============================================================================== */
+.dlu-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(14, 73, 60, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 20px;
+  animation: dluFadeIn 0.2s ease;
+}
+
+.dlu-modal-card {
+  background: #ffffff;
+  border-radius: 20px;
+  max-width: 460px;
+  width: 100%;
+  padding: 28px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(19, 92, 72, 0.1);
+  position: relative;
+}
+
+.dlu-modal-card h3 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--dlu-forest-dark);
+}
+
+.dlu-modal-card p {
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--dlu-text-muted);
+}
+
+.dlu-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.dlu-modal-btn-close {
+  background: var(--dlu-forest);
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.15s ease;
+}
+
+.dlu-modal-btn-close:hover {
+  background: var(--dlu-forest-dark);
+}
+
+@keyframes dluFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==============================================================================
+   RESPONSIVE DESIGN (Desktop, Laptop, Tablet, Mobile)
+   ============================================================================== */
+@media (max-width: 1200px) {
+  .dlu-login-hero {
+    padding: 36px 40px;
+  }
+
+  .dlu-hero-system-title {
+    font-size: 30px;
+  }
+
+  .dlu-login-form-side {
+    padding: 40px 32px;
+  }
+
+  .dlu-hero-highlights {
+    gap: 10px;
+  }
+
+  .dlu-highlight-card {
+    padding: 14px 12px;
+  }
+}
+
+/* Tablet portrait & màn hình nhỏ hơn 1024px: Đổi sang 1 cột (Hero banner trên, Form dưới) */
+@media (max-width: 1024px) {
+  .dlu-login-wrapper {
+    grid-template-columns: 1fr;
+    min-height: 100vh;
+  }
+
+  .dlu-login-hero {
+    min-height: 280px;
+    height: 300px;
+    padding: 28px 24px;
+    background-position: center 30%;
+    justify-content: center;
+  }
+
+  .dlu-hero-top-badge {
+    display: none;
+  }
+
+  .dlu-hero-curve {
+    display: none;
+  }
+
+  .dlu-hero-highlights {
+    display: none;
+  }
+
+  .dlu-hero-main-content {
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  }
+
+  .dlu-hero-tag {
+    margin-bottom: 10px;
+  }
+
+  .dlu-hero-uni-name {
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+
+  .dlu-hero-system-title {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  .dlu-hero-description {
+    display: none;
+  }
+
+  .dlu-login-form-side {
+    margin-top: -24px;
+    border-radius: 28px 28px 0 0;
+    padding: 34px 28px 40px 28px;
+    box-shadow: 0 -8px 24px rgba(14, 73, 60, 0.08);
+  }
+
+  .dlu-form-inner-wrap {
+    max-width: 440px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .dlu-login-hero {
+    min-height: 240px;
+    height: 240px;
+    padding: 20px;
+  }
+
+  .dlu-hero-system-title {
+    font-size: 21px;
+  }
+
+  .dlu-login-form-side {
+    padding: 28px 20px 36px 20px;
+    border-radius: 24px 24px 0 0;
+    margin-top: -20px;
+  }
+
+  .dlu-sso-group {
+    grid-template-columns: 1fr;
+  }
+
+  .dlu-form-title {
+    font-size: 24px;
+  }
+
+  .dlu-form-logo {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (max-width: 390px) {
+  .dlu-login-hero {
+    min-height: 210px;
+    height: 210px;
+    padding: 16px;
+  }
+
+  .dlu-hero-tag {
+    font-size: 10px;
+    padding: 4px 10px;
+  }
+
+  .dlu-hero-system-title {
+    font-size: 19px;
+  }
+
+  .dlu-login-form-side {
+    padding: 22px 14px 28px 14px;
+    border-radius: 20px 20px 0 0;
+    margin-top: -18px;
+  }
+
+  .dlu-form-brand-row {
+    gap: 10px;
+  }
+
+  .dlu-form-logo {
+    width: 40px;
+    height: 40px;
+  }
+
+  .dlu-form-title {
+    font-size: 21px;
+  }
+
+  .dlu-form-subtitle {
+    font-size: 13px;
+  }
+}
+
+/* Trường hợp màn hình ngắn theo chiều dọc: Cuộn dọc mượt mà không bị che mất form */
+@media (max-height: 720px) and (min-width: 1025px) {
+  .dlu-login-form-side {
+    justify-content: flex-start;
+    padding-top: 32px;
+    padding-bottom: 32px;
+  }
+
+  .dlu-form-inner-wrap {
+    margin: 0;
+  }
+}

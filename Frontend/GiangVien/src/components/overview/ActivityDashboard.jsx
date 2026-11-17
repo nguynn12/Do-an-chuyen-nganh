@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { IS_ASSIGNMENT_MANAGEMENT_ENABLED } from "../../config/featureFlags";
 import { getCourseEngagementTrend, getCourseSegments } from "../../services/teacherApi";
 
-function ActivityDashboard({ stats, courses = [] }) {
+function ActivityDashboard({ stats, courses = [], analytics }) {
   const navigate = useNavigate();
   const [trendData, setTrendData] = useState([]);
   const [segmentData, setSegmentData] = useState(null);

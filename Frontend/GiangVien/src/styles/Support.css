@@ -1,0 +1,37 @@
+.app.support-page { padding: 0; min-height: 100vh; }
+.support-page .support-main { display: block; grid-template-columns: none; margin-left: var(--dlu-sidebar-width, 136px); padding: 86px 28px 32px; min-height: 100vh; box-sizing: border-box; width: auto; }
+.support-page .support-back { display: inline-flex; align-items: center; gap: 7px; width: auto; height: 34px; min-height: 0; margin: 0 0 14px; padding: 0 11px; border: 1px solid #dce5dc; border-radius: 8px; background: #ffffffb8; color: #55705b; font: inherit; font-size: 12px; cursor: pointer; }
+.support-page .support-back:hover { background: #edf4e9; color: #2c603f; }
+.support-page .support-container { width: 100%; max-width: 1040px; margin: 0 auto; }
+.support-page .support-hero { padding: 24px 28px; gap: 18px; border-radius: 17px; margin-bottom: 20px; }
+.support-page .support-hero-icon { flex: 0 0 52px; width: 52px; height: 52px; border-radius: 15px; }
+.support-page .support-eyebrow { font-size: 10px; letter-spacing: 1.1px; margin-bottom: 7px; }
+.support-page .support-hero h1 { font-size: clamp(20px, 2vw, 26px); line-height: 1.35; margin: 0 0 8px; letter-spacing: -.5px; }
+.support-page .support-hero p { max-width: 680px; font-size: 13px; line-height: 1.7; margin: 0; }
+.support-page .support-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.support-page .support-card { min-width: 0; padding: 22px; border: 1px solid #dfe7df; border-radius: 16px; background: #fff; box-shadow: 0 4px 16px #21452c08; }
+.support-page .support-card-header { display: flex; align-items: flex-start; gap: 13px; }
+.support-page .support-card-heading { display: block; min-width: 0; }
+.support-page .support-card-icon { width: 38px; height: 38px; border-radius: 11px; flex-shrink: 0; display: grid; place-items: center; }
+.support-page .support-card-icon-green { background: #eaf4e7; color: #4c8651; }
+.support-page .support-card-icon-blue { background: #edf2fa; color: #5374a3; }
+.support-page .support-card-heading h2 { font-size: 16px; line-height: 1.5; margin: 0 0 6px; }
+.support-page .support-card-heading p { font-size: 12px; line-height: 1.7; margin: 0; color: #81907e; }
+.support-page .support-card-divider { height: 1px; margin: 18px 0; background: #edf1e9; }
+.support-page .support-info-list { display: grid; gap: 14px; margin: 0 0 20px; }
+.support-page .support-info-row { display: flex; align-items: flex-start; gap: 10px; }
+.support-page .support-info-row > svg { margin-top: 3px; flex-shrink: 0; }
+.support-page .support-info-row span { font-size: 10px; }
+.support-page .support-info-row strong { display: block; font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.support-page .support-action { width: 100%; min-height: 38px; height: auto; box-sizing: border-box; font-size: 12px; padding: 10px 14px; border-radius: 9px; }
+.support-page .support-scope { margin-top: 18px; padding: 18px 20px; border-radius: 13px; gap: 13px; }
+.support-page .support-scope-icon { flex-shrink: 0; width: 38px; height: 38px; border-radius: 11px; }
+.support-page .support-scope-content h3 { font-size: 13px; margin: 0 0 5px; }
+.support-page .support-scope-content p { font-size: 12px; line-height: 1.8; margin: 0; }
+.support-page .support-highlights { margin-top: 18px; padding: 17px; border-radius: 13px; }
+.support-page .support-highlight strong { font-size: 12px; }
+.support-page .support-highlight span { font-size: 11px; line-height: 1.6; }
+.support-page .support-footer { margin-top: 20px; font-size: 10px; padding-bottom: 24px; }
+.support-page .support-back:focus-visible, .support-page a:focus-visible { outline: 2px solid #82a478; outline-offset: 3px; }
+@media (max-width: 760px) { .support-page .support-main { padding: 78px 16px 28px; } .support-page .support-grid { grid-template-columns: 1fr; } .support-page .support-hero { padding: 20px; align-items: flex-start; } .support-page .support-highlights { grid-template-columns: 1fr; gap: 14px; } .support-page .support-highlight + .support-highlight { border-left: 0; padding-left: 0; } }
+@media (max-width: 450px) { .support-page .support-hero { flex-direction: column; gap: 12px; } .support-page .support-hero-icon { flex-basis: auto; } .support-page .support-card { padding: 18px; } }

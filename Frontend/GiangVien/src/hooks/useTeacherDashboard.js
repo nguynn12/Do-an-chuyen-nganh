@@ -4,10 +4,11 @@ import {
   useState,
 } from "react";
 
+import { getTeacherActivityApi } from "../services/teacherApi";
+
 import {
-  getTeacherTasks,
-  getTeacherAnalytics,
-} from "../services/dashboardService";
+  getTeacherSession,
+} from "../services/authService";
 
 import {
   getNotifications,
@@ -189,13 +190,7 @@ export default function useTeacherDashboard() {
     calendarDate,
     setCalendarDate,
   ] =
-    useState(
-      new Date(
-        2026,
-        7,
-        1
-      )
-    );
+    useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
 
 
   const [
@@ -233,12 +228,8 @@ export default function useTeacherDashboard() {
   // GIẢNG VIÊN ĐANG LOGIN
   // ==========================================================
 
-  const teacherId =
-    Number(
-      localStorage.getItem(
-        "currentTeacherId"
-      )
-    );
+  const session = getTeacherSession();
+  const teacherId = session?.teacherId ? Number(session.teacherId) : null;
 
 
   // ==========================================================
@@ -267,9 +258,11 @@ export default function useTeacherDashboard() {
         // ====================================================
 
         if (!teacherId) {
-          throw new Error(
-            "Không tìm thấy phiên đăng nhập."
-          );
+          if (!cancelled) {
+            setLoading(false);
+            setError("Không tìm thấy phiên đăng nhập giảng viên hợp lệ.");
+          }
+          return;
         }
 
 
@@ -513,8 +506,10 @@ export default function useTeacherDashboard() {
 
                     submissionRate,
 
-                    attendance:
-                      null,
+                    attendance: (() => {
+                      const rates = studentAnalytics.filter(row => row.Attendance_Rate != null && Number.isFinite(Number(row.Attendance_Rate))).map(row => Number(row.Attendance_Rate));
+                      return rates.length ? Number((rates.reduce((sum, value) => sum + value, 0) / rates.length).toFixed(2)) : null;
+                    })(),
 
                     color:
                       "#3d7f3d",
@@ -584,142 +579,21 @@ export default function useTeacherDashboard() {
         );
 
 
-        // ====================================================
-        // DỮ LIỆU PHỤ
-        //
-        // TASK       : hiện giữ nguồn cũ
-        // NOTIFICATION: BACKEND + MYSQL THẬT
-        // ANALYTICS  : hiện giữ nguồn cũ
-        // ====================================================
-
-        try {
-
-          /*
-            Task và Analytics hiện vẫn đang sử dụng
-            service cũ nên tạm giữ mockTeacherId.
-
-            Notification KHÔNG dùng mockTeacherId nữa.
-            Notification dùng teacherId của tài khoản
-            đang đăng nhập.
-          */
-
-          const mockTeacherId =
-            localStorage.getItem(
-              "currentUsername"
-            ) ===
-            "gv_tranminhb"
-              ? "GV002"
-              : "GV001";
-
-
-          const [
-            taskData,
-            notificationResponse,
-            analyticsData,
-          ] =
-            await Promise.all([
-
-              // ==============================================
-              // TASK - GIỮ NGUYÊN NGUỒN HIỆN TẠI
-              // ==============================================
-
-              getTeacherTasks(
-                mockTeacherId
-              ),
-
-
-              // ==============================================
-              // NOTIFICATION - DỮ LIỆU THẬT MYSQL
-              // ==============================================
-
-              getNotifications(
-                teacherId
-              ),
-
-
-              // ==============================================
-              // ANALYTICS - GIỮ NGUYÊN NGUỒN HIỆN TẠI
-              // ==============================================
-
-              getTeacherAnalytics(
-                mockTeacherId
-              ),
-
-            ]);
-
-
-          if (cancelled) {
-            return;
-          }
-
-
-          // ================================================
-          // TASK
-          // ================================================
-
-          setTasks(
-            taskData ||
-            []
-          );
-
-
-          // ================================================
-          // NOTIFICATION THẬT
-          //
-          // API:
-          // {
-          //   success: true,
-          //   teacherId: 2,
-          //   total: 5,
-          //   data: [...]
-          // }
-          // ================================================
-
-          const realNotifications =
-            Array.isArray(
-              notificationResponse?.data
-            )
-              ? notificationResponse.data
-              : [];
-
-
-          setNotifications(
-            realNotifications
-          );
-
-
-          // ================================================
-          // ANALYTICS
-          // ================================================
-
-          setAnalytics(
-            analyticsData || {
-              topCourses: [],
-              attendanceTrend: [],
-            }
-          );
-
-
-        } catch (
-          secondaryError
-        ) {
-
-          console.warn(
-            "Dữ liệu phụ chưa tải được:",
-            secondaryError
-          );
-
-
-          setTasks([]);
-
-          setNotifications([]);
-
-
-          setAnalytics({
-            topCourses: [],
-            attendanceTrend: [],
-          });
+        const [notificationResult, activityResult] = await Promise.allSettled([
+          getNotifications(teacherId), getTeacherActivityApi(teacherId),
+        ]);
+        if (cancelled) return;
+        if (notificationResult.status === 'fulfilled') {
+          const items = notificationResult.value.data || [];
+          setNotifications(items);
+          setTasks(items.filter(item => item.id.startsWith('pending:')).map(item => ({
+            id:item.id, title:item.title, description:item.message, type:'grading', path:'/quan-ly-bai-tap/' + item.courseId, action:'Xem bài nộp',
+          })));
+        } else {
+          setNotifications([]); setTasks([]);
+          setError(notificationResult.reason.message || 'Không tải được thông báo.');
         }
+        setAnalytics(activityResult.status === 'fulfilled' ? activityResult.value : {daily:[], unavailable:true});
 
 
       } catch (err) {
@@ -972,7 +846,8 @@ export default function useTeacherDashboard() {
 
   teacher,
 
-  stats,
+  stats: stats ? {...stats, unreadMessages: notifications.filter(item => !item.isRead).length,
+    unreadSupportRequests: notifications.filter(item => item.type === 'support' && !item.isRead).length} : null,
 
   courses,
 

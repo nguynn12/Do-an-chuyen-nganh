@@ -100,7 +100,7 @@ const COURSES = [
   },
 ];
 
-const COHORTS = ["K47", "K46", "K45"];
+const COHORTS = ["K47", "K46", "K45", "K48"];
 
 
 // ============================================================
@@ -123,7 +123,8 @@ function normalizeCohort(cohort) {
   if (
     value === "45" ||
     value === "46" ||
-    value === "47"
+    value === "47" ||
+    value === "48"
   ) {
     return `K${value}`;
   }
@@ -136,7 +137,7 @@ function normalizeCohort(cohort) {
 // LẤY URL POWER BI
 // ============================================================
 
-export function getPowerBIUrl(courseKey, cohort) {
+function getPowerBIUrl(courseKey, cohort) {
   const normalizedCourseKey = Number(courseKey);
   const normalizedCohort = normalizeCohort(cohort);
 
@@ -165,23 +166,20 @@ function PowerBIClassReport({ courseKey, cohort }) {
   // ==========================================================
 
   const currentCourseKey = Number(courseKey);
-  const currentCohort = normalizeCohort(cohort);
+  const currentCohort = normalizeCohort(cohort) || "K47";
 
   const validCourse =
     Number.isFinite(currentCourseKey) &&
-    Object.prototype.hasOwnProperty.call(
-      POWER_BI_PAGES,
-      currentCourseKey
-    );
+    currentCourseKey > 0;
 
   const validCohort =
-    COHORTS.includes(currentCohort);
+    Boolean(currentCohort);
 
   const courseName =
     COURSE_NAMES[currentCourseKey] ||
     `Môn ${currentCourseKey}`;
 
-  const reportUrl =
+  const _reportUrl =
     getPowerBIUrl(
       currentCourseKey,
       currentCohort
@@ -307,12 +305,11 @@ function PowerBIClassReport({ courseKey, cohort }) {
           </span>
 
           <h2>
-            Phân tích trực quan lớp học
+            Tổng quan lớp học
           </h2>
 
           <p>
-            Báo cáo tổng hợp theo môn học và{" "}
-            {currentCohort || "khóa học"}.
+            Phân tích tổng quan kết quả học tập, chuyên cần và mức độ tham gia của sinh viên trong lớp.
           </p>
         </div>
 
@@ -559,23 +556,13 @@ function PowerBIClassReport({ courseKey, cohort }) {
             Cohort: {String(cohort)}
           </span>
         </div>
-      ) : !reportUrl ? (
-        <div
-          className="powerbi-frame-wrap"
-          style={messageStyle}
-        >
-          <strong>
-            Chưa có báo cáo Power BI
-            cho lớp này.
-          </strong>
-        </div>
       ) : (
 
         /* ====================================================
             POWER BI LỚP HIỆN TẠI (SECURE EMBED POWER BI SDK)
             - Tự động xác thực qua Microsoft Entra ID
             - Lọc động môn học theo Course_Key trên Data Warehouse
-            - Bảo lưu mã iframe Publish to Web cũ làm dự phòng
+            - Target page: "01 - Course Overview NEW"
         ==================================================== */
 
         <div className="powerbi-frame-wrap">
@@ -587,17 +574,6 @@ function PowerBIClassReport({ courseKey, cohort }) {
             height="auto"
             hidePageNavigation={true}
           />
-
-          {/* GHI CHÚ BẢO LƯU CODE IFRAME CŨ ĐỂ PHỤC HỒI KHI CẦN:
-          <iframe
-            key={`${currentCourseKey}-${currentCohort}`}
-            title={`Power BI - ${courseName} - ${currentCohort}`}
-            src={reportUrl}
-            frameBorder="0"
-            allowFullScreen
-            loading="lazy"
-          />
-          */}
 
         </div>
       )}

@@ -15,6 +15,7 @@ import {
   powerBiEnv,
   checkPowerBiConfig,
   buildSecureEmbedUrl,
+  validateSecureEmbedTarget,
   COURSE_FILTER_CONFIG,
   COHORT_FILTER_CONFIG,
   STUDENT_FILTER_CONFIG,
@@ -24,6 +25,7 @@ import {
   getPowerBiTokenSilent,
   loginMicrosoftPopup,
   getActiveAccount,
+  getMsalDiagnosticTrace,
 } from "../../services/powerBiAuthService";
 
 const { models } = pbi;
@@ -36,13 +38,21 @@ function resolveTargetPage(pages, target) {
   const raw = String(target).trim();
   const lower = raw.toLowerCase();
 
-  // 1. Khớp theo key trong POWER_BI_PAGES_CONFIG (vd 'QUIZ', 'KNOWLEDGE_GAP', 'COURSE_OVERVIEW'...)
+  // 1. Khớp theo key trong POWER_BI_PAGES_CONFIG (vd 'QUIZ', 'KNOWLEDGE_GAP', 'COURSE_OVERVIEW', 'GRADE_SIMULATOR'...)
   if (POWER_BI_PAGES_CONFIG[target]) {
     const cfg = POWER_BI_PAGES_CONFIG[target];
     const matchById = pages.find((p) => p.name === cfg.id);
     if (matchById) return matchById;
     const matchByDisplayName = pages.find((p) => p.displayName === cfg.displayName);
     if (matchByDisplayName) return matchByDisplayName;
+    if (Array.isArray(cfg.aliasDisplayNames)) {
+      const matchByAlias = pages.find((p) =>
+        cfg.aliasDisplayNames.some(
+          (alias) => String(p.displayName || "").trim().toLowerCase() === String(alias).trim().toLowerCase()
+        )
+      );
+      if (matchByAlias) return matchByAlias;
+    }
   }
 
   // 2. Khớp tuyệt đối theo GUID (name)
@@ -53,11 +63,36 @@ function resolveTargetPage(pages, target) {
   const byDisplayNameExact = pages.find((p) => p.displayName === raw);
   if (byDisplayNameExact) return byDisplayNameExact;
 
-  // 4. Khớp chứa chuỗi (contains) theo displayName
+  // 4. Khớp qua alias trong toàn bộ POWER_BI_PAGES_CONFIG
+  for (const key of Object.keys(POWER_BI_PAGES_CONFIG)) {
+    const cfg = POWER_BI_PAGES_CONFIG[key];
+    if (Array.isArray(cfg.aliasDisplayNames)) {
+      const hasAlias = cfg.aliasDisplayNames.some(
+        (alias) => String(alias).trim().toLowerCase() === lower
+      );
+      if (hasAlias) {
+        const foundPage = pages.find((p) => p.name === cfg.id || p.displayName === cfg.displayName);
+        if (foundPage) return foundPage;
+      }
+    }
+  }
+
+  // 5. Khớp chứa chuỗi (contains) theo displayName
   const byDisplayNamePartial = pages.find((p) =>
     String(p.displayName || "").toLowerCase().includes(lower)
   );
   if (byDisplayNamePartial) return byDisplayNamePartial;
+
+  // 6. Khớp đặc thù cho trang "Chi tiết chuyên cần" / "What-if simulator"
+  if (lower.includes("chuyên cần") && (lower.includes("chi tiết") || lower.includes("điểm điều chỉnh") || lower.includes("what-if") || lower.includes("simulator"))) {
+    const simPage = pages.find(
+      (p) =>
+        p.name === POWER_BI_PAGES_CONFIG.GRADE_SIMULATOR.id ||
+        String(p.displayName || "").toLowerCase().includes("simulator") ||
+        String(p.displayName || "").toLowerCase().includes("08")
+    );
+    if (simPage) return simPage;
+  }
 
   return null;
 }
@@ -84,6 +119,8 @@ function getPowerBiService() {
  * - Sẵn sàng hỗ trợ điều khiển Bookmark (CC_MO, GK_MO...)
  */
 function SecurePowerBIReport({
+  reportId: propReportId,
+  embedUrl: propEmbedUrl,
   courseKey,
   cohort,
   userKey,
@@ -91,19 +128,33 @@ function SecurePowerBIReport({
   targetPage = null,
   targetPageDisplayName = null,
   height = "auto",
+  aspectRatio = "16 / 9",
+  displayOption,
+  displayMode = "fitToWidth",
+  isExpanded = false,
   onLoaded,
   onError,
   onPagesLoaded,
   onPageNotFound,
   hidePageNavigation = true,
+  filterMode = "lms",
+  onStudentSelect,
 }) {
   const containerRef = useRef(null);
+  // Generic Studio reports have their own schema; LMS reports retain mandatory course filtering.
+  const isStudioReport = filterMode === "report" && Boolean(propReportId);
   const reportRef = useRef(null);
   const isMountedRef = useRef(true);
+
+  // Xác định display mode ưu tiên từ prop displayOption hoặc displayMode
+  const activeDisplayOption = displayOption || displayMode || "fitToWidth";
 
   // Lưu trữ các tham số mới nhất bằng Ref
   const filterParamsRef = useRef({ courseKey, cohort, userKey, username });
   filterParamsRef.current = { courseKey, cohort, userKey, username };
+
+  const displayModeRef = useRef(activeDisplayOption);
+  displayModeRef.current = activeDisplayOption;
 
   const courseKeyRef = useRef(courseKey);
   courseKeyRef.current = courseKey;
@@ -120,6 +171,7 @@ function SecurePowerBIReport({
   // Trạng thái thành phần
   // 'checking' | 'unconfigured' | 'need_login' | 'loading' | 'filtering' | 'ready' | 'no_permission' | 'error' | 'invalid_course' | 'page_not_found'
   const [status, setStatus] = useState("checking");
+  const [sdkPhase, setSdkPhase] = useState("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [userAccount, setUserAccount] = useState(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -129,6 +181,12 @@ function SecurePowerBIReport({
   const [reportPages, setReportPages] = useState([]);
   const [activePageName, setActivePageName] = useState("");
   const [isPageSwitching, setIsPageSwitching] = useState(false);
+  const [pageAspectRatio, setPageAspectRatio] = useState(aspectRatio || "16 / 9");
+
+  // Nhật ký chẩn đoán xác thực Microsoft (không nhạy cảm)
+  const [diagTrace, setDiagTrace] = useState(null);
+  const [showDiagModal, setShowDiagModal] = useState(false);
+  const [copyStatus, setCopyStatus] = useState("");
 
   // Tạo bộ lọc Course_Key theo chuẩn Power BI Basic Filter
   const createCourseFilter = useCallback((targetKey) => {
@@ -144,21 +202,52 @@ function SecurePowerBIReport({
     };
   }, []);
 
-  // Tạo bộ lọc Cohort
-  const createCohortFilter = useCallback((targetCohort) => {
+  // Tạo các bộ lọc Cohort (hỗ trợ cả lms_datawarehouse dim_user và StudentAssignmentStatus)
+  const createCohortFilters = useCallback((targetCohort) => {
     const norm = String(targetCohort || "").trim().toUpperCase();
-    if (!norm) return null;
-    return {
-      $schema: "http://powerbi.com/product/schema#basic",
-      target: {
-        table: COHORT_FILTER_CONFIG.primaryTable,
-        column: COHORT_FILTER_CONFIG.primaryColumn,
-      },
-      operator: "In",
-      values: [norm],
-      filterType: models.FilterType.Basic,
-    };
+    if (!norm) return [];
+
+    const list = [];
+
+    // 1. Bảng dim_user (bảng chứa thông tin sinh viên)
+    if (COHORT_FILTER_CONFIG.userTable && COHORT_FILTER_CONFIG.userColumn) {
+      list.push({
+        $schema: "http://powerbi.com/product/schema#basic",
+        target: {
+          table: COHORT_FILTER_CONFIG.userTable,
+          column: COHORT_FILTER_CONFIG.userColumn,
+        },
+        operator: "In",
+        values: [norm],
+        filterType: models.FilterType.Basic,
+      });
+    }
+
+    // 2. Bảng primaryTable (StudentAssignmentStatus) nếu khác userTable
+    if (
+      COHORT_FILTER_CONFIG.primaryTable &&
+      COHORT_FILTER_CONFIG.primaryColumn &&
+      COHORT_FILTER_CONFIG.primaryTable.toLowerCase() !== (COHORT_FILTER_CONFIG.userTable || "").toLowerCase()
+    ) {
+      list.push({
+        $schema: "http://powerbi.com/product/schema#basic",
+        target: {
+          table: COHORT_FILTER_CONFIG.primaryTable,
+          column: COHORT_FILTER_CONFIG.primaryColumn,
+        },
+        operator: "In",
+        values: [norm],
+        filterType: models.FilterType.Basic,
+      });
+    }
+
+    return list;
   }, []);
+
+  const createCohortFilter = useCallback((targetCohort) => {
+    const filters = createCohortFilters(targetCohort);
+    return filters.length > 0 ? filters[0] : null;
+  }, [createCohortFilters]);
 
   // Tạo bộ lọc Sinh viên (User_Key hoặc Username)
   const createStudentFilter = useCallback((targetUserKey, targetUsername) => {
@@ -192,12 +281,63 @@ function SecurePowerBIReport({
   }, []);
 
   /**
+   * Áp dụng chế độ co giãn canvas (Fit to page / Fit to width) qua API chính thức powerbi-client
+   * models.DisplayOption: FitToPage = 0, FitToWidth = 1, ActualSize = 2
+   */
+  const applyDisplayOptionToReport = useCallback(
+    async (reportInstance, opt) => {
+      if (!reportInstance) return;
+      const rawMode = String(opt || displayModeRef.current || "fitToWidth").trim().toLowerCase();
+
+      const isFitPage = rawMode === "fittopage" || rawMode === "fit_to_page" || rawMode === "fit-to-page";
+      const isActualSize = rawMode === "actualsize" || rawMode === "actual_size" || rawMode === "actual-size";
+
+      let pbiDisplayOption = models.DisplayOption.FitToWidth;
+      let pageViewString = "fitToWidth";
+
+      if (isFitPage) {
+        pbiDisplayOption = models.DisplayOption.FitToPage;
+        pageViewString = "fitToPage";
+      } else if (isActualSize) {
+        pbiDisplayOption = models.DisplayOption.ActualSize;
+        pageViewString = "actualSize";
+      }
+
+      try {
+        await reportInstance.updateSettings({
+          layoutType: models.LayoutType.Custom,
+          customLayout: {
+            displayOption: pbiDisplayOption,
+          },
+        });
+        console.log(
+          `[PowerBI Embed] Áp dụng customLayout displayOption: ${
+            isFitPage ? "FitToPage (0)" : isActualSize ? "ActualSize (2)" : "FitToWidth (1)"
+          }`
+        );
+      } catch (customErr) {
+        console.warn("[PowerBI Embed] updateSettings customLayout:", customErr?.message || customErr);
+        try {
+          await reportInstance.updateSettings({ pageView: pageViewString });
+        } catch { /* Optional browser capability or cached state is unavailable; retain the fallback. */ 
+          // ignore
+        }
+      }
+    },
+    []
+  );
+
+  /**
    * Áp dụng đồng thời các bộ lọc Course_Key, Cohort và Student
    * Giữ lại các bộ lọc khác ngoài phạm vi LMS quản lý
    */
   const applyAllFiltersToReport = useCallback(
     async (reportInstance, params) => {
       if (!reportInstance) return;
+      if (isStudioReport) {
+        if (isMountedRef.current) setStatus("ready");
+        return;
+      }
 
       const seqId = ++filterSequenceRef.current;
       const { courseKey: cKey, cohort: coh, userKey: uKey, username: uName } = params;
@@ -247,10 +387,12 @@ function SecurePowerBIReport({
           newFilters.push(createCourseFilter(numCourseKey));
         }
 
-        // 2. Cohort Filter
+        // 2. Cohort Filter (áp dụng cho cả dim_user và StudentAssignmentStatus)
         if (coh) {
-          const cohortFilter = createCohortFilter(coh);
-          if (cohortFilter) newFilters.push(cohortFilter);
+          const cohortFilters = createCohortFilters(coh);
+          if (cohortFilters.length > 0) {
+            newFilters.push(...cohortFilters);
+          }
         }
 
         // 3. Student Filter
@@ -259,7 +401,314 @@ function SecurePowerBIReport({
           newFilters.push(studentFilter);
         }
 
-        await reportInstance.setFilters([...otherFilters, ...newFilters]);
+        const finalFilters = [...otherFilters, ...newFilters];
+        console.log("[PBI FILTER REQUESTED]", JSON.stringify(finalFilters, null, 2));
+
+        let applied = false;
+        let lastError = null;
+        try {
+          await reportInstance.setFilters(finalFilters);
+          applied = true;
+          console.log("[PowerBI Embed] report.setFilters() thành công với đầy đủ filters!");
+        } catch (setBothErr) {
+          lastError = setBothErr;
+          console.warn("[PowerBI Embed] Thử setFilters cả 2 bảng Cohort gặp lỗi:", setBothErr?.message || setBothErr);
+
+          // Thử lần 1: Chỉ lọc userTable (lms_datawarehouse dim_user)
+          try {
+            const userOnlyFilters = finalFilters.filter(
+              (f) => (f?.target?.table || "").toLowerCase() !== COHORT_FILTER_CONFIG.primaryTable.toLowerCase()
+            );
+            console.log("[PBI FILTER DEBUG RETRY dim_user only]", JSON.stringify(userOnlyFilters, null, 2));
+            await reportInstance.setFilters(userOnlyFilters);
+            applied = true;
+            console.log("[PowerBI Embed] Thành công khi lọc Cohort theo 'lms_datawarehouse dim_user'!");
+          } catch (dimErr) {
+            lastError = dimErr;
+            console.warn("[PowerBI Embed] Lọc dim_user thất bại:", dimErr?.message || dimErr);
+
+            // Thử lần 2: Chỉ lọc primaryTable (StudentAssignmentStatus)
+            try {
+              const primaryOnlyFilters = finalFilters.filter(
+                (f) => (f?.target?.table || "").toLowerCase() !== (COHORT_FILTER_CONFIG.userTable || "").toLowerCase()
+              );
+              console.log("[PBI FILTER DEBUG RETRY primaryTable only]", JSON.stringify(primaryOnlyFilters, null, 2));
+              await reportInstance.setFilters(primaryOnlyFilters);
+              applied = true;
+              console.log("[PowerBI Embed] Thành công khi lọc Cohort theo primaryTable!");
+            } catch (primErr) {
+              lastError = primErr;
+              console.error("[PowerBI Embed] Cả 2 cách lọc Cohort đều thất bại:", primErr?.message || primErr);
+            }
+          }
+        }
+
+        // Đọc lại filters thực tế từ Power BI để đối chiếu (Verification step)
+        const verifiedFilters = await reportInstance.getFilters();
+        console.log("[PBI GET FILTERS VERIFICATION]", JSON.stringify(verifiedFilters, null, 2));
+
+        // Kiểm chứng: Nếu có chỉ định Course_Key, verifiedFilters phải chứa filter Course_Key hợp lệ
+        if (numCourseKey > 0) {
+          const hasVerifiedCourse = Array.isArray(verifiedFilters) && verifiedFilters.some((f) => {
+            const col = (f?.target?.column || "").toLowerCase();
+            return (
+              (col === "course_key" || col === COURSE_FILTER_CONFIG.column.toLowerCase()) &&
+              Array.isArray(f?.values) &&
+              f.values.map(Number).includes(numCourseKey)
+            );
+          });
+
+          if (!hasVerifiedCourse && !applied) {
+            throw new Error(
+              `Không thể áp dụng bộ lọc Môn '${numCourseKey}' vào Semantic Model Power BI (${lastError?.message || "Bảng hoặc cột Course_Key không tồn tại"})`
+            );
+          }
+        }
+
+        // Kiểm chứng: Nếu có chỉ định cohort, verifiedFilters phải chứa filter Cohort hợp lệ
+        if (coh) {
+          const normCoh = String(coh).trim().toUpperCase();
+          const hasVerifiedCohort = Array.isArray(verifiedFilters) && verifiedFilters.some((f) => {
+            const col = (f?.target?.column || "").toLowerCase();
+            return col === "cohort" && Array.isArray(f?.values) && f.values.map((v) => String(v).toUpperCase()).includes(normCoh);
+          });
+
+          if (!hasVerifiedCohort && !applied) {
+            throw new Error(
+              `Không thể áp dụng bộ lọc Khóa '${normCoh}' vào Semantic Model Power BI (${lastError?.message || "Bảng hoặc cột Cohort không tồn tại"})`
+            );
+          }
+        }
+
+        // Kiểm tra và đồng bộ Page-level & Visual-level filters
+        // Loại bỏ xung đột khi trang báo cáo có sẵn filter lưu cứng (ví dụ Course_Key = 12 được lưu khi publish)
+        try {
+          const pages = await reportInstance.getPages();
+          const activePage = pages.find((p) => p.isActive) || pages[0];
+          if (activePage) {
+            const pageFilters = await activePage.getFilters();
+            console.log(`[PBI PAGE FILTERS: ${activePage.displayName}]`, JSON.stringify(pageFilters, null, 2));
+
+            // Đồng bộ page-level filter nếu có filter Course_Key, Cohort hoặc Student cố định
+            if (Array.isArray(pageFilters) && pageFilters.length > 0) {
+              let pageChanged = false;
+              let hasPageStudentFilter = false;
+              let hasPageCourseFilter = false;
+              const updatedPageFilters = [];
+
+              for (const pf of pageFilters) {
+                const col = (pf?.target?.column || "").toLowerCase();
+                const tbl = (pf?.target?.table || "").toLowerCase();
+
+                // 1. Nhận diện bộ lọc Môn học (Course_Key hoặc Course_Name trên bất kỳ bảng nào)
+                const isCourseKey =
+                  col === "course_key" ||
+                  (tbl === COURSE_FILTER_CONFIG.table.toLowerCase() &&
+                    col === COURSE_FILTER_CONFIG.column.toLowerCase());
+
+                const isCourseName =
+                  col === "course_name" || col === "coursename" || col === "tên môn học";
+
+                // 2. Nhận diện bộ lọc Khóa (Cohort)
+                const isCohort =
+                  col === "cohort" ||
+                  (tbl === COHORT_FILTER_CONFIG.userTable.toLowerCase() &&
+                    col === COHORT_FILTER_CONFIG.userColumn.toLowerCase()) ||
+                  (tbl === COHORT_FILTER_CONFIG.primaryTable.toLowerCase() &&
+                    col === COHORT_FILTER_CONFIG.primaryColumn.toLowerCase());
+
+                // 3. Nhận diện bộ lọc Sinh viên (Username, User_Key trên dim_user)
+                const isStudent =
+                  col === "username" ||
+                  col === "user_key" ||
+                  col === "user key" ||
+                  col === STUDENT_FILTER_CONFIG.column.toLowerCase() ||
+                  col === STUDENT_FILTER_CONFIG.usernameColumn.toLowerCase() ||
+                  tbl === STUDENT_FILTER_CONFIG.table.toLowerCase();
+
+                // 4. Nhận diện bộ lọc What-if Slicer lưu cứng (Đầu điểm điều chỉnh động)
+                const isWhatIfItemKey =
+                  (tbl.includes("điều chỉnh") || tbl.includes("dieu chinh")) &&
+                  (col === "item_key" || col === "item key");
+
+                if (isCourseKey) {
+                  if (numCourseKey > 0) {
+                    const curVal = Array.isArray(pf.values) ? pf.values[0] : null;
+                    if (Number(curVal) !== numCourseKey) {
+                      pageChanged = true;
+                    }
+                    updatedPageFilters.push({ ...pf, values: [numCourseKey] });
+                    hasPageCourseFilter = true;
+                  } else {
+                    pageChanged = true;
+                  }
+                } else if (isCourseName) {
+                  // Gỡ bỏ filter Course_Name lưu cứng (ví dụ 'Phát triển ứng dụng Game nâng cao')
+                  // để tránh xung đột với Course_Key
+                  console.log(`[PBI Page Filter] Gỡ bỏ filter Course_Name lưu cứng: ${JSON.stringify(pf.values)}`);
+                  pageChanged = true;
+                } else if (isCohort) {
+                  if (coh) {
+                    const normCoh = String(coh).trim().toUpperCase();
+                    const curVal = Array.isArray(pf.values) ? pf.values[0] : null;
+                    if (String(curVal).toUpperCase() !== normCoh) {
+                      pageChanged = true;
+                    }
+                    updatedPageFilters.push({ ...pf, values: [normCoh] });
+                  } else {
+                    pageChanged = true;
+                  }
+                } else if (isStudent) {
+                  // Đồng bộ bộ lọc Sinh viên theo sinh viên được chọn trên web
+                  const cleanUName = String(uName || "").trim();
+                  const numUKey = Number(uKey);
+
+                  if (cleanUName) {
+                    const curVal = Array.isArray(pf.values) ? pf.values[0] : null;
+                    if (String(curVal).toLowerCase() !== cleanUName.toLowerCase()) {
+                      pageChanged = true;
+                    }
+                    updatedPageFilters.push({
+                      $schema: "http://powerbi.com/product/schema#basic",
+                      target: {
+                        table: STUDENT_FILTER_CONFIG.table,
+                        column: STUDENT_FILTER_CONFIG.usernameColumn,
+                      },
+                      operator: "In",
+                      values: [cleanUName],
+                      filterType: models.FilterType.Basic,
+                    });
+                    hasPageStudentFilter = true;
+                  } else if (Number.isFinite(numUKey) && numUKey > 0) {
+                    const curVal = Array.isArray(pf.values) ? pf.values[0] : null;
+                    if (Number(curVal) !== numUKey) {
+                      pageChanged = true;
+                    }
+                    updatedPageFilters.push({
+                      $schema: "http://powerbi.com/product/schema#basic",
+                      target: {
+                        table: STUDENT_FILTER_CONFIG.table,
+                        column: STUDENT_FILTER_CONFIG.column,
+                      },
+                      operator: "In",
+                      values: [numUKey],
+                      filterType: models.FilterType.Basic,
+                    });
+                    hasPageStudentFilter = true;
+                  } else {
+                    // Nếu chưa chọn sinh viên, gỡ bỏ filter sinh viên lưu cứng (ví dụ sv2210003)
+                    console.log(`[PBI Page Filter] Gỡ bỏ filter Username lưu cứng: ${JSON.stringify(pf.values)}`);
+                    pageChanged = true;
+                  }
+                } else if (isWhatIfItemKey) {
+                  // Gỡ bỏ filter What-if lưu cứng (Item_Key = 8) để visual không bị khóa vào item của Game
+                  console.log(`[PBI Page Filter] Gỡ bỏ filter What-if Item_Key lưu cứng: ${JSON.stringify(pf.values)}`);
+                  pageChanged = true;
+                } else {
+                  updatedPageFilters.push(pf);
+                }
+              }
+
+              // Nếu trên Page chưa có filter sinh viên và người dùng đang chọn sinh viên:
+              if (!hasPageStudentFilter && (uName || uKey)) {
+                const stFilter = createStudentFilter(uKey, uName);
+                if (stFilter) {
+                  updatedPageFilters.push(stFilter);
+                  pageChanged = true;
+                }
+              }
+
+              // Nếu trên Page chưa có filter Course_Key:
+              if (!hasPageCourseFilter && numCourseKey > 0) {
+                updatedPageFilters.push(createCourseFilter(numCourseKey));
+                pageChanged = true;
+              }
+
+              if (pageChanged) {
+                console.log(
+                  `[PBI] Đồng bộ triệt để Page-level filters trên trang '${activePage.displayName}':`,
+                  {
+                    courseKey: numCourseKey,
+                    cohort: coh,
+                    studentUsername: uName,
+                    studentUserKey: uKey,
+                  }
+                );
+                await activePage.setFilters(updatedPageFilters);
+                const newPf = await activePage.getFilters();
+                console.log("[PBI UPDATED PAGE FILTERS]", JSON.stringify(newPf, null, 2));
+              }
+            } else if (uName || uKey || numCourseKey > 0) {
+              // Trang chưa có page-level filter nào, bổ sung nếu cần
+              const newPfList = [];
+              if (numCourseKey > 0) newPfList.push(createCourseFilter(numCourseKey));
+              if (uName || uKey) {
+                const sf = createStudentFilter(uKey, uName);
+                if (sf) newPfList.push(sf);
+              }
+              if (newPfList.length > 0) {
+                console.log(`[PBI] Thêm Page-level filters mới trên '${activePage.displayName}'`);
+                await activePage.setFilters(newPfList);
+              }
+            }
+
+            // Kiểm tra và đồng bộ visual-level filters nếu có filter Course_Key hoặc Cohort
+            const visuals = await activePage.getVisuals();
+            for (const v of visuals) {
+              try {
+                const vFilters = await v.getFilters();
+                if (Array.isArray(vFilters) && vFilters.length > 0) {
+                  let vChanged = false;
+                  const updatedVFilters = [];
+
+                  for (const vf of vFilters) {
+                    const col = (vf?.target?.column || "").toLowerCase();
+                    const tbl = (vf?.target?.table || "").toLowerCase();
+
+                    const isCourse =
+                      (tbl === COURSE_FILTER_CONFIG.table.toLowerCase() || !tbl) &&
+                      (col === COURSE_FILTER_CONFIG.column.toLowerCase() || col === "course_key");
+
+                    const isCohort =
+                      col === "cohort" ||
+                      (tbl === COHORT_FILTER_CONFIG.userTable.toLowerCase() && col === COHORT_FILTER_CONFIG.userColumn.toLowerCase()) ||
+                      (tbl === COHORT_FILTER_CONFIG.primaryTable.toLowerCase() && col === COHORT_FILTER_CONFIG.primaryColumn.toLowerCase());
+
+                    if (isCourse) {
+                      if (numCourseKey > 0) {
+                        const curVal = Array.isArray(vf.values) ? vf.values[0] : null;
+                        if (Number(curVal) !== numCourseKey) vChanged = true;
+                        updatedVFilters.push({ ...vf, values: [numCourseKey] });
+                      } else {
+                        vChanged = true;
+                      }
+                    } else if (isCohort) {
+                      if (coh) {
+                        const normCoh = String(coh).trim().toUpperCase();
+                        const curVal = Array.isArray(vf.values) ? vf.values[0] : null;
+                        if (String(curVal).toUpperCase() !== normCoh) vChanged = true;
+                        updatedVFilters.push({ ...vf, values: [normCoh] });
+                      } else {
+                        vChanged = true;
+                      }
+                    } else {
+                      updatedVFilters.push(vf);
+                    }
+                  }
+
+                  if (vChanged) {
+                    console.log(`[PBI] Cập nhật Visual-level filter cho '${v.title || v.name}'`);
+                    await v.setFilters(updatedVFilters);
+                  }
+                }
+              } catch { /* Optional browser capability or cached state is unavailable; retain the fallback. */ 
+                // Ignore visuals that do not support getFilters
+              }
+            }
+          }
+        } catch (inspectErr) {
+          console.warn("[PBI INSPECT ERROR]", inspectErr?.message);
+        }
 
         // Cập nhật trạng thái nếu vẫn là yêu cầu mới nhất
         if (isMountedRef.current && filterSequenceRef.current === seqId) {
@@ -267,25 +716,15 @@ function SecurePowerBIReport({
           setStatus("ready");
         }
       } catch (err) {
-        console.error("[PowerBI Embed] Lỗi khi áp dụng bộ lọc:", err);
+        console.error("[PowerBI Embed] Lỗi khi áp dụng bộ lọc:", err?.message || err, err);
         if (isMountedRef.current && filterSequenceRef.current === seqId) {
-          // Thử fallback: chỉ lọc Course_Key nếu lỗi do bảng Cohort hoặc Student chưa khớp
-          try {
-            const numCourseKey = Number(cKey);
-            if (Number.isFinite(numCourseKey) && numCourseKey > 0) {
-              await reportInstance.setFilters([createCourseFilter(numCourseKey)]);
-              setStatus("ready");
-              return;
-            }
-          } catch {
-            // ignore
-          }
-          setErrorMessage(`Không thể áp dụng bộ lọc báo cáo Power BI.`);
+          // Báo lỗi rõ ràng, KHÔNG nuốt lỗi rồi fallback sang chỉ Course_Key và hiển thị ready sai lệch
+          setErrorMessage(`Không thể áp dụng bộ lọc báo cáo Power BI: ${err?.message || "Lỗi cấu hình bộ lọc"}`);
           setStatus("error");
         }
       }
     },
-    [createCourseFilter, createCohortFilter, createStudentFilter]
+    [createCourseFilter, createCohortFilters, createStudentFilter, isStudioReport]
   );
 
   /**
@@ -296,8 +735,8 @@ function SecurePowerBIReport({
     async (accessToken) => {
       if (!containerRef.current) return;
 
-      const embedUrl = buildSecureEmbedUrl();
-      const reportId = powerBiEnv.reportId;
+      const reportId = propReportId || powerBiEnv.reportId;
+      const embedUrl = propEmbedUrl || (reportId ? `https://app.powerbi.com/reportEmbed?reportId=${reportId}&groupId=${powerBiEnv.workspaceId}` : buildSecureEmbedUrl());
 
       if (!embedUrl || !reportId) {
         if (isMountedRef.current) {
@@ -306,6 +745,8 @@ function SecurePowerBIReport({
         }
         return;
       }
+      validateSecureEmbedTarget(reportId, embedUrl);
+      setSdkPhase('loading');
 
       if (isMountedRef.current) {
         setStatus("loading");
@@ -324,13 +765,15 @@ function SecurePowerBIReport({
         initialFilters.push(createCourseFilter(currentKey));
       }
       if (currentParams.cohort) {
-        const cFilter = createCohortFilter(currentParams.cohort);
-        if (cFilter) initialFilters.push(cFilter);
+        const cFilters = createCohortFilters(currentParams.cohort);
+        if (cFilters && cFilters.length > 0) initialFilters.push(...cFilters);
       }
       if (currentParams.userKey || currentParams.username) {
         const uFilter = createStudentFilter(currentParams.userKey, currentParams.username);
         if (uFilter) initialFilters.push(uFilter);
       }
+
+      const isFitToPage = displayModeRef.current === "fitToPage";
 
       const embedConfig = {
         type: "report",
@@ -339,10 +782,26 @@ function SecurePowerBIReport({
         embedUrl,
         id: reportId,
         permissions: models.Permissions.Read,
+        eventHooks: {
+          accessTokenProvider: async () => {
+            try {
+              const token = await getPowerBiTokenSilent();
+              if (!token && isMountedRef.current) { setSdkPhase('need_login'); setStatus('need_login'); }
+              return token;
+            } catch {
+              if (isMountedRef.current) { setSdkPhase('need_login'); setStatus('need_login'); }
+              return null;
+            }
+          },
+        },
         filters: initialFilters,
-        pageView: "fitToWidth",
         settings: {
-          pageView: "fitToWidth",
+          layoutType: models.LayoutType.Custom,
+          customLayout: {
+            displayOption: isFitToPage
+              ? models.DisplayOption.FitToPage
+              : models.DisplayOption.FitToWidth,
+          },
           panes: {
             filters: {
               expanded: false,
@@ -352,12 +811,23 @@ function SecurePowerBIReport({
               visible: false, // Ẩn thanh chuyển trang mặc định để LMS điều hướng
             },
           },
-          background: models.BackgroundType.Transparent,
+          background: models.BackgroundType.Default,
         },
       };
 
-      if (powerBiEnv.coursePageName) {
+      if (!isFitToPage) {
+        embedConfig.pageView = "fitToWidth";
+      }
+
+      if (!isStudioReport && powerBiEnv.coursePageName) {
         embedConfig.pageName = powerBiEnv.coursePageName;
+      } else if (targetPageRef.current) {
+        const rawTarget = String(targetPageRef.current).trim();
+        if (POWER_BI_PAGES_CONFIG[rawTarget]?.id) {
+          embedConfig.pageName = POWER_BI_PAGES_CONFIG[rawTarget].id;
+        } else if (/^[a-f0-9]{20}$/i.test(rawTarget) || /^ReportSection/i.test(rawTarget)) {
+          embedConfig.pageName = rawTarget;
+        }
       }
 
       try {
@@ -373,13 +843,15 @@ function SecurePowerBIReport({
         // Khi báo cáo nạp xong metadata (loaded)
         report.on("loaded", async () => {
           if (!isMountedRef.current) return;
+          setSdkPhase('loaded');
 
-          // 1. Áp dụng tất cả bộ lọc
-          await applyAllFiltersToReport(report, filterParamsRef.current);
-
-          // 2. Lấy danh sách 7 trang nội bộ từ Power BI Service
+          // 1. Lấy danh sách 7 trang nội bộ và chuyển sang trang đích (nếu có) trước khi lọc
           try {
             const pages = await report.getPages();
+            console.log(
+              "[PowerBI] Danh sách trang thực tế từ report.getPages():",
+              pages.map((p) => ({ name: p.name, displayName: p.displayName, isActive: p.isActive }))
+            );
             if (isMountedRef.current && Array.isArray(pages) && pages.length > 0) {
               setReportPages(pages);
 
@@ -396,8 +868,15 @@ function SecurePowerBIReport({
                   await report.setPage(targetMatchedPage.name);
                   setActivePageName(targetMatchedPage.name);
                   try {
-                    await report.updateSettings({ pageView: "fitToWidth" });
-                  } catch {
+                    await report.updateSettings({
+                      layoutType: models.LayoutType.Custom,
+                      customLayout: {
+                        displayOption: isFitToPage
+                          ? models.DisplayOption.FitToPage
+                          : models.DisplayOption.FitToWidth,
+                      },
+                    });
+                  } catch { /* Optional browser capability or cached state is unavailable; retain the fallback. */ 
                     // ignore
                   }
                 } catch (setErr) {
@@ -413,10 +892,25 @@ function SecurePowerBIReport({
                     onPageNotFound(requestedTarget, pages);
                   }
                 }
-              } else {
-                const activePage = pages.find((p) => p.isActive) || pages[0];
-                if (activePage) {
+              }
+
+              const activePage = targetMatchedPage || pages.find((p) => p.isActive) || pages[0];
+              if (activePage) {
+                if (!targetMatchedPage) {
                   setActivePageName(activePage.name);
+                }
+                // Tự động nhận diện tỷ lệ canvas thực tế của trang từ metadata
+                if (activePage?.defaultSize?.width && activePage?.defaultSize?.height) {
+                  const w = Number(activePage.defaultSize.width);
+                  const h = Number(activePage.defaultSize.height);
+                  if (w > 0 && h > 0) {
+                    setPageAspectRatio(`${w} / ${h}`);
+                    console.log(
+                      `[PowerBI Embed] Tỷ lệ canvas thực tế của trang '${activePage.displayName}': ${w}x${h} (${(
+                        w / h
+                      ).toFixed(2)})`
+                    );
+                  }
                 }
               }
 
@@ -428,10 +922,13 @@ function SecurePowerBIReport({
             console.warn("[PowerBI] Không thể lấy danh sách trang bằng getPages():", pagesErr.message);
           }
 
-          // Cập nhật chế độ fitToWidth sau khi loaded
+          // 2. Áp dụng tất cả bộ lọc sau khi trang đích đã được kích hoạt
+          await applyAllFiltersToReport(report, filterParamsRef.current);
+
+          // 3. Đảm bảo chế độ hiển thị chuẩn xác (Fit to page / Fit to width) sau khi loaded
           try {
-            await report.updateSettings({ pageView: "fitToWidth" });
-          } catch {
+            await applyDisplayOptionToReport(report, displayModeRef.current);
+          } catch { /* Optional browser capability or cached state is unavailable; retain the fallback. */ 
             // ignore
           }
 
@@ -441,11 +938,7 @@ function SecurePowerBIReport({
         // Khi báo cáo vẽ xong toàn bộ visual
         report.on("rendered", async () => {
           if (!isMountedRef.current) return;
-          try {
-            await report.updateSettings({ pageView: "fitToWidth" });
-          } catch {
-            // ignore
-          }
+          setSdkPhase('rendered');
         });
 
         // Theo dõi sự kiện trang thay đổi
@@ -456,9 +949,69 @@ function SecurePowerBIReport({
             setActivePageName(newPage.name);
           }
           try {
-            await report.updateSettings({ pageView: "fitToWidth" });
-          } catch {
+            await applyDisplayOptionToReport(report, displayModeRef.current);
+          } catch { /* Optional browser capability or cached state is unavailable; retain the fallback. */ 
             // ignore
+          }
+        });
+
+        // Bắt sự kiện chọn dữ liệu trực tiếp trên Visual Power BI (dataSelected)
+        report.on("dataSelected", (event) => {
+          if (!isMountedRef.current) return;
+          try {
+            const dataPoints = event?.detail?.dataPoints;
+            console.log("[PowerBI dataSelected Event]:", event?.detail);
+
+            if (!Array.isArray(dataPoints) || dataPoints.length === 0) {
+              return;
+            }
+
+            // Quét identity để tìm định danh sinh viên (User_Key, Username)
+            let detectedUserKey = null;
+            let detectedUsername = null;
+
+            for (const point of dataPoints) {
+              const identities = point?.identity || [];
+              for (const id of identities) {
+                const col = String(id?.target?.column || "").toLowerCase();
+                if (col.includes("user_key") || col === "user key") {
+                  detectedUserKey = id.equals;
+                } else if (col.includes("username") || col.includes("mssv")) {
+                  detectedUsername = id.equals;
+                }
+              }
+
+              // Kiểm tra trong values nếu identity không chứa trực tiếp
+              const values = point?.values || [];
+              for (const val of values) {
+                const col = String(val?.target?.column || "").toLowerCase();
+                if (col.includes("user_key")) {
+                  detectedUserKey = val.value;
+                } else if (col.includes("username") || col.includes("mssv")) {
+                  detectedUsername = val.value;
+                }
+              }
+            }
+
+            if (detectedUserKey || detectedUsername) {
+              console.log("[PowerBI dataSelected] Đã phát hiện danh tính sinh viên từ click visual:", {
+                userKey: detectedUserKey,
+                username: detectedUsername,
+              });
+              if (typeof onStudentSelect === "function") {
+                onStudentSelect({
+                  userKey: detectedUserKey,
+                  username: detectedUsername,
+                  source: "powerbi_dataSelected",
+                });
+              }
+            } else {
+              console.log(
+                "[PowerBI dataSelected] Visual phát sinh event nhưng không chứa cột User_Key hoặc Username trong identity payload."
+              );
+            }
+          } catch (e) {
+            console.warn("[PowerBI dataSelected] Lỗi xử lý sự kiện click visual:", e);
           }
         });
 
@@ -466,9 +1019,10 @@ function SecurePowerBIReport({
         report.on("error", (event) => {
           if (!isMountedRef.current) return;
 
-          console.error("[PowerBI SDK Error Event]:", event.detail);
           const detail = event?.detail || {};
           const msg = detail.message || detail.detailedMessage || "Lỗi tải báo cáo từ Power BI.";
+          setSdkPhase('error');
+          console.error("[PowerBI SDK Error]:", detail.errorCode || 'REPORT_ERROR');
 
           if (
             msg.includes("PowerBIEntityNotFound") ||
@@ -514,7 +1068,8 @@ function SecurePowerBIReport({
   const initPowerBiFlow = useCallback(async () => {
     // 1. Kiểm tra cấu hình môi trường
     const configCheck = checkPowerBiConfig();
-    if (!configCheck.isConfigured && !configCheck.hasReportId) {
+    const effectiveReportId = propReportId || powerBiEnv.reportId;
+    if (!configCheck.isConfigured && !configCheck.hasReportId && !effectiveReportId) {
       if (isMountedRef.current) {
         setStatus("unconfigured");
         setMissingConfigKeys(configCheck.missingFields);
@@ -544,7 +1099,7 @@ function SecurePowerBIReport({
 
       // 4. Kiểm tra courseKey có hợp lệ không
       const numericKey = Number(courseKeyRef.current || filterParamsRef.current.courseKey || courseKey);
-      if (!Number.isFinite(numericKey) || numericKey <= 0) {
+      if (!isStudioReport && (!Number.isFinite(numericKey) || numericKey <= 0)) {
         setStatus("invalid_course");
         return;
       }
@@ -558,7 +1113,7 @@ function SecurePowerBIReport({
         setErrorMessage(err.message || "Lỗi kiểm tra phiên đăng nhập Microsoft.");
       }
     }
-  }, [embedReport]);
+  }, [embedReport, isStudioReport]);
 
   // VÒNG ĐỜI 1: CHỈ KHỞI TẠO BÁO CÁO KHI MOUNT
   useEffect(() => {
@@ -573,7 +1128,7 @@ function SecurePowerBIReport({
           reportRef.current.off("rendered");
           reportRef.current.off("error");
           reportRef.current.off("pageChanged");
-        } catch {
+        } catch { /* Optional browser capability or cached state is unavailable; retain the fallback. */ 
           // ignore
         }
       }
@@ -590,7 +1145,7 @@ function SecurePowerBIReport({
   // VÒNG ĐỜI 2: KHI BỘ LỌC THAY ĐỔI (COURSE, COHORT, USERKEY, USERNAME) -> CHỈ CẬP NHẬT FILTER (KHÔNG RE-EMBED, KHÔNG ĐỔI TRANG)
   useEffect(() => {
     const numericKey = Number(courseKey);
-    if (!Number.isFinite(numericKey) || numericKey <= 0) {
+    if (!isStudioReport && (!Number.isFinite(numericKey) || numericKey <= 0)) {
       setStatus("invalid_course");
       return;
     }
@@ -598,7 +1153,7 @@ function SecurePowerBIReport({
     if (reportRef.current) {
       applyAllFiltersToReport(reportRef.current, { courseKey, cohort, userKey, username });
     }
-  }, [courseKey, cohort, userKey, username, applyAllFiltersToReport]);
+  }, [courseKey, cohort, userKey, username, applyAllFiltersToReport, isStudioReport]);
 
   // VÒNG ĐỜI 3: KHI TARGETPAGE THAY ĐỔI -> ĐIỀU HƯỚNG SANG ĐÚNG TRANG ĐÍCH MÀ KHÔNG LÀM MẤT FILTER
   useEffect(() => {
@@ -630,13 +1185,11 @@ function SecurePowerBIReport({
         setActivePageName(pageName);
       }
 
-      // Đảm bảo chế độ hiển thị fitToWidth vẫn được duy trì sau khi đổi trang
+      // Duy trì đúng chế độ hiển thị (Fit to page hoặc Fit to width) sau khi đổi trang
       try {
-        await reportRef.current.updateSettings({
-          pageView: "fitToWidth",
-        });
+        await applyDisplayOptionToReport(reportRef.current, displayModeRef.current);
       } catch (settingsErr) {
-        console.warn("[PowerBI] updateSettings pageView on switch warning:", settingsErr?.message);
+        console.warn("[PowerBI] updateSettings displayOption on switch warning:", settingsErr?.message);
       }
 
       // Giữ nguyên tất cả bộ lọc sau khi chuyển trang
@@ -650,10 +1203,19 @@ function SecurePowerBIReport({
     }
   };
 
+  // VÒNG ĐỜI 4: KHI DISPLAYOPTION HOẶC DISPLAYMODE THAY ĐỔI -> CẬP NHẬT ĐỘNG KHÔNG RE-EMBED
+  useEffect(() => {
+    const currentOpt = displayOption || displayMode || "fitToWidth";
+    displayModeRef.current = currentOpt;
+    if (reportRef.current && (status === "ready" || status === "filtering")) {
+      applyDisplayOptionToReport(reportRef.current, currentOpt);
+    }
+  }, [displayOption, displayMode, status, applyDisplayOptionToReport]);
+
   /**
    * Điều khiển Bookmark trong Power BI bằng report.bookmarksManager.apply()
    */
-  const handleApplyBookmark = async (bookmarkName) => {
+  const _handleApplyBookmark = async (bookmarkName) => {
     if (!reportRef.current?.bookmarksManager) {
       console.warn("[PowerBI] bookmarksManager không khả dụng trên report.");
       return;
@@ -686,15 +1248,18 @@ function SecurePowerBIReport({
 
       if (result && result.accessToken) {
         setUserAccount(result.account);
+        setDiagTrace(getMsalDiagnosticTrace());
         await embedReport(result.accessToken);
       } else {
         setStatus("need_login");
+        setDiagTrace(getMsalDiagnosticTrace());
       }
     } catch (err) {
       console.error("[PowerBI] Đăng nhập thất bại:", err);
       if (isMountedRef.current) {
         setErrorMessage(err.message || "Đăng nhập Microsoft không thành công.");
         setStatus("need_login");
+        setDiagTrace(getMsalDiagnosticTrace());
       }
     } finally {
       if (isMountedRef.current) {
@@ -711,6 +1276,8 @@ function SecurePowerBIReport({
   return (
     <div
       className="secure-pbi-wrapper"
+      data-report-id={propReportId || powerBiEnv.reportId}
+      data-sdk-state={sdkPhase}
       style={{
         position: "relative",
         width: "100%",
@@ -723,6 +1290,14 @@ function SecurePowerBIReport({
         flexDirection: "column",
       }}
     >
+      {isStudioReport && <div role="status" aria-label="Trạng thái nhúng Power BI" style={{ padding: '8px 18px', fontSize: '12px' }}>
+        {sdkPhase === 'idle' && 'Đang kiểm tra phiên Microsoft'}
+        {sdkPhase === 'loading' && 'Power BI đang tải báo cáo'}
+        {sdkPhase === 'loaded' && 'Power BI đã nạp cấu trúc, đang vẽ nội dung'}
+        {sdkPhase === 'rendered' && 'Power BI đã phát sự kiện rendered. Hãy kiểm tra số liệu và tương tác bên dưới.'}
+        {sdkPhase === 'need_login' && 'Phiên Microsoft cần đăng nhập lại'}
+        {sdkPhase === 'error' && 'Power BI báo lỗi tải nội dung'}
+      </div>}
       {/* 1. THANH ĐIỀU KHIỂN & BỘ LỌC PHÍA TRÊN */}
       <div
         className="secure-pbi-toolbar"
@@ -755,9 +1330,9 @@ function SecurePowerBIReport({
 
           <span style={{ color: "#c1ccc3" }}>|</span>
 
-          <span>
+          {!isStudioReport && <span>
             Bảng lọc: <code>{COURSE_FILTER_CONFIG.table}</code>
-          </span>
+          </span>}
 
           <span style={{ color: "#c1ccc3" }}>•</span>
 
@@ -804,6 +1379,25 @@ function SecurePowerBIReport({
               title="Bộ lọc sinh viên cụ thể (Student 360)"
             >
               Sinh viên: {username || `Key: ${userKey}`}
+            </span>
+          )}
+
+          {(displayOption || displayMode) && (
+            <span
+              style={{
+                fontSize: "11px",
+                color: (displayOption || displayMode) === "fitToPage" ? "#065f46" : "#475569",
+                background: (displayOption || displayMode) === "fitToPage" ? "#ecfdf5" : "#f1f5f9",
+                border: (displayOption || displayMode) === "fitToPage" ? "1px solid #a7f3d0" : "1px solid #cbd5e1",
+                padding: "2px 7px",
+                borderRadius: "4px",
+                fontWeight: 600,
+              }}
+              title="Chế độ hiển thị canvas báo cáo"
+            >
+              {(displayOption || displayMode) === "fitToPage"
+                ? "Khung: Vừa toàn trang (Fit to page)"
+                : "Khung: Vừa chiều rộng (Fit to width)"}
             </span>
           )}
         </div>
@@ -897,10 +1491,10 @@ function SecurePowerBIReport({
         style={{
           position: "relative",
           width: "100%",
-          aspectRatio: height === "auto" ? "16 / 9" : undefined,
+          aspectRatio: height === "auto" ? (pageAspectRatio || aspectRatio || "16 / 9") : undefined,
           height: height === "auto" ? "auto" : height,
           minHeight: "480px",
-          maxHeight: "820px",
+          maxHeight: height === "auto" ? (isExpanded ? "95vh" : "920px") : undefined,
           flex: height === "auto" ? "none" : 1,
           overflow: "hidden",
         }}
@@ -1105,6 +1699,32 @@ function SecurePowerBIReport({
               Entra ID có quyền xem báo cáo để tiếp tục.
             </p>
 
+            {typeof window !== "undefined" && window.location.port === "5174" && (
+              <div
+                style={{
+                  maxWidth: "520px",
+                  padding: "8px 14px",
+                  borderRadius: "6px",
+                  backgroundColor: "#fef3c7",
+                  border: "1px solid #fde68a",
+                  color: "#92400e",
+                  fontSize: "12px",
+                  marginBottom: "16px",
+                  textAlign: "left",
+                  lineHeight: "1.5",
+                }}
+              >
+                <strong>⚠️ Đang mở trên cổng 5174:</strong> Microsoft Entra ID hiện đã đăng ký SPA Redirect URI cho cổng <code>5173</code>. Khuyến nghị mở trang qua cổng chuẩn:{" "}
+                <a
+                  href={`http://localhost:5173${window.location.pathname}${window.location.search}`}
+                  style={{ color: "#b45309", fontWeight: 600, textDecoration: "underline" }}
+                >
+                  http://localhost:5173{window.location.pathname}
+                </a>{" "}
+                (hoặc thêm <code>http://localhost:5174/auth.html</code> vào Entra ID App Registration).
+              </div>
+            )}
+
             <button
               type="button"
               onClick={handleMicrosoftLogin}
@@ -1139,9 +1759,34 @@ function SecurePowerBIReport({
             </button>
 
             {errorMessage && (
-              <p style={{ color: "#dc2626", fontSize: "12px", marginTop: "14px" }}>
-                {errorMessage}
-              </p>
+              <div style={{ marginTop: "14px", display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+                <p style={{ color: "#dc2626", fontSize: "12px", margin: 0, maxWidth: "520px" }}>
+                  {errorMessage}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDiagTrace(getMsalDiagnosticTrace());
+                    setShowDiagModal(true);
+                  }}
+                  style={{
+                    fontSize: "12px",
+                    color: "#2563eb",
+                    backgroundColor: "#eff6ff",
+                    border: "1px solid #bfdbfe",
+                    borderRadius: "6px",
+                    padding: "4px 10px",
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "5px",
+                    fontWeight: 500,
+                  }}
+                >
+                  <Info size={13} />
+                  Xem nhật ký chẩn đoán kỹ thuật (Diagnostic Trace)
+                </button>
+              </div>
             )}
           </div>
         )}
@@ -1409,7 +2054,7 @@ function SecurePowerBIReport({
           width: 100%;
           height: 100%;
           position: relative;
-          overflow: hidden;
+          overflow: auto;
         }
         .secure-pbi-embed-container iframe {
           width: 100% !important;
@@ -1424,6 +2069,248 @@ function SecurePowerBIReport({
           zoom: 1 !important;
         }
       `}</style>
+
+      {/* MODAL CHẨN ĐOÁN KỸ THUẬT (DIAGNOSTIC TRACE MODAL - REDACTED) */}
+      {showDiagModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            zIndex: 9999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px",
+          }}
+          onClick={() => setShowDiagModal(false)}
+        >
+          <div
+            style={{
+              backgroundColor: "#ffffff",
+              borderRadius: "10px",
+              maxWidth: "680px",
+              width: "100%",
+              maxHeight: "85vh",
+              display: "flex",
+              flexDirection: "column",
+              boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
+              overflow: "hidden",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div
+              style={{
+                padding: "16px 20px",
+                borderBottom: "1px solid #e5e7eb",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                backgroundColor: "#f9fafb",
+              }}
+            >
+              <div>
+                <h4 style={{ margin: 0, color: "#111827", fontSize: "15px", fontWeight: 600 }}>
+                  Nhật ký chẩn đoán xác thực Microsoft (Redacted Trace)
+                </h4>
+                <p style={{ margin: "2px 0 0 0", color: "#6b7280", fontSize: "11px" }}>
+                  An toàn tuyệt đối — Không ghi nhận Access Token, Auth Code hay thông tin nhạy cảm
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowDiagModal(false)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: "18px",
+                  cursor: "pointer",
+                  color: "#6b7280",
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Body */}
+            <div style={{ padding: "16px 20px", overflowY: "auto", flex: 1, fontSize: "12px" }}>
+              {/* PHÂN LOẠI 4 TÌNH HUỐNG THỰC TẾ */}
+              <div
+                style={{
+                  padding: "10px 14px",
+                  borderRadius: "6px",
+                  backgroundColor: "#f0fdf4",
+                  border: "1px solid #bbf7d0",
+                  marginBottom: "14px",
+                }}
+              >
+                <strong style={{ color: "#166534", display: "block", marginBottom: "4px" }}>
+                  Kết quả phân loại tình huống:
+                </strong>
+                {(() => {
+                  const arrival = diagTrace?.popupArrival;
+                  const trace = diagTrace?.popupTrace || [];
+                  const mainEvents = diagTrace?.mainEvents || [];
+                  const lastMain = mainEvents[mainEvents.length - 1];
+
+                  if (!arrival) {
+                    return (
+                      <span style={{ color: "#991b1b" }}>
+                        <strong>• Tình huống 1:</strong> Popup chưa chuyển hướng về localhost (Vẫn dừng ở login.microsoftonline.com do chờ người dùng chọn tài khoản, xác thực 2 bước MFA, màn hình Consent/Need admin approval, hoặc popup bị đóng trước khi hoàn tất).
+                      </span>
+                    );
+                  }
+                  if (arrival.pathname !== "/auth.html") {
+                    return (
+                      <span style={{ color: "#854d0e" }}>
+                        <strong>• Tình huống 2:</strong> Popup đã chuyển về localhost nhưng vào nhầm trang chủ ({arrival.pathname}) thay vì /auth.html.
+                      </span>
+                    );
+                  }
+                  const bridgeError = trace.find((t) => t.type === "BRIDGE_ERROR");
+                  if (bridgeError) {
+                    return (
+                      <span style={{ color: "#991b1b" }}>
+                        <strong>• Tình huống 3:</strong> Popup đã tải /auth.html nhưng Redirect Bridge ném lỗi ({bridgeError?.detail?.errorCode || bridgeError?.detail?.message || "lỗi bridge"}).
+                      </span>
+                    );
+                  }
+                  if (lastMain?.errorCode === "timed_out") {
+                    return (
+                      <span style={{ color: "#c2410c" }}>
+                        <strong>• Tình huống 3B:</strong> Popup đã phát tin nhưng Main Frame bị timeout trước khi nhận được hoặc channel ID không khớp.
+                      </span>
+                    );
+                  }
+                  return (
+                    <span style={{ color: "#166534" }}>
+                      <strong>• Xác thực hoàn tất:</strong> Token đã được chuyển giao an toàn cho Power BI Embed.
+                    </span>
+                  );
+                })()}
+              </div>
+
+              {/* TÓM TẮT TRẠNG THÁI */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "14px" }}>
+                <div style={{ padding: "10px", border: "1px solid #e5e7eb", borderRadius: "6px", backgroundColor: "#f9fafb" }}>
+                  <strong>Cửa sổ Callback Microsoft:</strong>
+                  <div style={{ marginTop: "4px", color: "#374151" }}>
+                    • Đã về localhost: {diagTrace?.popupArrival ? "Có (Đã nhận)" : "Chưa (Chưa nhận callback)"}
+                    <br />
+                    • Origin: {diagTrace?.popupArrival?.origin || "N/A"}
+                    <br />
+                    • Pathname: {diagTrace?.popupArrival?.pathname || "N/A"}
+                    <br />
+                    • hasCode: {String(Boolean(diagTrace?.popupArrival?.hasCode))}
+                    <br />
+                    • hasError: {String(Boolean(diagTrace?.popupArrival?.hasError))}
+                    {diagTrace?.popupArrival?.errorName && (
+                      <>
+                        <br />
+                        • Mã lỗi Microsoft: <code style={{ color: "#dc2626" }}>{diagTrace?.popupArrival?.errorName}</code>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ padding: "10px", border: "1px solid #e5e7eb", borderRadius: "6px", backgroundColor: "#f9fafb" }}>
+                  <strong>Redirect Bridge & Main Frame:</strong>
+                  <div style={{ marginTop: "4px", color: "#374151" }}>
+                    • Bridge khởi chạy: {diagTrace?.popupTrace?.some((t) => t.type === "BRIDGE_START") ? "Có" : "Chưa"}
+                    <br />
+                    • Bridge thành công: {diagTrace?.popupTrace?.some((t) => t.type === "BRIDGE_SUCCESS") ? "Có" : "Chưa"}
+                    <br />
+                    • Bridge lỗi: {diagTrace?.popupTrace?.some((t) => t.type === "BRIDGE_ERROR") ? "Có" : "Không"}
+                    <br />
+                    • Số sự kiện Main Frame: {diagTrace?.mainEvents?.length || 0}
+                  </div>
+                </div>
+              </div>
+
+              {/* RAW JSON LOG (REDACTED) */}
+              <div style={{ marginBottom: "10px" }}>
+                <strong>Chi tiết nhật ký tuần tự:</strong>
+                <pre
+                  style={{
+                    backgroundColor: "#1f2937",
+                    color: "#f3f4f6",
+                    padding: "10px",
+                    borderRadius: "6px",
+                    fontSize: "11px",
+                    maxHeight: "200px",
+                    overflow: "auto",
+                    marginTop: "6px",
+                  }}
+                >
+                  {JSON.stringify(diagTrace, null, 2)}
+                </pre>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div
+              style={{
+                padding: "12px 20px",
+                borderTop: "1px solid #e5e7eb",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                backgroundColor: "#f9fafb",
+              }}
+            >
+              <div>
+                {copyStatus && (
+                  <span style={{ color: "#166534", fontSize: "11px", fontWeight: 500 }}>
+                    {copyStatus}
+                  </span>
+                )}
+              </div>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(JSON.stringify(diagTrace, null, 2));
+                    setCopyStatus("Đã sao chép nhật ký vào bộ nhớ tạm!");
+                    setTimeout(() => setCopyStatus(""), 3000);
+                  }}
+                  style={{
+                    padding: "7px 14px",
+                    backgroundColor: "#37883e",
+                    color: "#ffffff",
+                    border: "none",
+                    borderRadius: "6px",
+                    fontSize: "12px",
+                    fontWeight: 500,
+                    cursor: "pointer",
+                  }}
+                >
+                  Sao chép nhật ký (Copy)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowDiagModal(false)}
+                  style={{
+                    padding: "7px 14px",
+                    backgroundColor: "#ffffff",
+                    color: "#374151",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "6px",
+                    fontSize: "12px",
+                    fontWeight: 500,
+                    cursor: "pointer",
+                  }}
+                >
+                  Đóng
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

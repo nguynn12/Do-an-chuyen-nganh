@@ -41,7 +41,7 @@ const RISK_LEVEL_CONFIG = {
   },
 };
 
-export default function EarlyWarningRiskSection({ courseId, onSelectStudent }) {
+export default function EarlyWarningRiskSection({ courseId, cohort, onSelectStudent }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -58,7 +58,7 @@ export default function EarlyWarningRiskSection({ courseId, onSelectStudent }) {
       try {
         setLoading(true);
         setError(null);
-        const res = await getCourseRisk(courseId);
+        const res = await getCourseRisk(courseId, cohort);
         if (!isCancelled) {
           setData(res);
         }
@@ -76,7 +76,7 @@ export default function EarlyWarningRiskSection({ courseId, onSelectStudent }) {
     return () => {
       isCancelled = true;
     };
-  }, [courseId]);
+  }, [courseId, cohort]);
 
   // Sinh viên sau lọc
   const filteredStudents = useMemo(() => {

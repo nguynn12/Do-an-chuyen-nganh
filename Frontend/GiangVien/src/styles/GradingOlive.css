@@ -1,0 +1,246 @@
+/* Olive accents are scoped to the grading workspace. Shared navigation is unchanged. */
+.grading-page.dlu-theme {
+  --dlu-green: #4e6531;
+  --dlu-green-hover: #4e6531;
+  --dlu-green-light: #f0f4e9;
+  --dlu-green-badge: #f0f4e9;
+}
+.grading-page.dlu-theme .grading-toast-banner {
+  background: #f6f8f2;
+  border: 1px solid #e2ead5;
+  color: #4e6531;
+  box-shadow: 0 4px 12px rgba(113,139,72,0.1);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.grading-page.dlu-theme .page-icon-box {
+  background: linear-gradient(135deg, var(--dlu-green) 0%, #4e6531 100%);
+  box-shadow: 0 4px 12px rgba(113,139,72,0.2);
+}
+
+.grading-page.dlu-theme .stat-pill.success {
+  background: #f6f8f2;
+  border-color: #e2ead5;
+  color: #4e6531;
+}
+
+.grading-page.dlu-theme .dlu-select:focus {
+  box-shadow: 0 0 0 3px rgba(113,139,72,0.12);
+}
+
+.grading-page.dlu-theme .select-student-highlight {
+  border-color: #4e6531;
+  background-color: #f6f8f2;
+}
+
+.grading-page.dlu-theme .student-avatar-circle {
+  background: #4e6531;
+}
+
+.grading-page.dlu-theme .btn-sub-toggle.active {
+  color: #4e6531;
+}
+
+.grading-page.dlu-theme .secure-tag-mini {
+  background: #f6f8f2;
+  border: 1px solid #e2ead5;
+  color: #4e6531;
+}
+
+.grading-page.dlu-theme .dot-green {
+  background: #718b48;
+}
+
+.grading-page.dlu-theme .group-tab-btn.active {
+  box-shadow: 0 4px 12px rgba(113,139,72,0.1);
+}
+
+.grading-page.dlu-theme .group-tab-btn.confirmed .tab-number {
+  background: #718b48;
+}
+
+.grading-page.dlu-theme .badge-green {
+  background: #f0f4e9;
+  color: #4e6531;
+}
+
+.grading-page.dlu-theme .item-weight-textbox {
+  color: #4e6531;
+}
+
+.grading-page.dlu-theme .item-score-textbox.has-value {
+  color: #4e6531;
+  border-color: #e2ead5;
+  background: #f6f8f2;
+}
+
+.grading-page.dlu-theme .item-score-textbox:focus {
+  box-shadow: 0 0 0 3px rgba(113,139,72,0.15);
+}
+
+.grading-page.dlu-theme .status-badge-text.entered {
+  background: #f0f4e9;
+  color: #4e6531;
+}
+
+.grading-page.dlu-theme .weight-status-banner.valid {
+  color: #4e6531;
+}
+
+.grading-page.dlu-theme .draft-score-number {
+  color: #4e6531;
+}
+
+.grading-page.dlu-theme .confirmed-badge-box {
+  background: #f6f8f2;
+  border: 1px solid #e2ead5;
+  color: #4e6531;
+}
+
+.grading-page.dlu-theme .btn-confirm-group-primary.ready {
+  background: linear-gradient(135deg, var(--dlu-green) 0%, #4e6531 100%);
+  box-shadow: 0 4px 12px rgba(113,139,72,0.25);
+}
+
+.grading-page.dlu-theme .btn-confirm-group-primary.ready:hover {
+  box-shadow: 0 6px 16px rgba(113,139,72,0.35);
+}
+
+.grading-page.dlu-theme .score-kpi-card.is-confirmed {
+  border-color: #e2ead5;
+  box-shadow: 0 2px 6px rgba(113,139,72,0.08);
+}
+
+.grading-page.dlu-theme .kpi-status-tag.confirmed {
+  background: #f0f4e9;
+  color: #4e6531;
+}
+.grading-page.dlu-theme .final-kpi-card {
+  background: linear-gradient(135deg, #f6f8f2 0%, #f6f8f2 100%);
+  border: 2px solid #e2ead5;
+}
+
+.grading-page.dlu-theme .final-name {
+  color: #4e6531;
+}
+
+.grading-page.dlu-theme .final-badge {
+  background: #4e6531;
+}
+
+.grading-page.dlu-theme .final-number {
+  color: #4e6531;
+}
+
+.grading-page.dlu-theme .kpi-status-tag.final-confirmed {
+  background: #4e6531;
+}
+
+.grading-page.dlu-theme .formula-equation {
+  color: #4e6531;
+}
+
+.grading-page.dlu-theme .btn-confirm-final-grade.active {
+  background: linear-gradient(135deg, var(--dlu-green) 0%, #4e6531 100%);
+  box-shadow: 0 4px 14px rgba(113,139,72,0.3);
+}
+
+.grading-page.dlu-theme .btn-confirm-final-grade.active:hover {
+  box-shadow: 0 6px 18px rgba(113,139,72,0.4);
+}
+
+.grading-page.dlu-theme .tech-list code {
+  color: #4e6531;
+}
+
+.grading-page.dlu-theme .student-row.is-selected-row {
+  background-color: #f6f8f2 !important;
+}
+
+.grading-page.dlu-theme .student-code {
+  color: #4e6531;
+  background: #f0f4e9;
+}
+
+.grading-page.dlu-theme .table-score-tag.confirmed {
+  background: #f6f8f2;
+  color: #4e6531;
+  border: 1px solid #e2ead5;
+}
+
+.grading-page.dlu-theme .table-score-tag.final {
+  background: #4e6531;
+}
+
+.grading-page.dlu-theme .btn-table-action:hover {
+  border-color: #4e6531;
+  color: #4e6531;
+}
+
+.grading-page.dlu-theme .btn-table-action.active {
+  background: #4e6531 !important;
+  border-color: #4e6531 !important;
+}
+.grading-page.dlu-theme .text-emerald {
+  color: #4e6531;
+}
+
+.grading-page.dlu-theme .grade-adjustment-bridge {border:1px solid #e2ead5;background:#f6f8f2;color:#4e6531;}
+.grading-page.dlu-theme .grade-adjustment-controls select {border:1px solid #c8d6b2;color:#4e6531;}
+.grading-page.dlu-theme .grade-adjustment-bridge button {border:1px solid #c8d6b2;color:#4e6531;}
+.grading-page.dlu-theme { background: #f6f8f2; }
+.grading-page.dlu-theme .dlu-card { border: 1px solid #f0f4e9; box-shadow: 0 3px 14px #4e653110; }
+.grading-page.dlu-theme .grading-top-header-card { border-top: 3px solid #4e6531; }
+.grading-page.dlu-theme .active-student-banner { background: #f6f8f2; border-color: #f0f4e9; }
+.grading-page.dlu-theme .foldable-tag { background: #f6f8f2; border-color: #f0f4e9; color: #718b48; }
+.grading-page.dlu-theme .grade-adjustment-bridge { border: 1px solid #f0f4e9; background: #f6f8f2; }
+.grading-page.dlu-theme .grade-adjustment-bridge > strong { color: #4e6531; }
+.grading-page.dlu-theme .grade-bridge-help { border-top: 1px solid #f0f4e9; color: #718b48; }
+.grading-page.dlu-theme .group-tab-btn.active { background: #f6f8f2; box-shadow: inset 0 0 0 1px #4e6531; }
+.grading-page.dlu-theme .dlu-table thead th { background: #f6f8f2; }
+.grading-page.dlu-theme .item-name-textbox { border-color: #e2ead5; }
+.grading-page.dlu-theme .group-bottom-summary { background: #f6f8f2; }
+.grading-page.dlu-theme .calc-icon-badge { background: #f6f8f2; color: #4e6531; }
+.grading-page.dlu-theme .tech-title { color: #718b48; }
+.grading-page.dlu-theme :is(button,select,input):focus-visible { outline: 3px solid #c8d6b2; }
+
+.grading-page.dlu-theme .grade-sources-panel {border:1px solid #f0f4e9;background:#f6f8f2;}
+.grading-page.dlu-theme .grade-sources-panel > summary {color:#4e6531;}
+.grading-page.dlu-theme .grade-sources-panel > summary span {color:#718b48;}
+.grading-page.dlu-theme .grade-sources-body {border-top:1px solid #f0f4e9;}
+.grading-page.dlu-theme .grade-sources-body p {color:#718b48;}
+.grading-page.dlu-theme .grade-sources-body label {color:#4e6531;}
+.grading-page.dlu-theme .grade-sources-body select,.grading-page.dlu-theme .grade-sources-body input {border:1px solid #e2ead5;}
+.grading-page.dlu-theme .grade-sources-body button {border:1px solid #c8d6b2;color:#4e6531;}
+.grading-page.dlu-theme .grade-sources-columns > section {border:1px solid #f0f4e9;}
+.grading-page.dlu-theme .grade-sources-columns h4 {color:#4e6531;}
+.grading-page.dlu-theme .grade-sources-create {border-top:1px solid #f0f4e9;}
+.grading-page.dlu-theme .grade-import-preview {border-top:1px solid #f0f4e9;}
+.grading-page.dlu-theme .btn-export-grades {
+  border: 1px solid #4e6531;
+  background: #4e6531;
+}
+.grading-page.dlu-theme .btn-export-grades:hover:not(:disabled) { background: #4e6531; }
+.grading-page.dlu-theme .btn-export-grades:focus-visible { outline: 3px solid #c8d6b2; }
+
+.grading-page.dlu-theme {
+ --dlu-green:#718b48; --dlu-green-hover:#607f3c; --dlu-green-light:#f0f4e9;
+ --dlu-green-badge:#e2ead5;
+}
+.grading-page.dlu-theme .grading-main-layout { padding-top:var(--dlu-header-height,58px); }
+.grading-page.dlu-theme .page-icon-box { background:linear-gradient(135deg,#8eac54,#607f3c); }
+.grading-page.dlu-theme :is(.btn-confirm-group-primary,.btn-confirm-final-grade,.btn-export-grades):not(:disabled) { background:#718b48; border-color:#718b48; color:#fff; }
+.grading-page.dlu-theme :is(.btn-confirm-group-primary,.btn-confirm-final-grade,.btn-export-grades):not(:disabled):hover { background:#607f3c; border-color:#607f3c; }
+.grading-page.dlu-theme .group-tab-btn.confirmed .tab-number { background:#8eac54; color:#fff; }
+.grading-page.dlu-theme .student-avatar-circle { background:#718b48; }
+.grading-page.dlu-theme .group-tab-btn.active { box-shadow:inset 0 0 0 1px #718b48; }

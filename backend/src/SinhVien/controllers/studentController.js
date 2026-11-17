@@ -3,10 +3,25 @@ import { calculateCourseBehaviorMetrics } from "../../shared/analytics/behaviorM
 
 /**
  * Helper tìm sinh viên mục tiêu:
- * - Ưu tiên userId từ query / params
- * - Nếu không có, tự động lấy sinh viên active đầu tiên trong Dim_User
+ * - Ưu tiên thông tin sinh viên đã xác thực từ token (req.student)
+ * - Nếu không có token (ví dụ chạy demo/query), dùng identifier từ query / params
+ * - Fallback lấy sinh viên active đầu tiên
  */
 async function resolveStudent(req) {
+  // 1. Ưu tiên sinh viên đã xác thực danh tính qua token
+  if (req.student?.userKey || req.student?.moodleUserId || req.student?.username) {
+    const userKey = req.student.userKey;
+    const [authRows] = await pool.query(
+      `SELECT * FROM Dim_User 
+       WHERE Primary_Role = 'Student' 
+         AND User_Key = ? AND Is_Active = 1
+       LIMIT 1`,
+      [userKey]
+    );
+    return authRows[0] || null;
+  }
+
+  // 2. Dự phòng: identifier từ query / params
   const identifier = req.query.userId || req.query.studentId || req.params.userId;
   if (identifier) {
     const [rows] = await pool.query(
@@ -63,9 +78,11 @@ export async function getStudentDashboardSummary(req, res) {
 
     // 3. Số assignment đã nộp
     const [[{ submittedAssignments }]] = await pool.query(
-      `SELECT COUNT(DISTINCT Activity_Key) AS submittedAssignments
-       FROM Fact_Assignment_Submission
-       WHERE User_Key = ? AND Submission_Status IS NOT NULL`,
+      `SELECT COUNT(DISTINCT sub.Activity_Key) AS submittedAssignments
+       FROM Fact_Assignment_Submission sub
+       JOIN Dim_Activity a ON a.Activity_Key = sub.Activity_Key AND a.Is_Visible = 1 AND a.Activity_Type = 'assign'
+       WHERE sub.User_Key = ? AND sub.Submission_Status = 'submitted'
+         AND EXISTS (SELECT 1 FROM Fact_Enrolment e WHERE e.User_Key = sub.User_Key AND e.Course_Key = sub.Course_Key AND e.Status = 'Active')`,
       [userKey]
     );
 
@@ -122,11 +139,26 @@ export async function getStudentDashboardSummary(req, res) {
        INNER JOIN Dim_Course dc ON dc.Course_Key = da.Course_Key
        INNER JOIN Fact_Enrolment fe ON fe.Course_Key = dc.Course_Key AND fe.User_Key = ?
        INNER JOIN Dim_Date dd ON dd.Date_Key = da.Due_Date_Key
-       WHERE da.Is_Visible = 1
+       WHERE da.Is_Visible = 1 AND fe.Status = 'Active' AND da.Activity_Type = 'assign'
+         AND dd.Full_Date >= CURDATE()
+         AND NOT EXISTS (SELECT 1 FROM Fact_Assignment_Submission sub WHERE sub.User_Key = fe.User_Key
+           AND sub.Activity_Key = da.Activity_Key AND sub.Submission_Status = 'submitted')
        ORDER BY dd.Full_Date ASC
        LIMIT 4`,
       [userKey]
     );
+
+    const [[attendance]] = await pool.query(`SELECT
+      ROUND(100 * SUM(CASE WHEN LOWER(Attendance_Status) IN ('present','p','late','l') THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 1) AS rate
+      FROM Fact_Attendance WHERE User_Key = ?`, [userKey]);
+    const [[punctuality]] = await pool.query(`SELECT
+      ROUND(100 * SUM(CASE WHEN Is_Submitted_On_Time = 1 THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 1) AS rate
+      FROM Fact_Assignment_Submission WHERE User_Key = ? AND Submission_Status = 'submitted' AND Is_Submitted_On_Time IS NOT NULL`, [userKey]);
+
+    const [noticeRows] = await pool.query(`SELECT notification_id, title, message, created_at
+      FROM fact_notification WHERE recipient_user_id = ? ORDER BY created_at DESC, notification_id DESC LIMIT 30`, [userKey]);
+    const intake = String(student.Username || '').match(/^sv(\d{2})/i);
+    const intakeYear = intake ? 2000 + Number(intake[1]) : null;
 
     // Chuẩn hóa định dạng stats cho GreetingCard
     const stats = [
@@ -141,8 +173,8 @@ export async function getStudentDashboardSummary(req, res) {
         tone: pendingAssignments > 0 ? "amber" : "green",
       },
       {
-        value: gradeStats?.avgGrade ? `${gradeStats.avgGrade}/10 Điểm` : `${totalCourses || 0} Khóa`,
-        label: gradeStats?.avgGrade ? "Điểm trung bình tích lũy" : "Khóa học hoàn thành",
+        value: gradeStats?.avgGrade != null ? `${gradeStats.avgGrade}/10 Điểm` : `${totalCourses || 0} Khóa`,
+        label: gradeStats?.avgGrade != null ? "Điểm trung bình tích lũy" : "Khóa học hoàn thành",
         tone: "green",
       },
     ];
@@ -155,9 +187,9 @@ export async function getStudentDashboardSummary(req, res) {
         username: student.Username,
         fullName: student.Full_Name,
         email: student.Email,
-        cohort: "CTK47B",
-        academicYear: "2023-2027",
-        currentSemester: "Học kỳ 1 (2026-2027)",
+        cohort: intakeYear ? `K${intakeYear - 1976}` : null,
+        academicYear: intakeYear ? `${intakeYear}-${intakeYear + 4}` : null,
+        currentSemester: null,
       },
       stats,
       kpis: {
@@ -165,16 +197,15 @@ export async function getStudentDashboardSummary(req, res) {
         totalAssignments: Number(totalAssignments || 0),
         submittedAssignments: Number(submittedAssignments || 0),
         pendingAssignments: Number(pendingAssignments),
-        averageGrade: Number(gradeStats?.avgGrade || 0),
-        averagePercentage: Number(gradeStats?.avgPercentage || 0),
+        averageGrade: gradeStats?.avgPercentage == null ? null : Number((Number(gradeStats.avgPercentage)/10).toFixed(2)),
+        averagePercentage: gradeStats?.avgPercentage == null ? null : Number(gradeStats.avgPercentage),
+        attendanceRate: attendance.rate == null ? null : Number(attendance.rate),
+        punctualityScore: punctuality.rate == null ? null : Number(punctuality.rate),
         totalEngagementHours: Number(totalEngagementHours || 0),
       },
       recentActivities: recentRows,
       events: eventRows,
-      notifications: [
-        ["Hệ thống phân tích học tập LMS đã sẵn sàng đồng bộ", "Vừa xong"],
-        ["Đã cập nhật tiến độ tương tác học liệu học kỳ mới", "1 giờ trước"],
-      ],
+      notifications: noticeRows.map(row => ({id:row.notification_id, title:row.title, message:row.message, createdAt:row.created_at})),
     });
   } catch (error) {
     console.error("Lỗi getStudentDashboardSummary:", error);
@@ -257,11 +288,12 @@ export async function getStudentCourses(req, res) {
 
        LEFT JOIN (
          SELECT 
-           Course_Key,
-           COUNT(DISTINCT Activity_Key) AS submittedCount
-         FROM Fact_Assignment_Submission
-         WHERE User_Key = ? AND Submission_Status IS NOT NULL
-         GROUP BY Course_Key
+           sub.Course_Key,
+           COUNT(DISTINCT sub.Activity_Key) AS submittedCount
+         FROM Fact_Assignment_Submission sub
+         JOIN Dim_Activity a ON a.Activity_Key = sub.Activity_Key AND a.Is_Visible = 1 AND a.Activity_Type = 'assign'
+         WHERE sub.User_Key = ? AND sub.Submission_Status = 'submitted'
+         GROUP BY sub.Course_Key
        ) sub ON sub.Course_Key = dc.Course_Key
 
        LEFT JOIN (
@@ -303,8 +335,8 @@ export async function getStudentCourses(req, res) {
       totalActivities: Number(c.totalActivities || 0),
       totalAssignments: Number(c.totalAssignments || 0),
       submittedCount: Number(c.submittedCount || 0),
-      averageGrade: c.avgGrade ? Number(c.avgGrade) : null,
-      averagePercentage: c.avgPercentage ? Number(c.avgPercentage) : null,
+      averageGrade: c.avgPercentage == null ? null : Number((Number(c.avgPercentage)/10).toFixed(2)),
+      averagePercentage: c.avgPercentage == null ? null : Number(c.avgPercentage),
       totalEngagementHours: Number(c.totalEngagementHours || 0),
     }));
 

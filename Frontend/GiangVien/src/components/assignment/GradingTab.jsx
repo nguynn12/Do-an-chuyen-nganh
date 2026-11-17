@@ -28,8 +28,8 @@ import {
 export default function GradingTab({
   teacherId,
   selectedCourse,
-  courses,
-  onCourseChange,
+  courses: _courses,
+  onCourseChange: _onCourseChange,
 }) {
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);

@@ -1,3 +1,5 @@
+import { requireTeacherAuth } from '../../shared/middleware/authMiddleware.js';
+import { requireOwnTeacherPath } from '../../shared/middleware/teacherPathIdentity.js';
 import express from "express";
 
 import {
@@ -14,6 +16,8 @@ import {
 
 
 const router = express.Router();
+router.use(requireTeacherAuth);
+router.param('teacherId', (req, res, next) => requireOwnTeacherPath(req, res, next));
 
 
 // ======================================================

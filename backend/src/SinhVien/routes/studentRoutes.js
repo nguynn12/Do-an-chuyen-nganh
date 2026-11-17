@@ -1,4 +1,5 @@
 import express from "express";
+import { requireStudentAuth } from "../../shared/middleware/authMiddleware.js";
 import {
   getStudentDashboardSummary,
   getStudentCourses,
@@ -11,6 +12,10 @@ import {
 } from "../controllers/studentController.js";
 
 const router = express.Router();
+
+// BẢO MẬT: Bắt buộc xác thực vai trò Sinh viên với Bearer Token cho toàn bộ API phân hệ Sinh viên
+router.use(requireStudentAuth);
+
 
 // 1. Dashboard summary
 router.get("/dashboard-summary", getStudentDashboardSummary);

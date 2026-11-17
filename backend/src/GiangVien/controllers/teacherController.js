@@ -1,3 +1,5 @@
+import { applyAlertState } from '../services/learningAlertStateService.js';
+import { savePlannedSchedule } from '../services/schedulePlanningService.js';
 import pool from "../../config/database.js";
 
 
@@ -77,6 +79,10 @@ function normalizeScheduleRow(row) {
 
     description:
       row.Description || "",
+    endTime: normalizeTime(row.End_Time),
+    location: row.Location || "",
+    meetingUrl: row.Meeting_Url || "",
+    seriesId: row.Series_ID || null,
 
     createdAt:
       row.Created_At,
@@ -988,6 +994,7 @@ export async function getTeacherSchedule(
           Title,
           Event_Type,
           Description,
+          End_Time, Location, Meeting_Url, Series_ID,
           Created_At,
           Updated_At
 
@@ -1063,461 +1070,23 @@ export async function getTeacherSchedule(
 // }
 // ======================================================
 
-export async function createTeacherSchedule(
-  req,
-  res
-) {
+export async function createTeacherSchedule(req, res) {
   try {
-    const { teacherId } =
-      req.params;
-
-
-    const {
-      date,
-      time,
-      title,
-      type = "class",
-      description = null,
-    } = req.body;
-
-
-    const teacher =
-      await findTeacherByMoodleId(
-        teacherId
-      );
-
-
-    if (!teacher) {
-      return res.status(404).json({
-        success: false,
-
-        message:
-          "Không tìm thấy giảng viên.",
-      });
-    }
-
-
-    // --------------------------------------------------
-    // VALIDATE
-    // --------------------------------------------------
-
-    if (
-      !date ||
-      !title?.trim()
-    ) {
-      return res.status(400).json({
-        success: false,
-
-        message:
-          "Ngày và tiêu đề lịch là bắt buộc.",
-      });
-    }
-
-
-    if (
-      !/^\d{4}-\d{2}-\d{2}$/.test(
-        date
-      )
-    ) {
-      return res.status(400).json({
-        success: false,
-
-        message:
-          "Ngày không hợp lệ.",
-      });
-    }
-
-
-    const allowedTypes = [
-      "class",
-      "exam",
-      "deadline",
-      "meeting",
-    ];
-
-
-    if (
-      !allowedTypes.includes(
-        type
-      )
-    ) {
-      return res.status(400).json({
-        success: false,
-
-        message:
-          "Loại lịch không hợp lệ.",
-      });
-    }
-
-
-    // --------------------------------------------------
-    // INSERT
-    // --------------------------------------------------
-
-    const [result] =
-      await pool.query(
-        `
-        INSERT INTO Teacher_Schedule (
-          Teacher_User_Key,
-          Event_Date,
-          Event_Time,
-          Title,
-          Event_Type,
-          Description
-        )
-
-        VALUES (
-          ?,
-          ?,
-          ?,
-          ?,
-          ?,
-          ?
-        )
-        `,
-        [
-          teacher.User_Key,
-
-          date,
-
-          time || null,
-
-          title.trim(),
-
-          type,
-
-          description?.trim() ||
-            null,
-        ]
-      );
-
-
-    // --------------------------------------------------
-    // GET CREATED ROW
-    // --------------------------------------------------
-
-    const [rows] =
-      await pool.query(
-        `
-        SELECT
-          Schedule_ID,
-
-          DATE_FORMAT(
-            Event_Date,
-            '%Y-%m-%d'
-          ) AS Event_Date,
-
-          TIME_FORMAT(
-            Event_Time,
-            '%H:%i'
-          ) AS Event_Time,
-
-          Title,
-          Event_Type,
-          Description,
-          Created_At,
-          Updated_At
-
-        FROM Teacher_Schedule
-
-        WHERE Schedule_ID = ?
-
-        LIMIT 1
-        `,
-        [
-          result.insertId,
-        ]
-      );
-
-
-    return res.status(201).json({
-      success: true,
-
-      message:
-        "Tạo lịch thành công.",
-
-      data:
-        normalizeScheduleRow(
-          rows[0]
-        ),
-    });
-
+    const events = await savePlannedSchedule(req.params.teacherId, req.body);
+    return res.status(201).json({ success: true, data: events[0], events, message: `Đã tạo ${events.length} buổi.` });
   } catch (error) {
-    console.error(
-      "Lỗi createTeacherSchedule:",
-      error
-    );
-
-    return res.status(500).json({
-      success: false,
-
-      message:
-        "Không thể tạo lịch.",
-
-      error:
-        error.message,
-    });
+    return res.status(error.status || 500).json({ success: false, message: error.status ? error.message : 'Không thể tạo lịch.' });
   }
 }
 
-
-// ======================================================
-// 7. CẬP NHẬT LỊCH
-//
-// PUT
-// /api/teachers/:teacherId/schedule/:scheduleId
-// ======================================================
-
-export async function updateTeacherSchedule(
-  req,
-  res
-) {
+export async function updateTeacherSchedule(req, res) {
   try {
-    const {
-      teacherId,
-      scheduleId,
-    } = req.params;
-
-
-    const {
-      date,
-      time,
-      title,
-      type,
-      description,
-    } = req.body;
-
-
-    const teacher =
-      await findTeacherByMoodleId(
-        teacherId
-      );
-
-
-    if (!teacher) {
-      return res.status(404).json({
-        success: false,
-
-        message:
-          "Không tìm thấy giảng viên.",
-      });
-    }
-
-
-    // --------------------------------------------------
-    // KIỂM TRA LỊCH THUỘC GIẢNG VIÊN
-    // --------------------------------------------------
-
-    const [existingRows] =
-      await pool.query(
-        `
-        SELECT *
-
-        FROM Teacher_Schedule
-
-        WHERE Schedule_ID = ?
-
-          AND Teacher_User_Key = ?
-
-        LIMIT 1
-        `,
-        [
-          scheduleId,
-          teacher.User_Key,
-        ]
-      );
-
-
-    if (
-      existingRows.length === 0
-    ) {
-      return res.status(404).json({
-        success: false,
-
-        message:
-          "Không tìm thấy lịch.",
-      });
-    }
-
-
-    const current =
-      existingRows[0];
-
-
-    const nextDate =
-      date ||
-      current.Event_Date;
-
-
-    const nextTime =
-      time === undefined
-        ? current.Event_Time
-        : time || null;
-
-
-    const nextTitle =
-      title === undefined
-        ? current.Title
-        : title.trim();
-
-
-    const nextType =
-      type ||
-      current.Event_Type;
-
-
-    const nextDescription =
-      description === undefined
-        ? current.Description
-        : description?.trim() ||
-          null;
-
-
-    // --------------------------------------------------
-    // VALIDATE
-    // --------------------------------------------------
-
-    if (!nextTitle) {
-      return res.status(400).json({
-        success: false,
-
-        message:
-          "Tiêu đề lịch không được để trống.",
-      });
-    }
-
-
-    const allowedTypes = [
-      "class",
-      "exam",
-      "deadline",
-      "meeting",
-    ];
-
-
-    if (
-      !allowedTypes.includes(
-        nextType
-      )
-    ) {
-      return res.status(400).json({
-        success: false,
-
-        message:
-          "Loại lịch không hợp lệ.",
-      });
-    }
-
-
-    // --------------------------------------------------
-    // UPDATE
-    // --------------------------------------------------
-
-    await pool.query(
-      `
-      UPDATE Teacher_Schedule
-
-      SET
-        Event_Date = ?,
-        Event_Time = ?,
-        Title = ?,
-        Event_Type = ?,
-        Description = ?
-
-      WHERE Schedule_ID = ?
-
-        AND Teacher_User_Key = ?
-      `,
-      [
-        nextDate,
-        nextTime,
-        nextTitle,
-        nextType,
-        nextDescription,
-        scheduleId,
-        teacher.User_Key,
-      ]
-    );
-
-
-    // --------------------------------------------------
-    // GET UPDATED ROW
-    // --------------------------------------------------
-
-    const [rows] =
-      await pool.query(
-        `
-        SELECT
-          Schedule_ID,
-
-          DATE_FORMAT(
-            Event_Date,
-            '%Y-%m-%d'
-          ) AS Event_Date,
-
-          TIME_FORMAT(
-            Event_Time,
-            '%H:%i'
-          ) AS Event_Time,
-
-          Title,
-          Event_Type,
-          Description,
-          Created_At,
-          Updated_At
-
-        FROM Teacher_Schedule
-
-        WHERE Schedule_ID = ?
-
-          AND Teacher_User_Key = ?
-
-        LIMIT 1
-        `,
-        [
-          scheduleId,
-          teacher.User_Key,
-        ]
-      );
-
-
-    return res.json({
-      success: true,
-
-      message:
-        "Cập nhật lịch thành công.",
-
-      data:
-        normalizeScheduleRow(
-          rows[0]
-        ),
-    });
-
+    const events = await savePlannedSchedule(req.params.teacherId, req.body, req.params.scheduleId);
+    return res.json({ success: true, data: events[0], message: 'Đã cập nhật buổi được chọn.' });
   } catch (error) {
-    console.error(
-      "Lỗi updateTeacherSchedule:",
-      error
-    );
-
-    return res.status(500).json({
-      success: false,
-
-      message:
-        "Không thể cập nhật lịch.",
-
-      error:
-        error.message,
-    });
+    return res.status(error.status || 500).json({ success: false, message: error.status ? error.message : 'Không thể cập nhật lịch.' });
   }
 }
-
-
-// ======================================================
-// 8. XÓA LỊCH
-//
-// DELETE
-// /api/teachers/:teacherId/schedule/:scheduleId
-// ======================================================
 
 export async function deleteTeacherSchedule(
   req,
@@ -1611,16 +1180,11 @@ export async function deleteTeacherSchedule(
 // GET /api/teachers/:teacherId/learning-alerts
 // ======================================================
 
-export async function getTeacherLearningAlerts(req, res) {
-  try {
-    const { teacherId } = req.params;
+export async function loadTeacherLearningAlerts(teacherId) {
     const teacher = await findTeacherByMoodleId(teacherId);
 
     if (!teacher) {
-      return res.status(404).json({
-        success: false,
-        message: "Không tìm thấy giảng viên.",
-      });
+      throw Object.assign(new Error("Không tìm thấy giảng viên."), { status: 404 });
     }
 
     // Lấy danh sách các môn học thật do giảng viên phụ trách
@@ -1646,10 +1210,7 @@ export async function getTeacherLearningAlerts(req, res) {
     );
 
     if (!courses || courses.length === 0) {
-      return res.json({
-        success: true,
-        data: [],
-      });
+      return [];
     }
 
     const courseKeys = courses.map((c) => c.Course_Key);
@@ -1658,13 +1219,14 @@ export async function getTeacherLearningAlerts(req, res) {
     const [riskRows] = await pool.query(
       `
       SELECT 
+        u.User_Key,
         u.Full_Name,
         u.Username,
         c.Course_Name,
         c.Moodle_Course_ID,
         c.Course_Code,
         ROUND(AVG(s.Grade), 1) as avg_grade,
-        SUM(CASE WHEN s.Is_Submitted_On_Time = 0 THEN 1 ELSE 0 END) as late_count,
+        SUM(CASE WHEN s.Submission_Status = 'submitted' AND s.Is_Submitted_On_Time = 0 THEN 1 ELSE 0 END) as late_count,
         COUNT(s.Submission_Key) as total_submissions
       FROM fact_assignment_submission s
       JOIN dim_user u ON s.User_Key = u.User_Key
@@ -1685,12 +1247,14 @@ export async function getTeacherLearningAlerts(req, res) {
         c.Course_Name,
         c.Moodle_Course_ID,
         c.Course_Code,
+        a.Activity_Key,
         a.Activity_Name,
         COUNT(s.Submission_Key) as pending_count
       FROM fact_assignment_submission s
       JOIN dim_activity a ON s.Activity_Key = a.Activity_Key
       JOIN dim_course c ON s.Course_Key = c.Course_Key
       WHERE s.Course_Key IN (?)
+        AND s.Submission_Status = 'submitted'
         AND (s.Is_Graded = 0 OR s.Grade IS NULL)
       GROUP BY c.Course_Key, a.Activity_Key
       ORDER BY pending_count DESC
@@ -1701,23 +1265,23 @@ export async function getTeacherLearningAlerts(req, res) {
 
     // Tổng hợp thành danh sách thông báo và cảnh báo
     const alerts = [];
-    let alertId = 1;
 
     // Cảnh báo rủi ro sinh viên thật từ CSDL
     riskRows.forEach((row) => {
       const isLate = Number(row.late_count) > 0;
-      const lowGrade = Number(row.avg_grade) < 6.5;
+      const hasGrade = row.avg_grade != null && Number.isFinite(Number(row.avg_grade));
+      const lowGrade = hasGrade && Number(row.avg_grade) < 6.5;
 
       alerts.push({
-        id: alertId++,
+        id: `risk:${row.Moodle_Course_ID}:${row.User_Key}`,
         type: "risk",
         title: `Cảnh báo học tập: Sinh viên ${row.Full_Name} (${row.Username})`,
-        desc: `Sinh viên có điểm thực hành trung bình ${row.avg_grade}/10${
+        desc: `Sinh viên ${hasGrade ? `có điểm thực hành trung bình ${row.avg_grade}/10` : "chưa có điểm thực hành"}${
           isLate ? ` và có ${row.late_count} bài nộp trễ hạn` : ""
         } trong môn ${row.Course_Name} (${row.Course_Code}), thuộc nhóm có nguy cơ cần chú ý.`,
         courseName: row.Course_Name,
         courseId: row.Moodle_Course_ID,
-        time: isLate ? "Hôm nay" : "Gần đây",
+        time: "Theo dữ liệu hiện có",
         unread: true,
         priority: lowGrade ? "high" : "medium",
         actionPath: `/quan-ly-lop/${row.Moodle_Course_ID}`,
@@ -1728,7 +1292,7 @@ export async function getTeacherLearningAlerts(req, res) {
     // Nhắc nhở bài chờ chấm thật từ CSDL
     pendingRows.forEach((row) => {
       alerts.push({
-        id: alertId++,
+        id: `pending:${row.Moodle_Course_ID}:${row.Activity_Key}`,
         type: "deadline",
         title: `Nhắc nhở chấm bài: ${row.Activity_Name}`,
         desc: `Môn ${row.Course_Name} (${row.Course_Code}) hiện có ${row.pending_count} bài nộp chưa có điểm đang chờ giảng viên chấm bài.`,
@@ -1742,32 +1306,27 @@ export async function getTeacherLearningAlerts(req, res) {
       });
     });
 
-    // Thông báo hệ thống LMS Data Warehouse
-    alerts.push({
-      id: alertId++,
-      type: "system",
-      title: "Hệ thống LMS: Đồng bộ dữ liệu Data Warehouse thành công",
-      desc: "Toàn bộ dữ liệu tương tác học tập và bảng điểm tuần vừa qua đã được đồng bộ vào hệ thống Power BI Analytics phục vụ phân tích học tập.",
-      courseName: "Hệ thống DLU LMS",
-      courseId: null,
-      time: "Hôm nay",
-      unread: false,
-      priority: "normal",
-      actionPath: "/phan-tich",
-      actionLabel: "Mở Power BI",
-    });
+    const [notifications] = await pool.query(`SELECT n.*, c.Course_Name, c.Moodle_Course_ID
+      FROM fact_notification n LEFT JOIN Dim_Course c ON c.Course_Key = n.course_id
+      WHERE n.recipient_user_id = ? ORDER BY n.created_at DESC, n.notification_id DESC`, [teacher.User_Key]);
+    for (const row of notifications) {
+      alerts.push({ id: `notification:${row.notification_id}`, type: ['RISK','DEADLINE','SUPPORT','COURSE'].includes(row.notification_type) ? row.notification_type.toLowerCase() : 'system',
+        title: row.title, desc: String(row.message || '').replace(/\[SCHEDULE:\d+\]\s*/g, ''),
+        courseName: row.Course_Name || 'Hệ thống DLU LMS', courseId: row.Moodle_Course_ID,
+        time: new Date(row.created_at).toLocaleString('vi-VN'), createdAt: row.created_at,
+        unread: !row.is_read, priority: 'normal',
+        actionPath: row.Moodle_Course_ID ? `/quan-ly-lop/${row.Moodle_Course_ID}` : null,
+        actionLabel: row.Moodle_Course_ID ? 'Xem lớp học' : null });
+    }
+    return applyAlertState(teacher.User_Key, alerts);
+}
 
-    return res.json({
-      success: true,
-      total: alerts.length,
-      data: alerts,
-    });
+export async function getTeacherLearningAlerts(req, res) {
+  try {
+    const data = await loadTeacherLearningAlerts(req.params.teacherId);
+    return res.json({ success: true, total: data.length, data });
   } catch (error) {
-    console.error("Lỗi getTeacherLearningAlerts:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Không thể lấy cảnh báo học tập từ cơ sở dữ liệu.",
-      error: error.message,
-    });
+    console.error('Lỗi getTeacherLearningAlerts:', error);
+    return res.status(error.status || 500).json({ success: false, message: error.status ? error.message : 'Không thể tải cảnh báo học tập.' });
   }
 }

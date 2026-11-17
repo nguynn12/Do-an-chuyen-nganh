@@ -86,7 +86,7 @@ async function getMoodleDeadlines(moodleUserId) {
     courseCode: row.course_code,
     courseName: row.course_name,
 
-    date: row.event_datetime,
+    date: formatDateOnly(row.event_datetime),
 
     assignmentId: row.assignment_id,
 
@@ -106,6 +106,10 @@ async function getTeacherSchedules(userKey) {
         Schedule_ID,
         Event_Date,
         Event_Time,
+        End_Time,
+        Location,
+        Meeting_Url,
+        Series_ID,
         Title,
         Event_Type,
         Description,
@@ -134,8 +138,12 @@ async function getTeacherSchedules(userKey) {
     title: row.Title,
     description: row.Description,
 
-    date: row.Event_Date,
+    date: formatDateOnly(row.Event_Date),
     time: row.Event_Time,
+    endTime: row.End_Time?.slice(0, 5) || "",
+    location: row.Location || "",
+    meetingUrl: row.Meeting_Url || "",
+    seriesId: row.Series_ID || null,
 
     editable: true,
 

@@ -9,6 +9,8 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   ClipboardCheck,
+  Award,
+  Sparkles,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IS_ASSIGNMENT_MANAGEMENT_ENABLED } from "../config/featureFlags";
@@ -19,7 +21,9 @@ const menuItems = [
   ...(IS_ASSIGNMENT_MANAGEMENT_ENABLED
     ? [{ path: "/quan-ly-bai-tap", label: "Quản lý bài tập", icon: ClipboardCheck }]
     : []),
+  { path: "/cham-diem", label: "Mô phỏng điểm", icon: Award },
   { path: "/phan-tich", label: "Phân tích học tập", icon: ChartNoAxesCombined },
+  { path: "/ai-studio", label: "AI Studio", icon: Sparkles, isAiStudio: true },
   { path: "/lich", label: "Lịch giảng dạy", icon: CalendarDays },
   // Không hard-code badge thông báo. Khi có API thật thì truyền số thật vào đây sau.
   { path: "/tin-nhan", label: "Thông báo", icon: Bell },
@@ -58,7 +62,7 @@ function Sidebar() {
         aria-label={collapsed ? "Mở rộng thanh điều hướng" : "Thu gọn thanh điều hướng"}
         title={collapsed ? "Mở rộng" : "Thu gọn"}
       >
-        {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+        {collapsed ? <PanelLeftOpen size={15} /> : <PanelLeftClose size={15} />}
         {!collapsed && <span>Thu gọn</span>}
       </button>
 
@@ -71,7 +75,7 @@ function Sidebar() {
             <button
               key={item.path}
               type="button"
-              className={`sidebar-button ${active ? "side-active" : ""}`}
+              className={`sidebar-button ${active ? "side-active" : ""} ${item.isAiStudio ? "ai-studio-nav-btn" : ""}`}
               onClick={() => navigate(item.path)}
               aria-label={item.label}
               title={collapsed ? item.label : undefined}

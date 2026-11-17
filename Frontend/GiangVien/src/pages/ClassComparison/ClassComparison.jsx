@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import { getTeacherToken } from '../../services/authService';
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Header from "../../components/Header";
 import Sidebar from "../../components/Sidebar";
@@ -344,6 +345,7 @@ export default function ClassComparison() {
           method: "GET",
           headers: {
             Accept: "application/json",
+            Authorization: `Bearer ${getTeacherToken()}`,
           },
           signal: controller.signal,
         });

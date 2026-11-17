@@ -1,0 +1,77 @@
+import assert from 'node:assert/strict';
+import ExcelJS from 'exceljs';
+import pool from './src/config/database.js';
+import {syncLmsGrades,score10} from './src/GiangVien/services/gradeIngestionService.js';
+import {parseGradeImport,importGradeFile,linkLmsGradeItem,createIngestItem} from './src/GiangVien/controllers/gradeIngestionController.js';
+import {getStudentCourseGrades} from './src/GiangVien/controllers/courseController.js';
+import app from './src/app.js';
+const [fixtures]=await pool.query(`SELECT i.Item_Key,i.LMS_Grade_Item_ID,gg.id AS Source_Grade_ID,gg.finalgrade,gg.userid,gi.grademax,c.Course_Key,c.Moodle_Course_ID,u.User_Key,u.Username,u.Full_Name FROM dim_teacher_grade_item i JOIN Dim_Course c ON c.Course_Key=i.Course_Key JOIN lms_moodle_source.mdl_grade_items gi ON gi.id=i.LMS_Grade_Item_ID JOIN lms_moodle_source.mdl_grade_grades gg ON gg.itemid=gi.id JOIN Dim_User u ON u.Moodle_User_ID=gg.userid JOIN Fact_Enrolment e ON e.User_Key=u.User_Key AND e.Course_Key=c.Course_Key AND LOWER(e.Status)='active' WHERE i.Source_Type='LMS_GRADE' AND i.Is_Active=1 AND c.Course_Key=11 AND gg.finalgrade IS NOT NULL LIMIT 1`);
+assert.ok(fixtures.length);const f=fixtures[0],id=`item_${f.Item_Key}`;
+const [teachers]=await pool.query("SELECT User_Key FROM App_User_Account WHERE LOWER(Role)='teacher' AND Is_Active=1 LIMIT 1");assert.ok(teachers.length);
+const teacher=teachers[0].User_Key,course={Course_Key:f.Course_Key,Moodle_Course_ID:f.Moodle_Course_ID};
+const students=[{User_Key:f.User_Key,Username:f.Username,Full_Name:f.Full_Name}];
+const req=(params={},body={},file)=>({course,teacher:{userKey:teacher},params:{courseId:String(f.Moodle_Course_ID),studentId:String(f.User_Key),itemKey:String(f.Item_Key),...params},body,file});
+async function call(fn,request){const out={status:200};await fn(request,{status(code){out.status=code;return this;},json(data){out.data=data;return this;}});return out;}
+async function xlsx(rows){const book=new ExcelJS.Workbook(),sheet=book.addWorksheet('Diem');sheet.addRow(['MSSV','Diem','DiemToiDa']);rows.forEach(r=>sheet.addRow(r));return Buffer.from(await book.xlsx.writeBuffer());}
+const good=await xlsx([[f.Username,0,10],[null,null,null]]);
+assert.equal((await parseGradeImport(good,'diem.xlsx',students)).rows[0].score10,0);
+const csv=Buffer.from(`MSSV;Diem;DiemToiDa\n${f.Username};75;100\n`);assert.equal((await parseGradeImport(csv,'diem.csv',students)).rows[0].score10,7.5);
+assert.equal((await parseGradeImport(Buffer.from(`MSSV;Diem\n${f.Username};7,5\n`),'diem.csv',students)).rows[0].score10,7.5);
+const invalid=await xlsx([[f.Username,11,10],['not_in_course',5,10]]);assert.equal((await parseGradeImport(invalid,'diem.xlsx',students)).errors.length,2);
+const duplicate=await xlsx([[f.Username,1,10],[f.Username,2,10]]);assert.equal((await parseGradeImport(duplicate,'diem.xlsx',students)).errors.length,1);
+const formula=await xlsx([[f.Username,{formula:'1+1',result:2},10]]);assert.equal((await parseGradeImport(formula,'diem.xlsx',students)).errors.length,1);
+console.log('PASS: XLSX/CSV, zero, max-score normalization, decimal comma, invalid/foreign/duplicate students and formula cells');
+const db=await pool.getConnection(),query=pool.query.bind(pool),getConnection=pool.getConnection.bind(pool);
+await db.beginTransaction();pool.query=db.query.bind(db);pool.getConnection=async()=>({query:db.query.bind(db),beginTransaction:async()=>{},commit:async()=>{},rollback:async()=>{},release:()=>{}});
+try {
+ const oldScore=score10(f.finalgrade,f.grademax);
+ await db.query('UPDATE Fact_Course_Grade SET Grade=?,Max_Grade=? WHERE Course_Key=? AND User_Key=? AND Grade_Item_ID=?',[f.finalgrade,f.grademax,f.Course_Key,f.User_Key,f.LMS_Grade_Item_ID]);
+ const base={scores:{[id]:oldScore},manualItemIds:[],origins:{[id]:'LMS'}};
+ await db.query(`INSERT INTO web_grade_confirmation (Course_Key,User_Key,Group_Code,Score,Snapshot,Updated_By) VALUES (?,?,'chuyen_can',?,?,?) ON DUPLICATE KEY UPDATE Snapshot=VALUES(Snapshot),Is_Confirmed=1`,[f.Course_Key,f.User_Key,oldScore,JSON.stringify(base),teacher]);
+ const newRaw=Number(f.finalgrade)===Number(f.grademax)*.8?Number(f.grademax)*.9:Number(f.grademax)*.8;
+ await db.query('UPDATE lms_moodle_source.mdl_grade_grades SET finalgrade=? WHERE id=?',[newRaw,f.Source_Grade_ID]);
+ let state=await syncLmsGrades(course,{connection:db});assert.ok(state.changed>0);
+ let [fact]=await db.query('SELECT Grade FROM Fact_Course_Grade WHERE User_Key=? AND Grade_Item_ID=?',[f.User_Key,f.LMS_Grade_Item_ID]);assert.equal(Number(fact[0].Grade),newRaw);
+ let [saved]=await db.query("SELECT Snapshot,Is_Confirmed FROM web_grade_confirmation WHERE Course_Key=? AND User_Key=? AND Group_Code='chuyen_can'",[f.Course_Key,f.User_Key]);
+ const snap=v=>typeof v==='string'?JSON.parse(v):v;
+ assert.equal(snap(saved[0].Snapshot).scores[id],score10(newRaw,f.grademax));assert.equal(saved[0].Is_Confirmed,0);
+ state=await syncLmsGrades(course,{connection:db});assert.equal(state.changed,0);
+ console.log('PASS: Moodle grade -> Fact_Course_Grade -> saved display, confirmation invalidated, repeat sync idempotent');
+ await db.query("UPDATE web_grade_confirmation SET Snapshot=?,Is_Confirmed=1 WHERE Course_Key=? AND User_Key=? AND Group_Code='chuyen_can'",[JSON.stringify({scores:{[id]:1.23},manualItemIds:[id],origins:{[id]:'MANUAL'}}),f.Course_Key,f.User_Key]);
+ await db.query('UPDATE lms_moodle_source.mdl_grade_grades SET finalgrade=? WHERE id=?',[Number(f.grademax)*.7,f.Source_Grade_ID]);
+ state=await syncLmsGrades(course,{connection:db});assert.ok(state.preservedOverrides>0);
+ [saved]=await db.query("SELECT Snapshot,Is_Confirmed FROM web_grade_confirmation WHERE Course_Key=? AND User_Key=? AND Group_Code='chuyen_can'",[f.Course_Key,f.User_Key]);assert.equal(snap(saved[0].Snapshot).scores[id],1.23);assert.equal(saved[0].Is_Confirmed,1);
+ console.log('PASS: explicit manual override survives new LMS grade');
+ await db.query('UPDATE lms_moodle_source.mdl_grade_items SET grademax=100 WHERE id=?',[f.LMS_Grade_Item_ID]);
+ await db.query('UPDATE lms_moodle_source.mdl_grade_grades SET finalgrade=75 WHERE id=?',[f.Source_Grade_ID]);await syncLmsGrades(course,{connection:db});
+ const real=await call(getStudentCourseGrades,req());assert.equal(real.status,200);const criterion=real.data.criteria.find(i=>i.itemKey===f.Item_Key);assert.equal(criterion.score,75);assert.equal(criterion.maxScore,100);
+ console.log('PASS: changed LMS scale 75/100 returned accurately (7.5/10 in Web)');
+ const imported=await xlsx([[f.Username,9.25,10]]),file={buffer:imported,originalname:'ket_qua.xlsx'};
+ const preview=await call(importGradeFile,req({}, {mode:'preview'},file));assert.equal(preview.status,200);assert.equal(preview.data.rows[0].score10,9.25);
+ let result=await call(importGradeFile,req({}, {mode:'commit',digest:'changed'},file));assert.equal(result.status,409);
+ result=await call(importGradeFile,req({}, {mode:'commit',digest:preview.data.digest},file));assert.equal(result.status,200);assert.equal(result.data.imported,1);
+ const [sqlScore]=await db.query('SELECT Score,Max_Score FROM fact_teacher_grade_score WHERE Item_Key=? AND User_Key=?',[f.Item_Key,f.User_Key]);assert.equal(Number(sqlScore[0].Score)/Number(sqlScore[0].Max_Score)*10,9.25);
+ [saved]=await db.query("SELECT Snapshot,Is_Confirmed FROM web_grade_confirmation WHERE Course_Key=? AND User_Key=? AND Group_Code='chuyen_can'",[f.Course_Key,f.User_Key]);assert.equal(snap(saved[0].Snapshot).scores[id],9.25);assert.equal(snap(saved[0].Snapshot).origins[id],'EXCEL');assert.equal(saved[0].Is_Confirmed,0);
+ const [source]=await db.query('SELECT finalgrade FROM lms_moodle_source.mdl_grade_grades WHERE id=?',[f.Source_Grade_ID]);assert.equal(Number(source[0].finalgrade),75);
+ const [audit]=await db.query('SELECT Row_Count FROM web_grade_import_log WHERE Course_Key=? AND Item_Key=? ORDER BY Import_ID DESC LIMIT 1',[f.Course_Key,f.Item_Key]);assert.equal(audit[0].Row_Count,1);
+ console.log('PASS: Excel preview no writes, digest verified, import writes SQL score/snapshot/audit and preserves Moodle source');
+ const badFile={buffer:invalid,originalname:'bad.xlsx'},badPreview=await call(importGradeFile,req({}, {mode:'preview'},badFile));
+ result=await call(importGradeFile,req({}, {mode:'commit',digest:badPreview.data.digest},badFile));assert.equal(result.status,422);
+ await db.query('UPDATE lms_moodle_source.mdl_grade_grades SET finalgrade=60 WHERE id=?',[f.Source_Grade_ID]);await syncLmsGrades(course,{connection:db});
+ [saved]=await db.query("SELECT Snapshot FROM web_grade_confirmation WHERE Course_Key=? AND User_Key=? AND Group_Code='chuyen_can'",[f.Course_Key,f.User_Key]);assert.equal(snap(saved[0].Snapshot).scores[id],9.25);
+ console.log('PASS: invalid file rejected atomically, Excel override survives subsequent LMS sync');
+ result=await call(linkLmsGradeItem,req({}, {lmsItemId:99999999}));assert.equal(result.status,403);
+ result=await call(createIngestItem,req({}, {groupKey:'giua_ky',name:'Quiz mới kiểm thử rollback'}));assert.equal(result.status,201);
+ const created=result.data.itemKey;result=await call(linkLmsGradeItem,req({itemKey:String(created)}, {lmsItemId:f.LMS_Grade_Item_ID}));assert.equal(result.status,200);
+ const [linked]=await db.query('SELECT Source_Type,LMS_Grade_Item_ID,Internal_Weight FROM dim_teacher_grade_item WHERE Item_Key=?',[created]);assert.equal(linked[0].Source_Type,'LMS_GRADE');assert.equal(Number(linked[0].LMS_Grade_Item_ID),f.LMS_Grade_Item_ID);assert.equal(Number(linked[0].Internal_Weight),0);
+ await db.query('UPDATE lms_moodle_source.mdl_grade_grades SET finalgrade=NULL WHERE id=?',[f.Source_Grade_ID]);
+ await syncLmsGrades(course,{connection:db});
+ const missing=await call(getStudentCourseGrades,req());assert.equal(missing.data.criteria.find(i=>i.itemKey===created).score,null);
+ const [nullOverride]=await db.query('SELECT Score_10 FROM web_grade_item_override WHERE Course_Key=? AND User_Key=? AND Item_Key=?',[f.Course_Key,f.User_Key,created]);assert.equal(nullOverride.length,0);
+ console.log('PASS: missing LMS grade remains NULL, no synthetic zero in override view');
+ console.log('PASS: create persistent blank item, link valid course source, foreign source rejected');
+} finally {pool.query=query;pool.getConnection=getConnection;await db.rollback();db.release();}
+const server=app.listen(0,'127.0.0.1');await new Promise(resolve=>server.once('listening',resolve));
+try {for(const [path,method] of [['grade-sources/lms-items','GET'],['grade-sources/sync','POST'],['grade-sources/items','POST'],[`grade-items/${f.Item_Key}/lms-source`,'PUT'],[`grade-items/${f.Item_Key}/import-template`,'GET'],[`grade-items/${f.Item_Key}/import`,'POST']]){const r=await fetch(`http://127.0.0.1:${server.address().port}/api/courses/${f.Moodle_Course_ID}/${path}`,{method});assert.equal(r.status,401);}console.log('PASS: all ingestion/template/import endpoints require teacher authentication');}
+finally {await new Promise(resolve=>server.close(resolve));await pool.end();}
+console.log('All ingestion tests passed; test DB writes rolled back.');

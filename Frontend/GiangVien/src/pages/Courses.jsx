@@ -534,8 +534,10 @@ function Courses() {
 
                     avgHoursPerStudent,
 
-                    attendance:
-                      null,
+                    attendance: (() => {
+                      const rates = analytics.filter(row => row.Attendance_Rate != null && Number.isFinite(Number(row.Attendance_Rate))).map(row => Number(row.Attendance_Rate));
+                      return rates.length ? Number((rates.reduce((sum, value) => sum + value, 0) / rates.length).toFixed(2)) : null;
+                    })(),
 
                     color:
                       "#6f9638",

@@ -67,7 +67,7 @@ function CourseRow({
             <div>
               <span>Chuyên cần</span>
               <strong>
-                {course.attendance || 0}%
+                {course.attendance == null ? "—" : `${course.attendance}%`}
               </strong>
             </div>
           </div>
