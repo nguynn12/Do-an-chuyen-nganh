@@ -28,13 +28,13 @@ function normalizeCohort(value) {
 function getCohortPattern(cohort) {
   const mapping = {
     ALL: "%",
-    K45: "sv21%",
-    K46: "sv22%",
-    K47: "sv23%",
-    K48: "sv24%",
+    K45: "%21%",
+    K46: "%22%",
+    K47: "%23%",
+    K48: "%24%",
   };
 
-  return mapping[cohort] || "sv23%";
+  return mapping[cohort] || "%";
 }
 
 
@@ -56,10 +56,15 @@ export async function getCourseStudents(req, res) {
     const cohortPattern =
       getCohortPattern(cohort);
 
+    const [cRows] = await pool.query(
+      "SELECT Course_Key FROM Dim_Course WHERE Moodle_Course_ID = ? LIMIT 1",
+      [courseId]
+    );
+    const targetCourseKey = cRows[0]?.Course_Key || courseId;
 
     const [rows] = await pool.query(
       `
-        SELECT
+        SELECT DISTINCT
           du.User_Key,
           du.Moodle_User_ID,
           du.Username,
@@ -85,18 +90,13 @@ export async function getCourseStudents(req, res) {
           ON dc.Course_Key = fe.Course_Key
 
         WHERE
-          (
-            dc.Moodle_Course_ID = ?
-            OR dc.Course_Key = ?
-          )
-
+          dc.Course_Key = ?
           AND du.Username LIKE ?
 
         ORDER BY du.Full_Name
       `,
       [
-        courseId,
-        courseId,
+        targetCourseKey,
         cohortPattern,
       ]
     );
