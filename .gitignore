@@ -63,3 +63,9 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
+
+# =========================
+# RAW DATA DUMPS
+# =========================
+Data/
+
