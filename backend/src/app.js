@@ -44,6 +44,8 @@ import studentRoutes from "./SinhVien/routes/studentRoutes.js";
 
 import setupFrontendServing from "./serveFrontend.js";
 
+// AI Module
+import aiRoutes from "./ai/routes/aiRoutes.js";
 
 const app = express();
 
@@ -81,6 +83,7 @@ app.use(
     },
 
     credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization", "x-user-gemini-key"],
   })
 );
 
@@ -192,9 +195,15 @@ app.use(
   studentRoutes
 );
 
+// ============================================================
+// 4. AI GATEWAY APIS
+// ============================================================
+
+app.use("/api/ai", aiRoutes);
+
 
 // ============================================================
-// 4. PHỤC VỤ FILE TĨNH & CỔNG CHỌN VAI TRÒ FRONTEND
+// 5. PHỤC VỤ FILE TĨNH & CỔNG CHỌN VAI TRÒ FRONTEND
 // ============================================================
 
 setupFrontendServing(app);

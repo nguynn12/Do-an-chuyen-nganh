@@ -12,6 +12,9 @@ import "./styles/StudentDashboard.css";
 import StudentSidebar from "./components/StudentSidebar";
 import StudentHeader from "./components/StudentHeader";
 import StudentProtectedRoute from "./components/StudentProtectedRoute";
+import { AIKeyProvider } from "./context/AIKeyContext";
+import AIKeyModal from "./components/AIKeyModal";
+import AIStudyCoachWidget from "./components/AIStudyCoachWidget";
 
 import StudentLogin from "./pages/StudentLogin";
 import StudentOverview from "./pages/StudentOverview";
@@ -89,6 +92,8 @@ function StudentLayout() {
       grades: "/bang-diem",
       engagement: "/thoi-gian-hoc",
       analytics: "/phan-tich",
+      ai: "/co-van-ai",
+      "co-van-ai": "/co-van-ai",
     };
 
     if (HASH_MAP[cleanHash]) {
@@ -161,6 +166,9 @@ function StudentLayout() {
       ) : (
         <Outlet context={{ summary, courses, loading, error }} />
       )}
+
+      {/* Modal cấu hình AI Key (BYOK) */}
+      <AIKeyModal />
     </div>
   );
 }
@@ -184,6 +192,8 @@ function StudentOverviewWrapper() {
           grades: "/bang-diem",
           engagement: "/thoi-gian-hoc",
           analytics: "/phan-tich",
+          ai: "/co-van-ai",
+          "co-van-ai": "/co-van-ai",
         };
         navigate(PATH_MAP[tabId] || "/");
       }}
@@ -204,35 +214,86 @@ function StudentCoursesWrapper() {
   );
 }
 
+// Component hiển thị trang Cố vấn học tập AI riêng biệt
+function StudentAICoachPage() {
+  const { summary } = useOutletContext();
+
+  return (
+    <main className="page-full" style={{ padding: "24px 30px" }}>
+      <div style={{ maxWidth: "1050px", margin: "0 auto" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: "20px",
+            background: "#ffffff",
+            padding: "16px 22px",
+            borderRadius: "14px",
+            border: "1px solid #e2e8f0",
+          }}
+        >
+          <div>
+            <h2
+              style={{
+                margin: 0,
+                fontSize: "18px",
+                fontWeight: "700",
+                color: "#1b5e20",
+              }}
+            >
+              Cố vấn học tập AI (AI Study Coach)
+            </h2>
+            <p
+              style={{
+                margin: "4px 0 0 0",
+                fontSize: "12.5px",
+                color: "#64748b",
+              }}
+            >
+              Trợ lý sư phạm thông minh cá nhân hóa phân tích dữ liệu điểm số và chuyên cần từ Data Warehouse
+            </p>
+          </div>
+        </div>
+
+        <AIStudyCoachWidget userKey={summary?.student?.userKey} />
+      </div>
+    </main>
+  );
+}
+
 export default function App() {
   return (
-    <Routes>
-      {/* Route Đăng nhập độc lập */}
-      <Route path="/dang-nhap" element={<StudentLogin />} />
+    <AIKeyProvider>
+      <Routes>
+        {/* Route Đăng nhập độc lập */}
+        <Route path="/dang-nhap" element={<StudentLogin />} />
 
-      {/* Route cha StudentLayout bọc bởi StudentProtectedRoute */}
-      <Route
-        element={
-          <StudentProtectedRoute>
-            <StudentLayout />
-          </StudentProtectedRoute>
-        }
-      >
-        <Route index element={<StudentOverviewWrapper />} />
-        <Route path="khoa-hoc" element={<StudentCoursesWrapper />} />
-        <Route path="khoa-hoc/:courseId" element={<StudentCourseDetail />} />
-        <Route path="ho-so-hanh-vi" element={<StudentBehavior />} />
-        <Route path="bai-nop" element={<StudentSubmissions />} />
-        <Route path="bang-diem" element={<StudentGrades />} />
-        <Route path="thoi-gian-hoc" element={<StudentEngagement />} />
-        <Route path="phan-tich" element={<StudentAnalytics />} />
+        {/* Route cha StudentLayout bọc bởi StudentProtectedRoute */}
+        <Route
+          element={
+            <StudentProtectedRoute>
+              <StudentLayout />
+            </StudentProtectedRoute>
+          }
+        >
+          <Route index element={<StudentOverviewWrapper />} />
+          <Route path="khoa-hoc" element={<StudentCoursesWrapper />} />
+          <Route path="khoa-hoc/:courseId" element={<StudentCourseDetail />} />
+          <Route path="ho-so-hanh-vi" element={<StudentBehavior />} />
+          <Route path="bai-nop" element={<StudentSubmissions />} />
+          <Route path="bang-diem" element={<StudentGrades />} />
+          <Route path="thoi-gian-hoc" element={<StudentEngagement />} />
+          <Route path="phan-tich" element={<StudentAnalytics />} />
+          <Route path="co-van-ai" element={<StudentAICoachPage />} />
 
-        {/* Route 404 cho các đường dẫn không tồn tại trong Cổng Sinh viên */}
+          {/* Route 404 cho các đường dẫn không tồn tại trong Cổng Sinh viên */}
+          <Route path="*" element={<NotFound />} />
+        </Route>
+
+        {/* Tuyến dự phòng 404 cho các route ngoài layout */}
         <Route path="*" element={<NotFound />} />
-      </Route>
-
-      {/* Tuyến dự phòng 404 cho các route ngoài layout */}
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+      </Routes>
+    </AIKeyProvider>
   );
 }

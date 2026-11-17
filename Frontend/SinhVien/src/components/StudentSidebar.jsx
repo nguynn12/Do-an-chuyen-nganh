@@ -9,10 +9,12 @@ import {
   Compass,
   PanelLeftClose,
   PanelLeftOpen,
+  Sparkles,
   LogOut,
 } from "lucide-react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { clearAuthStorage } from "../services/studentAuth";
+import { useAIKey } from "../context/AIKeyContext";
 
 const menuItems = [
   { path: "/", label: "Tổng quan", icon: Home, end: true },
@@ -22,9 +24,12 @@ const menuItems = [
   { path: "/bang-diem", label: "Bảng điểm", icon: Award },
   { path: "/thoi-gian-hoc", label: "Thời gian học", icon: Clock },
   { path: "/phan-tich", label: "Phân tích Power BI", icon: BarChart3 },
+  { path: "/co-van-ai", label: "Cố vấn AI", icon: Sparkles, isAI: true },
 ];
 
 export default function StudentSidebar() {
+  const { isConfigured, setIsModalOpen } = useAIKey();
+
   // Mặc định là THU GỌN (56px) giống hệt bên Giảng viên
   const [collapsed, setCollapsed] = useState(() => {
     const saved = localStorage.getItem("dluStudentSidebarCollapsed");
@@ -73,6 +78,11 @@ export default function StudentSidebar() {
               key={item.path}
               to={item.path}
               end={item.end}
+              onClick={() => {
+                if (item.isAI && !isConfigured) {
+                  setIsModalOpen(true);
+                }
+              }}
               className={({ isActive }) => {
                 const isCourseActive =
                   item.path === "/khoa-hoc" &&
@@ -80,9 +90,17 @@ export default function StudentSidebar() {
                 const active = isActive || isCourseActive;
                 return `sidebar-button ${active ? "side-active" : ""}`;
               }}
-              style={{ textDecoration: "none" }}
+              style={{ textDecoration: "none", position: item.isAI ? "relative" : undefined }}
               aria-label={item.label}
-              title={collapsed ? item.label : undefined}
+              title={
+                item.isAI
+                  ? isConfigured
+                    ? "Cố vấn học tập AI (Đã kết nối)"
+                    : "Cố vấn học tập AI (Chưa cài đặt Key)"
+                  : collapsed
+                  ? item.label
+                  : undefined
+              }
             >
               {({ isActive }) => {
                 const isCourseActive =
@@ -91,8 +109,29 @@ export default function StudentSidebar() {
                 const active = isActive || isCourseActive;
                 return (
                   <>
-                    <span className="sidebar-icon-wrap">
-                      <Icon size={19} strokeWidth={active ? 2.25 : 1.85} />
+                    <span className="sidebar-icon-wrap" style={{ position: "relative" }}>
+                      <Icon
+                        size={19}
+                        strokeWidth={active ? 2.25 : 1.85}
+                        color={
+                          item.isAI && isConfigured && !active
+                            ? "#22c55e"
+                            : undefined
+                        }
+                      />
+                      {item.isAI && isConfigured && (
+                        <span
+                          style={{
+                            position: "absolute",
+                            top: "-2px",
+                            right: "-2px",
+                            width: "6px",
+                            height: "6px",
+                            borderRadius: "50%",
+                            backgroundColor: "#22c55e",
+                          }}
+                        />
+                      )}
                     </span>
                     {!collapsed && <span className="sidebar-label">{item.label}</span>}
                   </>

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import AIStudyCoachWidget from "../components/AIStudyCoachWidget";
 import {
   BookOpen,
   Award,
@@ -105,6 +106,9 @@ export default function StudentOverview({
             </div>
           </div>
         </section>
+
+        {/* 1.1. AI STUDY COACH WIDGET (BYOK MODEL) */}
+        <AIStudyCoachWidget userKey={student?.userKey || summary?.student?.userKey} />
 
         {/* 2. ĐÁNH GIÁ NĂNG LỰC TOÀN DIỆN & CẢNH BÁO SỚM (RADAR CHART) */}
         <StudentCompetencyRadar
