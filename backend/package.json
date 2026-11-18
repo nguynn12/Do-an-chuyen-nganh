@@ -6,8 +6,7 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
-    "start": "node server.js",
-    "test:audit": "node test_web_audit_http.mjs && node test_web_audit_notifications.mjs && node test_assignment_monitoring.mjs && node test_student_assignment_stats.mjs && node test_classroom_conversation.mjs && node test_classroom_concise.mjs && node test_schedule_planning.mjs && node test_remaining_fixes.mjs && node test_grade_persistence.mjs && node test_grade_ingestion.mjs && node test_grade_export.mjs --http"
+    "start": "node server.js"
   },
   "dependencies": {
     "@google/genai": "^2.31.0",

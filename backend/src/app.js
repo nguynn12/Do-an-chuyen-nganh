@@ -6,7 +6,6 @@ import cors from "cors";
 // ============================================================
 
 import authRoutes from "./shared/routes/authRoutes.js";
-import testRoutes from "./shared/routes/testRoutes.js";
 
 
 // ============================================================
@@ -114,9 +113,9 @@ app.use(
   authRoutes
 );
 
-app.use(
-  "/api/test",
-  testRoutes
+app.get(
+  "/api/health",
+  (req, res) => res.json({ success: true, message: "Backend đang hoạt động!" })
 );
 
 
